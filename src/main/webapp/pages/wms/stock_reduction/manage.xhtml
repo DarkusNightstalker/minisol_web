@@ -1,0 +1,272 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript" src="#{request.contextPath}/js/stock-reduction_man.js" />
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">#{managedStockReductionBean.selected.id eq null ? 'REGISTRAR' : 'EDITAR'} MERMA DE STOCK</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" process="@this" update=":content-wrapper" action="#{stockReductionBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/wms/stock_reduction/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{stockReductionBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedStockReductionBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedStockReductionBean.doSave('/pages/wms/stock_reduction/list.xhtml', stockReductionBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SR.back()" class="metro-tile bg-danger light">
+                                <span class="fa fa-arrow-left text-muted"></span>
+                                <span class="metro-title">Volver a lista</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SR.refresh()" class="metro-tile bg-warning light">
+                                <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                <span class="metro-title">Reestablecer</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SR.save()" class="metro-tile bg-primary light">
+                                <span class="fa fa-save text-muted"></span>
+                                <span class="metro-title">Guardar</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel mb10">
+                                    <div class="panel-heading">
+                                        <span class="panel-icon ">
+                                            <i class="fa fa-building"></i>
+                                        </span>
+                                        <span class="panel-title ">Responsable</span>
+                                    </div>
+                                    <div class="panel-body pb10">
+                                        <div class="form-horizontal">                                
+                                            <h:panelGroup id="responsible-wrapper" layout="block">
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="col-md-2 control-label">DNI/RUC</label>
+                                                    <div class="col-md-6">
+                                                        <p:remoteCommand 
+                                                            name="search_responsible"
+                                                            onstart="begin_load()"  
+                                                            onsuccess="end_load()"   
+                                                            process="@this,identity-number" 
+                                                            action="#{managedStockReductionBean.responsibleSearcher.search()}"
+                                                            update="form:responsible-info,:s-actor-content,:m-responsible-content"/>
+                                                        <p:remoteCommand 
+                                                            name="null_responsible"
+                                                            onstart="begin_load()"  
+                                                            onsuccess="end_load()"   
+                                                            process="@this" 
+                                                            update="form:responsible-info">
+                                                            <f:setPropertyActionListener target="#{managedStockReductionBean.responsibleSearcher.actor}" value="#{null}" />
+                                                        </p:remoteCommand>
+                                                        <script>
+                                                            $(function () {
+                                                                $("#form\\:identity-number")
+                                                                        .keyup(function (e) {
+                                                                            var code = e.keyCode ? e.keyCode : e.which;
+                                                                            if (code == 13) {
+                                                                                if ($("#exist_responsible").val() == "true") {
+                                                                                    $("#formc\\:btn-prove").trigger("click");
+                                                                                } else {
+                                                                                    search_responsible();
+                                                                                }
+                                                                                e.preventDefault();
+                                                                                return false;
+                                                                            }
+                                                                        })
+                                                                        .numeric({precision: 11, scale: 0})
+                                                                        .on("input", function () {
+                                                                            if ($("#exist_customer").val() == "true") {
+                                                                                null_responsible();
+                                                                            }
+                                                                        });
+                                                            });
+                                                        </script>
+                                                        <p:inputText id="identity-number" value="#{managedStockReductionBean.responsibleSearcher.identityNumber}" styleClass="form-control" />
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup id="responsible-info" layout="block">
+                                                    <ui:fragment rendered="#{managedStockReductionBean.responsibleSearcher.actor ne null}">
+                                                        <div class="form-group form-group-sm mb5">
+                                                            <label class="col-md-2 control-label">Nombre</label>
+                                                            <div class="col-md-6">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-group-sm mb5">
+                                                            <label class="col-md-2 control-label">Dirección</label>
+                                                            <div class="col-md-6">
+                                                            </div>
+                                                        </div>
+                                                    </ui:fragment>
+                                                </h:panelGroup>
+                                            </h:panelGroup>            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel">
+                                    <div class="panel-heading">
+                                        <span class="panel-icon pull-left">
+                                            <i class="fa fa-file"></i>
+                                        </span>
+                                        <div class="panel-title pull-left">
+                                            DOCUMENTO
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group form-group-sm mb5">
+                                                <label class="control-label col-md-3 text-left">Doc.</label>
+                                                <div class="col-md-3">
+                                                    <div class="form-group form-group-sm mbn">
+                                                        <div class="col-md-12">
+                                                            <p:inputText id="serie" value="#{managedStockReductionBean.serie}"  styleClass="form-control input-sm" placeholder="Serie" maxlength="4"   />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 text-center">
+                                                    <p class="form-control-static input-sm text-center"><i class="fa fa-minus"/></p>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="form-group form-group-sm mbn">
+                                                        <div class="col-md-12">
+                                                            <p:inputText id="document-number" value="#{managedStockReductionBean.documentNumber}"  styleClass="form-control input-sm" maxlength="8" placeholder="Número de documento" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm mb5">
+                                                <label class="control-label col-md-3 text-left">Fec. emisión</label>
+                                                <div class="col-md-3">
+                                                    <p:inputText id="date-issue" value="#{managedStockReductionBean.dateIssue}" styleClass="form-control input-sm"  >
+                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                    </p:inputText>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel">
+                                    <div class="panel-heading">
+                                        <span class="panel-icon pull-left">
+                                            <i class="fa fa-dropbox"></i>
+                                        </span>
+                                        <span class="panel-title pull-left">PRODUCTOS</span>
+                                        <h:panelGroup id="add_button_wrapper" class="btn-group pull-right pt10">
+                                            <p:commandLink 
+                                                action="#{managedStockReductionBean.stockSearcher.update()}" 
+                                                process="@this,form:detail-wrapper"
+                                                update=":add-content" 
+                                                onstart="begin_load()"
+                                                styleClass="btn btn-sm btn-system"
+                                                oncomplete="end_load();open_search()">
+                                                <i class="fa fa-search"/> Buscar Productos
+                                            </p:commandLink>
+                                        </h:panelGroup>
+                                    </div>
+                                    <h:panelGroup id="detail-wrapper" layout="block" styleClass="panel-body pn">
+                                        <script>
+                                            $(function () {
+                                                $("#form\\:detail-wrapper .numeric").numeric({decimal: '.', scale: 2});
+                                            });
+                                        </script>
+                                        <table class="table form-horizontal table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-3 text-center">Cantidad</th>
+                                                    <th  class="col-md-9">Descripcion</th>
+                                                    <th  class="min-width:80px"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{managedStockReductionBean.detailSearcher.data}" var="item" varStatus="st">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="input-group input-group-sm">
+                                                                <p:inputText converter="javax.faces.BigDecimal" value="#{item[1]}" styleClass="form-control input-sm numeric quantity detail-item">
+                                                                    <f:passThroughAttribute name="required" value=""/>
+                                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                                    <f:passThroughAttribute name="min" value="1"/>
+                                                                    <f:passThroughAttribute name="data-msg-min" value="Minimo valor de 1"/>
+                                                                </p:inputText>
+                                                                <span  style="min-width:55px"  class="input-group-addon">#{item[3]}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>#{item[4]}</td>                                                        
+                                                        <td class="text-center">
+                                                            <p:commandLink process="@this,form:detail-wrapper" update="form:detail-wrapper" action="#{managedStockReductionBean.detailSearcher.removeItem(st.index)}" styleClass="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"/>
+                                                            </p:commandLink>
+                                                        </td>
+                                                    </tr> 
+                                                </ui:repeat>          
+                                                <ui:fragment rendered="#{empty managedStockReductionBean.detailSearcher.data}">
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td class="text-center" colspan="5">
+                                                                <h4 class="text-muted">No se ha agregado productos</h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>                                    
+                                            </tbody>
+                                        </table>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+    <ui:include src="search_product.xhtml" />
+
+    <ui:include src="/layout/search_actor.xhtml">        
+        <ui:param name="actorSearcher" value="#{managedStockReductionBean.responsibleSearcher}" />
+        <ui:param name="updated" value=":form:responsible-info" />
+    </ui:include>
+    <ui:include src="create_responsible.xhtml" />
+</ui:composition>
+
+

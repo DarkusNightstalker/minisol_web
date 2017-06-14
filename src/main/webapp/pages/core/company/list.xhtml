@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Sedes</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <ui:fragment rendered="#{sessionBean.authorize('M_CPY,R_CPY,I_CPY')}">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn pb5" style="display: block;">
+                        <div class="topbar-menu row">
+                            <ui:fragment rendered="#{sessionBean.authorize('M_CPY')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  action="#{managedCompanyBean.create()}"
+                                                    update=":content-wrapper" 
+                                                    process="@this" 
+                                                    onstart="begin_load()"
+                                                    oncomplete="end_load()" styleClass="metro-tile bg-success light">
+                                        <span class="fa fa-building text-muted"></span>
+                                        <span class="metro-title">Nueva sede</span>
+                                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/company/manage.xhtml"/>
+                                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedCompanyBean}"/>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('R_CPY')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <a href="#" class="metro-tile bg-dark light">
+                                        <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                        <span class="metro-title">Reportes</span>
+                                    </a>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('I_CPY')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <a href="#" class="metro-tile bg-system light">
+                                        <span class="glyphicons glyphicons-upload text-muted"></span>
+                                        <span class="metro-title">Importar</span>
+                                    </a>
+                                </div>
+                            </ui:fragment>
+                        </div>
+                    </div>
+                </ui:fragment>
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/datatable/toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{companyBean.pagination}"/>
+                                    <ui:param name="order_factory" value="#{companyBean.orderFactory}"/>
+                                    <ui:param name="update_script" value="search()"/>
+                                </ui:include>
+                                <table class="table table-hover theme-warning table-condensed fs13">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{companyBean.orderFactory}" />
+                                                <ui:param name="label" value="RUC" />
+                                                <ui:param name="field" value="ruc" />
+                                                <ui:param name="class" value="col-md-3 text-center" />
+                                            </ui:include>
+                                            <th class="col-md-6">
+                                                Sede
+                                            </th>
+                                            <th class="col-md-1 text-center">
+                                                Ventas
+                                            </th>
+                                            <th class="col-md-1 text-center">
+                                                Compras
+                                            </th>
+                                            <th class="col-md-1 text-center">
+                                                Almacen
+                                            </th>
+                                            <th class="text-center" style="min-width: 100px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{companyBean.pagination.data}"  var="item">
+                                            <tr>
+                                                <th class="text-center">#{item[1]}</th>
+                                                <td class="">#{item[2]} #{item[3]} (#{item[4]})</td>
+                                                <td class="text-center">
+                                                    <ui:fragment rendered="#{item[5]}">
+                                                        <i class="fa fa-check text-success"/>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{not item[5]}">
+                                                        <i class="fa fa-times text-danger"/>                                                        
+                                                    </ui:fragment>
+                                                </td>
+                                                <td class="text-center">
+                                                    <ui:fragment rendered="#{item[6]}">
+                                                        <i class="fa fa-check text-success"/>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{not item[6]}">
+                                                        <i class="fa fa-times text-danger"/>                                                        
+                                                    </ui:fragment>
+                                                </td>
+                                                <td class="text-center">
+                                                    <ui:fragment rendered="#{item[7]}">
+                                                        <i class="fa fa-check text-success"/>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{not item[7]}">
+                                                        <i class="fa fa-times text-danger"/>                                                        
+                                                    </ui:fragment>
+                                                </td>
+                                                <td class="text-right">
+                                                    <div class="btn-group">
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                <i class="fa fa-cog"/>
+                                                                <span class="caret ml5"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" role="menu">  
+                                                                <li>
+                                                                    <p:commandLink 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()"
+                                                                        oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                                        styleClass="btn btn-xs btn-gradient btn-info">
+                                                                        Información
+                                                                        <f:setPropertyActionListener target="#{companyBean.id}" value="#{item[0]}"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                                <ui:fragment rendered="#{sessionBean.authorize('M_CPY')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":content-wrapper" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load()" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-system">
+                                                                            Editar
+                                                                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/company/manage.xhtml"/>
+                                                                            <f:setPropertyActionListener target="#{managedCompanyBean.idSelected}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{sessionBean.authorize('A_CPY')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":delete-content" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();Sale.delete('#{item[2]}','#{item[3]}','#{item[4]}');" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                            Anular
+                                                                            <f:setPropertyActionListener target="#{companyBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty companyBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+                                <ui:include src="/layout/datatable/footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{companyBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match">
+                <!-- menu quick links -->
+                <div class="admin-form form-horizontal">
+
+                    <h4> Filtrar Sedes</h4>
+
+                    <hr class="short"/>
+                    <div class="section mb5">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-building"></i>
+                                    </span>
+                                    <p:inputText id="name" value="#{companyBean.name}" styleClass="form-control" placeholder="Nombre" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-map-marker"></i>
+                                    </span>
+                                    <p:inputText id="city" value="#{companyBean.city}" styleClass="form-control" placeholder="Ciudad" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{companyBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" action="#{managedCompanyBean.delete(companyBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{companyBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+
+
+                </div>
+            </aside>
+
+        </section>
+    </h:form>
+    <ui:include rendered="#{sessionBean.authorize('A_CPY')}" src="/layout/delete.xhtml">
+    </ui:include>
+
+    <script type="text/javascript" src="#{request.contextPath}/js/sale_view.js"/>
+</ui:composition>
+
+

@@ -1,0 +1,406 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:form id="form">
+        <header id="topbar" class="ph10">
+            <div class="topbar-left">
+                <ol class="breadcrumb">
+                    <li class="crumb-active">
+                        <a href="javascript:void(0)">Registrar Mov. entre sedes</a>
+                    </li>
+                    <li class="crumb-icon">
+                        <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                </ol>
+            </div>
+            <div class="topbar-right hidden-xs hidden-sm">
+            </div>
+        </header>
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel mb10">
+                            <div class="panel-body pb10">
+
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">Pto llegada</label>
+                                        <div class="col-md-5">
+                                            <h:selectOneMenu id="target" value="#{managedStockMovementBean.targetCompanyId}" class="form-control">
+                                                <f:selectItem/>
+                                                <f:selectItems
+                                                    value="#{managedStockMovementBean.companySearcher.targetData}"
+                                                    var="item"
+                                                    itemLabel="#{item[1]} #{item[2]} (#{item[3]})"
+                                                    itemValue="#{item[0]}"/>
+                                                <p:ajax process="@this" event="change" listener="#{managedStockMovementBean.companySearcher.updateSource()}" update="form:source,form:add_button_wrapper" />
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel">
+                                    <div class="panel-heading">
+                                        <span class="panel-title">
+                                            <span class="fa fa-dropbox"></span>Productos
+                                        </span> 
+                                        <h:panelGroup id="add_button_wrapper" styleClass="panel-controls">
+                                            <p:commandLink 
+                                                rendered="#{managedStockMovementBean.sourceCompanyId ne null and managedStockMovementBean.targetCompanyId ne null}"
+                                                action="#{managedStockMovementBean.stockSearcher.update()}" 
+                                                process="@this,source,target"
+                                                update=":add-content" 
+                                                oncomplete="App.open_modal('#modal-add', 'mfp-zoomIn', false)">
+                                                <i class="fa fa-plus"/>
+                                            </p:commandLink>
+                                        </h:panelGroup>
+                                    </div>
+                                    <h:panelGroup id="detail-wrapper" layout="block" styleClass="panel-body pn">
+                                        <script>
+                                            $(function () {
+                                                $("#form\\:detail-wrapper .numeric").numeric({decimal: '.', scale: 2});
+                                            });
+                                        </script>
+                                        <table class="table form-horizontal table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-3 text-center">Cantidad</th>
+                                                    <th  class="col-md-5">Descripcion</th>
+                                                    <th class="col-md-2 text-center">Peso</th>
+                                                    <th  class="col-md-2 text-center">Unid. Peso</th>
+                                                    <th  class="min-width:80px"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{managedStockMovementBean.stockMovementDetailSearcher.data}" var="item" varStatus="st">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="input-group input-group-sm">
+                                                                <p:inputText converter="javax.faces.BigDecimal" value="#{item[0]}" styleClass="form-control input-sm numeric quantity"/>  
+                                                                <span  style="min-width:55px"  class="input-group-addon">#{item[1]}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>#{item[2]}</td>
+                                                        <td class="text-right">
+                                                            <p:inputText converter="javax.faces.BigDecimal" value="#{item[3]}" styleClass="form-control input-sm numeric weigth"/>  
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <h:selectOneMenu converter="javax.faces.Integer" value="#{item[4]}" class="form-control input-sm">
+                                                                <f:selectItem/>
+                                                                <f:selectItems 
+                                                                    value="#{managedStockMovementBean.uomSearcher.data}" 
+                                                                    var="item"
+                                                                    itemLabel="#{item[2]}"
+                                                                    itemValue="#{item[0]}"/>
+                                                            </h:selectOneMenu>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <p:commandLink process="@this,form:detail-wrapper" update="form:detail-wrapper" action="#{managedStockMovementBean.stockMovementDetailSearcher.removeItem(st.index)}" styleClass="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"/>
+                                                            </p:commandLink>
+                                                        </td>
+                                                    </tr> 
+                                                </ui:repeat>          
+                                                <ui:fragment rendered="#{empty managedStockMovementBean.stockMovementDetailSearcher.data}">
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td class="text-center" colspan="5">
+                                                                <h4 class="text-muted">No se ha agregado productos</h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>                                    
+                                            </tbody>
+                                        </table>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel mbn">
+                                    <div class="panel-heading">
+                                        <span class="panel-title "><i class="glyphicons glyphicons-cars"/>Transporte</span>
+                                        <span class="panel-controls">
+                                            <p:commandLink action="#{managedStockMovementBean.carrierSearcher.create()}" 
+                                                           update=":carrier-content,form:carrier-wrapper" 
+                                                           oncomplete="App.open_modal('#modal-create-carrier','mfp-zoomIn',false)">
+                                                <i class="glyphicons glyphicons-user_add"/>
+                                            </p:commandLink>
+                                        </span>
+                                    </div>
+                                    <div class="panel-body">
+                                        <h:panelGroup id="carrier-wrapper" layout="block" styleClass="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4 text-left">Ruc</label>
+                                                <div class="col-md-8">
+                                                    <p:inputText value="#{managedStockMovementBean.carrierSearcher.carrierRUC}" styleClass="form-control input-sm"  />
+                                                </div>
+                                            </div>
+                                            <div class="form-group mbn">
+                                                <label class="control-label col-md-4 text-left"></label>
+                                                <div class="col-md-8">
+                                                    <p class="form-control-static text-muted ">#{managedStockMovementBean.carrierSearcher.carrier.name}</p>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                    
+                                    <div class="panel-footer text-right">
+                                        <button type="button" class="btn btn-danger">
+                                            Cancelar
+                                        </button>
+                                        <p:commandLink  action="#{managedStockMovementBean.doSave('/pages/accounting/payment_proof/view.xhtml', purchaseBean)}"
+                                                        styleClass="btn btn-primary">
+                                            Imprimir
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+
+    <div id="modal-create-carrier" class="popup-basic popup-lg bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="carrier-content" layout="block" styleClass="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="glyphicons glyphicons-cars"></i>
+                </span>
+                <span class="panel-title">Creando entidad de transporte público</span>
+            </div>
+            <h:form id="form-carrier">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <script>
+                                $(function () {
+                                    $("#form-carrier\\:ruc").numeric({precision: 11});
+                                    $("#form-carrier").validate({
+                                        errorClass: "has-error text-danger",
+                                        validClass: "has-success",
+                                        errorElement: "em",
+                                        rules: {
+                                            "form-carrier:ruc": {
+                                                minlength: 11,
+                                                required: true
+                                            },
+                                            "form-carrier:name": {
+                                                required: true
+                                            }
+                                        },
+                                        messages: {
+                                            "form-carrier:ruc": {
+                                                minlength: "El ruc son 11 digitos",
+                                                required: "Este campo es obligatorio"
+                                            },
+                                            "form-carrier:name": {
+                                                required: "Este campo es obligatorio"
+                                            }
+                                        },
+                                        highlight: function (element, errorClass, validClass) {
+                                            $(element).closest('.form-group').addClass(errorClass).removeClass(validClass);
+                                            if ($(element).hasClass("select2")) {
+                                                $(element).addClass("select2-danger").removeClass("select2-success");
+                                            }
+                                        },
+                                        unhighlight: function (element, errorClass, validClass) {
+                                            $(element).closest('.form-group').removeClass(errorClass).addClass(validClass);
+
+                                            if ($(element).hasClass("select2")) {
+                                                $(element).addClass("select2-success").removeClass("select2-danger");
+                                            }
+                                        },
+                                        errorPlacement: function (error, element) {
+                                            if (element.is("select")) {
+                                                error.insertAfter($(element).closest(".form-group").find("span.select2"))
+                                            } else {
+                                                error.insertAfter(element);
+                                            }
+                                        }
+                                    });
+                                })
+                            </script>
+                            <label class="col-lg-2 control-label">RUC</label>
+                            <div class="col-lg-4">
+                                <p:inputText id="ruc" value="#{managedStockMovementBean.carrierSearcher.carrier.identityNumber}" styleClass="form-control input-sm" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2 control-label">Razon social</label>
+                            <div class="col-lg-10">
+                                <p:inputText id="name" value="#{managedStockMovementBean.carrierSearcher.carrier.name}" styleClass="form-control input-sm" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2 control-label">Dirección</label>
+                            <div class="col-lg-10">
+                                <p:inputText id="address" value="#{managedStockMovementBean.carrierSearcher.carrier.address}" styleClass="form-control input-sm" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-lg-2 control-label">Representante</label>
+                            <div class="col-lg-10">
+                                <p:inputText id="representative" value="#{managedStockMovementBean.carrierSearcher.carrier.representative}" styleClass="form-control input-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h:panelGroup id="saved-wrapper" layout="block">
+                    <ui:fragment rendered="#{managedStockMovementBean.carrierSearcher.saved}">
+                        <script>
+                            $(function () {
+                                $.magnificPopup.close();
+                            })
+                        </script>
+                    </ui:fragment>
+                </h:panelGroup>
+                <div class="panel-footer text-right">
+                    <button type="button" onclick="if ($('#form-carrier').valid()) {
+                                        save_carrier();
+                                    }" class="btn btn-success">
+                        <i class="fa fa-save"/> Guardar
+                    </button>
+                    <p:remoteCommand
+                        name="save_carrier"
+                        action="#{managedStockMovementBean.carrierSearcher.save()}"
+                        update="form-carrier:saved-wrapper,:form:carrier-wrapper" 
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load()"/>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+    <div id="modal-add" class="popup-basic popup-full bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="add-content" layout="block" styleClass="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-plus"></i>
+                </span>
+                <span class="panel-title">Agregar Cantidades</span>
+            </div>
+            <h:form id="form-add">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <h:panelGroup layout="block"  id="load-wrapper">
+                            <div class="form-group">
+                                <label class="control-label col-md-1">Buscar</label>
+                                <div class="col-md-5">
+                                    <input type="textt" class="form-control"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <p:remoteCommand 
+                                        name="add_items"
+                                        process="@form" 
+                                        onsuccess="$.magnificPopup.close()"
+                                        update=":form:detail-wrapper"
+                                        action="#{managedStockMovementBean.stockMovementDetailSearcher.add()}"                                         
+                                        />
+                                    <button onclick="if($('#form-add').valid()){add_items()}" type="button" class="btn btn-primary pull-right">
+                                        Agregar productos
+                                    </button>
+                                </div>
+                            </div>
+                            <script>
+                                $(function () {
+                                    $("#form-add").validate({
+                                        errorClass: "has-error text-danger",
+                                        validClass: "has-success",
+                                        errorElement: "em",
+                                        highlight: function (element, errorClass, validClass) {
+                                            $(element).closest('.form-group').addClass(errorClass).removeClass(validClass);
+                                            if ($(element).hasClass("select2")) {
+                                                $(element).addClass("select2-danger").removeClass("select2-success");
+                                            }
+                                        },
+                                        unhighlight: function (element, errorClass, validClass) {
+                                            $(element).closest('.form-group').removeClass(errorClass).addClass(validClass);
+                                            if ($(element).hasClass("select2")) {
+                                                $(element).addClass("select2-success").removeClass("select2-danger");
+                                            }
+                                        },
+                                        errorPlacement: function (error, element) {
+                                            if (element.is("select")) {
+                                                error.insertAfter($(element).closest(".form-group").find("span.select2"))
+                                            } else {
+                                                error.insertAfter(element);
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+                            <table style="height:600px;display: -moz-groupbox;" class="table table-bordered table-condensed mbn">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 37px;max-width:37px"></th>
+                                        <th class="col-md-2">Código</th>
+                                        <th class="col-md-4">Producto</th>
+                                        <th class="col-md-1">Cant. disp.</th>
+                                        <th class="col-md-1">Cant. exist.</th>
+                                        <th class="col-md-4">Cant. trasl</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="overflow-y: scroll;
+                                       height: 580px;
+                                       width: 99%;
+                                       position: absolute;">
+                                    <ui:repeat value="#{managedStockMovementBean.stockSearcher.data}" var="item">
+                                        <tr>
+                                            <td  style="min-width: 37px;max-width:37px" class="text-center"><i class="fa fs14 fa-barcode"/></td>
+                                            <td class="col-md-2">#{item[1]}</td>
+                                            <td class="col-md-4">#{item[2]}</td>
+                                            <td class="col-md-1">#{item[3]} #{item[4]}</td>
+                                            <td class="col-md-1">#{item[7]} #{item[4]} </td>
+                                            <td class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="col-md-12">                                                         
+                                                        <p:inputText 
+                                                            value="#{item[6]}"
+                                                            converter="javax.faces.BigDecimal" 
+                                                            styleClass="form-control input-sm" > 
+                                                            <f:passThroughAttribute name="max" value="#{item[3]}"/>
+                                                            <f:passThroughAttribute name="data-msg-max" value="No puede ser mayor de #{item[3]}"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>                
+                                    </ui:repeat>
+                                </tbody>
+                            </table>
+                        </h:panelGroup>   
+                    </div>
+                </div>
+                <div class="panel-footer">
+
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>
+
+

@@ -1,0 +1,204 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">USUARIOS</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <p:remoteCommand 
+            name="create" 
+            onstart="begin_load()"
+            oncomplete="end_load();$('#modal-managed').modal();"
+            update=":m-user-content" 
+            action="#{managedUserBean.create()}" />
+
+        <section id="content" class="table-layout">
+            <div class="tray tray-center" style="height: 903px;">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:create()" class="metro-tile bg-success light">
+                                <span class="glyphicons glyphicons-user_add text-muted"></span>
+                                <span class="metro-title hidden-xs">Crear usuario</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:create()" class="metro-tile bg-dark light">
+                                <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                <span class="metro-title hidden-xs">Reportes</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <h:panelGroup id="table-wrapper" layout="block" styleClass="panel-body pn">
+                                <div class="table-responsive">
+                                    <div class="dataTables_wrapper form-inline no-footer">
+                                        <ui:include src="/layout/table_toolbar.xhtml">
+                                            <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{userBean.pagination}"/>
+                                            <ui:param name="order_factory" value="#{userBean.orderFactory}"/>
+                                            <ui:param name="update_script" value="search()"/>
+                                        </ui:include>
+                                        <table class="table table-condensed theme-warning  fs13">
+                                            <thead>
+                                                <tr class="bg-light">
+                                                    <th class="">Usuario</th>
+                                                    <th class="">Empleado</th>
+                                                    <th class="text-center"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{userBean.pagination.data}" var="item">
+                                                    <tr>
+                                                        <td class="">#{item[1]}
+                                                        </td>
+                                                        <td class="">#{item[2]}</td>
+
+                                                        <td class="text-right">
+
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" >
+                                                                    <i class="fa fa-cog"/>
+                                                                    <span class="caret ml5"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-right ptn pbn" role="menu">     
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            action="#{userBean.load()}"
+                                                                            oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-info">
+                                                                            Información
+                                                                            <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":m-user-content"
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();open_managed()" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-system">
+                                                                            Editar
+                                                                            <f:setPropertyActionListener value="#{item[0]}" target="#{managedUserBean.idSelected}" />
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":delete-content" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();User.delete('#{item[4]}');" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                            Eliminar
+                                                                            <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </ui:repeat>
+
+                                                <ui:fragment rendered="#{empty userBean.pagination.data}">
+                                                    <tfoot>
+                                                        <tr >
+                                                            <td class="pl20" colspan="6">
+                                                                <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>
+                                            </tbody>
+                                        </table>
+                                        <ui:include src="/layout/datatable/footer.xhtml">
+                                            <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{userBean.pagination}"/>
+                                        </ui:include>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <aside class="tray tray-right tray290" data-tray-height="match" style="height: 858px;">
+                <div class="admin-form form-horizontal">
+                    <h4> Filtrar Usuarios</h4>
+                    <hr class="short"/>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-user"></i>
+                                    </span>
+                                    <p:inputText id="user" value="#{userBean.username}"  styleClass="form-control input-sm" placeholder="Usuario" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Buscar por empleado</small></h5>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-vcard"></i>
+                                    </span>
+                                <p:inputText id="employee" value="#{userBean.name}"  styleClass="form-control input-sm" placeholder="Nombre de empleado" />
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{userBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedUserBean.delete(userBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{userBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </h:form>
+
+    <ui:include src="managed.xhtml" />
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+</ui:composition>

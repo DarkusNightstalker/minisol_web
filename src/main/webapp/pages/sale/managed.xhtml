@@ -1,0 +1,452 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_managed_sale() {
+            $('#modal-managed-sale').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-managed-sale').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script  type="text/javascript" src="#{request.contextPath}/js/sale_man.js"/>
+
+    <div id="modal-managed-sale" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width:90%">            
+            <h:panelGroup layout="block" id="create-content" styleClass="modal-content">
+                <h:form id="formc">
+                    <script>
+                        $(function () {
+                            $('#formc\\:identity-number').focus();
+                        });
+                    </script>
+                    <div class="modal-header pt5 pb5">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                        <span class="">      <i class="fa fa-plus"></i><b> AGREGAR VENTA</b> </span> 
+                        <span  style="max-width:200px"> 
+                            <h:selectOneMenu value="#{managedSaleBean.paymentProofId}" class="ml5 input-sm" style="width:200px" >
+                                <f:selectItems 
+                                    value="#{managedSaleBean.paymentProofSearcher.data}"
+                                    var="item"
+                                    itemLabel="#{item[1]}"
+                                    itemValue="#{item[0]}"
+                                    />
+                            </h:selectOneMenu>
+                        </span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <h:panelGroup id="customer-wrapper" layout="block" styleClass="col-md-4">
+                                    <div class="form-group form-group-sm mt10 fs11">
+                                        <label class="control-label col-md-4 text-left" style="">Identificación</label>
+                                        <div class="col-md-8">
+                                            <p:remoteCommand 
+                                                name="search_customer"
+                                                onstart="begin_load()"  
+                                                onsuccess="end_load()"   
+                                                process="@this,identity-number" 
+                                                action="#{managedSaleBean.customerSearcher.search()}"
+                                                update="formc:customer-info,formc:points-wrapper,:s-actor-content,:m-customer-content"/>
+                                            <p:remoteCommand 
+                                                name="null_customer"
+                                                onstart="begin_load()"  
+                                                onsuccess="end_load()"   
+                                                process="@this" 
+                                                update="formc:customer-info,formc:points-wrapper">
+                                                <f:setPropertyActionListener target="#{managedSaleBean.customerSearcher.actor}" value="#{null}" />
+                                            </p:remoteCommand>
+                                            <script>
+                                                $(function () {
+                                                    $("#formc\\:identity-number")
+                                                            .keyup(function (e) {
+                                                                var code = e.keyCode ? e.keyCode : e.which;
+                                                                if (code == 13) {
+                                                                    if ($("#exist_customer").val() == "true") {
+                                                                        $("#formc\\:btn-prove").trigger("click");
+                                                                    } else {
+                                                                        search_customer();
+                                                                    }
+                                                                    e.preventDefault();
+                                                                    return false;
+                                                                }
+                                                            })
+                                                            .numeric({precision: 11, scale: 0})
+                                                            .on("input", function () {
+                                                                if ($("#exist_customer").val() == "true") {
+                                                                    null_customer();
+                                                                }
+                                                            });
+                                                });
+                                            </script>
+                                            <p:inputText id="identity-number" value="#{managedSaleBean.customerSearcher.identityNumber}" styleClass="fs11 form-control input-sm" />
+                                        </div>
+                                    </div>
+                                    <h:panelGroup id="customer-info" layout="block"> 
+                                        <input id="exist_customer" type="hidden" value="#{managedSaleBean.customerSearcher.actor ne null}" />
+                                        <ui:fragment rendered="#{managedSaleBean.customerSearcher.actor ne null}">
+                                            <div class="form-group form-group-sm fs11">
+                                                <label class="control-label col-md-4 text-left" style="">Nombre</label>
+                                                <div class="col-md-6">
+                                                    <p class="form-control-static input-sm text-muted pbn">#{managedSaleBean.customerSearcher.actor.name}</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm fs11">
+                                                <label class="control-label col-md-4 text-left" style="">Puntos</label>
+                                                <div class="col-md-6">
+                                                    <p class="form-control-static input-sm text-muted pbn">#{managedSaleBean.customerSearcher.actor.points}</p>
+                                                </div>
+                                            </div>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{managedSaleBean.customerSearcher.actor eq null}">
+                                            <div class="text-center">
+                                                <h3>No hay informacion de cliente</h3>
+                                            </div>
+                                        </ui:fragment>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <div class="col-md-8">
+                                    <div id="datatable2_wrapper" class="dataTables_wrapper form-horizontal dt-bootstrap no-footer">
+                                        <div class="dt-panelmenu clearfix">
+                                            <div class="form-group form-group-sm mbn fs11">
+                                                <label class="control-label col-md-2 text-left">Buscar Producto</label>
+                                                <button type="button" id="formc:btn-prove" onclick="$('#formc\\:terms-product').select()" class="hidden"></button>
+                                                <div class="col-md-7">
+                                                    <script>
+                                                        $(function () {
+                                                            $("#formc\\:terms-product").pressEnter(function () {
+                                                                if ($("#formc\\:terms-product").val().match(/^[0-9]+$/) != null) {
+                                                                    search_product_numeric();
+                                                                } else {
+                                                                    search_product_alfa();
+                                                                }
+                                                            }).on("focus", function () {
+                                                                $(this).select();
+                                                            });
+                                                        });
+                                                    </script>
+                                                    <p:inputText id="terms-product" value="#{managedSaleBean.stockSearcher.terms}" styleClass="fs11 form-control input-sm" placeholder="Por nombre o código de barras"/>
+
+                                                    <p:remoteCommand name="search_product_numeric" 
+                                                                     onstart="begin_load()"  
+                                                                     onsuccess="end_load();$('#formc\\:terms-product').select();App.scrollBot($('#formc\\:detail-wrapper > table tbody')[0])"  
+                                                                     update="product-table-wrapper,detail-wrapper"
+                                                                     process="@this,terms-product,formc:detail-wrapper" 
+                                                                     action="#{managedSaleBean.stockSearcher.search()}"/>
+                                                    <p:remoteCommand name="search_product_alfa" 
+                                                                     onstart="begin_load()"  
+                                                                     onsuccess="end_load();App.scrollBot($('#formc\\:detail-wrapper > table tbody')[0])"  
+                                                                     update="product-table-wrapper,detail-wrapper"
+                                                                     process="@this,terms-product" 
+                                                                     action="#{managedSaleBean.stockSearcher.search()}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ui:param name="h_row" value="#{150}" />
+                                        <h:panelGroup id="product-table-wrapper" layout="block">
+                                            <p:remoteCommand 
+                                                name="add_detail"
+                                                onstart="begin_load()"
+                                                oncomplete="refresh_stock()"
+                                                process="@this,formc:detail-wrapper"
+                                                action="#{managedSaleBean.detailSearcher.add()}"
+                                                update="formc:detail-wrapper"/>
+                                            <p:remoteCommand
+                                                name="refresh_stock"
+                                                update="formc:product-table-wrapper"       
+                                                oncomplete="end_load()"
+                                                />
+                                            <script>
+                                                $(function () {
+                                                    SaleM.configure_stock();
+                                                });
+                                            </script>
+                                            <table class="table table-hover table-condensed table-bordered no-footer" id="datatable2" cellspacing="0" width="100%" role="grid" aria-describedby="datatable2_info" 
+                                                   style="width: 100%;height:#{managedSaleBean.stockSearcher.pagination.data.size() * h_row > 150 ? 150 : (managedSaleBean.stockSearcher.pagination.data.size() * h_row eq 0 ? h_row : managedSaleBean.stockSearcher.pagination.data.size() * h_row) }px;display: -moz-groupbox;overflow:hidden">
+                                                <thead>
+                                                    <tr class="bg-dark fs11" style="color:white">
+                                                        <th style="min-width: 50px;" class="hidden-xs"></th>
+                                                        <th class="col-xs-10" >PRODUCTO</th>
+                                                        <th class="col-xs-2 text-center">STOCK</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="" style="overflow-y: scroll;
+                                                       height: 180px;
+                                                       width: 99.5%;
+                                                       right: -5.5px;
+                                                       position: absolute;">
+                                                    <ui:repeat value="#{managedSaleBean.stockSearcher.pagination.data}" var="item" varStatus="st">                                                    
+                                                        <tr class="fs11 #{empty item[6] ? 'danger':''}" data-index="#{st.index}" data-p-id="#{item[0]}"     >
+                                                            <td  style="min-width: 50px;max-width: 50px" class="text-center hidden-xs ptn pbn">   
+                                                                <button type="button" tabindex="-1" class="btn btn-xs btn-success btn-detail">
+                                                                    <i class="fa fa-plus"/>
+                                                                </button>
+                                                            </td>
+                                                            <td class="col-xs-10 data ptn pbn" style="color : #000  !important">#{item[2]}</td>
+                                                            <td  style="color : #000  !important" class="text-right col-xs-2 data ptn pbn">
+                                                                #{item[5]}
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="hidden">  
+                                                            <td  style="min-width: 50px;max-width: 50px" class="text-center dark">   
+                                                            </td>
+                                                            <td colspan="2" class="col-xs-12 alert" style="color : #000  !important">
+                                                                <table class="col-sm-12">
+                                                                    <tr>
+                                                                        <td  style="min-width: 100px;max-width:100px" class="text-center hidden-xs">   
+                                                                            <img class="img-responsive mw40 ib mr10" src="#{request.contextPath}/assets/img/stock/products/thumb_1.jpg"/>
+                                                                        </td>
+                                                                        <td class="col-xs-12">
+                                                                            <table class="col-sm-12">
+                                                                                <ui:repeat value="#{item[6]}" var="price">
+                                                                                    <tr class="fs11">
+                                                                                        <td>#{price[0]} #{item[4]} x S/.#{price[1]}</td>
+                                                                                    </tr>
+                                                                                </ui:repeat>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                    <ui:fragment rendered="#{empty managedSaleBean.stockSearcher.pagination.data}">
+                                                        <tr>
+                                                            <td class="col-xs-12 text-center" colspan="4"><h3 class="text-danger">No se ha encontrado productos</h3></td>                                                        
+                                                        </tr>
+                                                    </ui:fragment>
+                                                </tbody>
+                                            </table>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="short mt5 mb5"/>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h:panelGroup id="detail-wrapper" layout="block">
+                                        <script>
+                                            $(function () {
+                                                SaleM.configure_detail();
+                                                SaleM.update_subtotal();
+                                                SaleM.update_points();
+                                            });
+                                        </script>
+                                        <table 
+                                            style="border:1px solid #82c0e9; width: 100%;height:150px;display: -moz-groupbox;overflow:hidden"  
+                                            class="table table-bordered table-condensed">
+                                            <thead>
+                                                <tr class="primary fs11">
+                                                    <th class="text-center" colspan="5">DETALLES DE VENTA</th>
+                                                </tr>
+                                                <tr class="info fs11">
+                                                    <th class="col-md-3 text-center">CANTIDAD</th>
+                                                    <th class="col-md-5">DESCRIPCIÓN</th>
+                                                    <th class="col-md-2 text-center">PREC. UNIT.</th>
+                                                    <th class="col-md-2 text-center">SUBTOTAL</th>
+                                                    <th style="min-width:70px;max-width:70px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody style="overflow-y: scroll;
+                                                   height: 120px;
+                                                   width: 99.5%;
+                                                   right: -5.5px;
+                                                   position: absolute;">
+                                                <ui:repeat id="detail" value="#{managedSaleBean.detailSearcher.data}" var="item" varStatus="st">
+                                                    <tr data-index="#{st.index}" data-p-id="#{item[6]}" class="fs11">
+                                                        <td class="pbn ptn col-md-3">
+                                                            <p:inputText id="quantity" onfocus="$(this).select()" converter="javax.faces.BigDecimal" value="#{item[1]}" styleClass="form-control input-sm detail-quantity fs11">
+                                                                <f:passThroughAttribute name="max" value="#{item[8]}"/>                                                            
+                                                            </p:inputText>  
+                                                        </td>
+                                                        <td class="pbn ptn col-md-5">#{item[3]}</td>
+                                                        <td class="text-right pbn ptn col-md-2">S/.                                                         
+                                                            <h:panelGroup id="display_unit-price">
+                                                                <h:outputText value="#{item[4]}">
+                                                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                </h:outputText>
+                                                            </h:panelGroup>
+                                                            <h:inputHidden converter="javax.faces.BigDecimal" id="unite-price" value="#{item[4]}" />
+                                                            <input id="formc:detail:#{st.index}:price-size" type="hidden" value="#{item[5].size()}"  />
+                                                            <ui:repeat value="#{item[5]}" var="p" varStatus="ps">
+                                                                <input id="formc:detail:#{st.index}:price:#{ps.index}" type="hidden" data-quantity="#{p[0]}" data-price="#{p[1]}"  />
+                                                            </ui:repeat>
+                                                        </td>
+                                                        <td class="text-right td-subtotal pbn ptn col-md-2">S/. 
+                                                            <h:panelGroup id="display_total">
+                                                                <h:outputText value="#{item[9] eq null ? 0 : item[9]}">
+                                                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                </h:outputText>
+                                                            </h:panelGroup>
+                                                            <h:inputHidden id="subtotal" converter="javax.faces.BigDecimal" value="#{item[9]}"  />
+                                                        </td>
+                                                        <td class="text-center td-other pbn ptn" style="min-width:70px;max-width:70px;">
+                                                            <h:inputHidden id="points" converter="javax.faces.BigDecimal" value="#{item[10]}"  />
+                                                            <p:commandLink 
+                                                                process="@this,formc:detail-wrapper"
+                                                                onstart="begin_load()"
+                                                                tabindex="-1"
+                                                                action="#{managedSaleBean.detailSearcher.remove(st.index)}" 
+                                                                update="formc:detail-wrapper"
+                                                                oncomplete="refresh_stock()"
+                                                                styleClass="btn btn-danger btn-xs">
+                                                                <i class="fa fa-trash"/>
+                                                            </p:commandLink>
+                                                        </td>
+                                                    </tr>   
+                                                </ui:repeat>               
+                                            </tbody>
+                                            <ui:fragment rendered="#{empty managedSaleBean.detailSearcher.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <th class="text-center" colspan="5">
+                                                            <h3 class="text-muted">No se ha agregado ningun producto</h3>
+                                                        </th>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </table>
+                                    </h:panelGroup>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="well well-sm mbn pt5 pb5 pr5 pl5">
+                                        <script>
+                                            $(function () {
+                                                SaleM.configure_sale_summary();
+                                            });
+                                        </script>
+                                        <h:panelGroup id="points-wrapper" layout="block" >
+                                            <ui:fragment rendered="#{managedSaleBean.customerSearcher.actor ne null}">
+                                                <script>
+                                                    $(function () {
+                                                        $("#formc\\:discount-points").on("input", function () {
+                                                            if (this.value == "") {
+                                                                $("#formc\\:discount_display").html("0.00");
+                                                                $("#formc\\:discount").val("0.00");
+                                                                $("#formc\\:discount").trigger("change");
+                                                                return;
+                                                            }
+                                                            var v = parseInt(this.value);
+                                                            var subtotal = parseFloat($("#formc\\:subtotal").val()) + parseFloat($("#formc\\:igv").val());
+                                                            var discount = parseInt(v / 100);
+                                                            if (discount > subtotal) {
+                                                                v = parseInt(subtotal) * 100;
+                                                                discount = parseInt(subtotal);
+                                                            }
+                                                            if (v > #{managedSaleBean.customerSearcher.actor.points}) {
+                                                                this.value = "" +#{managedSaleBean.customerSearcher.actor.points};
+                                                                v = #{managedSaleBean.customerSearcher.actor.points};
+                                                                discount = parseInt(v / 100);
+                                                            }
+
+                                                            $("#formc\\:discount_display").html(discount.toFixed(2));
+                                                            $("#formc\\:discount").val(discount.toFixed(2));
+                                                            $("#formc\\:discount").trigger("change");
+                                                        }).numeric({scale: 0, negative: false}).val("0").defaultSelect();
+                                                    });
+                                                </script>
+                                                <div class="form-group form-group-sm mbn fs11">
+                                                    <label class="control-label col-md-4 text-left">PTOS. DSCTO.</label>
+                                                    <div class="col-md-4">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p:inputText  id="discount-points" value="0" styleClass="form-control input-sm"  >
+                                                            <f:passThroughAttribute name="max" value="#{managedSaleBean.customerSearcher.actor.points}"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                </div>
+                                            </ui:fragment>
+                                        </h:panelGroup>
+                                        <div class="form-group form-group-sm mbn fs11">
+                                            <label class="control-label col-md-4 text-left">SUBTOTAL</label>
+                                            <div class="col-md-8">
+                                                <p class="form-control-static input-sm text-right">S/. 
+                                                    <h:panelGroup id="subtotal_display">
+                                                        <h:outputText value="#{managedSaleBean.subtotal}">
+                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                        </h:outputText>
+                                                    </h:panelGroup>
+                                                    <h:inputHidden id="subtotal" value="#{managedSaleBean.subtotal}"  />
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn fs11">
+                                            <label class="control-label col-md-4 text-left">DESCUENTO</label>
+                                            <div class="col-md-8">
+                                                <p class="form-control-static input-sm text-right">S/. 
+                                                    <h:panelGroup id="discount_display">
+                                                        <h:outputText value="#{managedSaleBean.subtotalDiscount}">
+                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                        </h:outputText>
+                                                    </h:panelGroup>
+                                                    <h:inputHidden id="discount" value="#{managedSaleBean.subtotalDiscount}"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn fs11">
+                                            <label class="control-label col-md-4 text-left">IGV(#{managedSaleBean.igvPercent}%)</label>
+                                            <div class="col-md-8">
+                                                <p class="form-control-static input-sm text-right">S/. 
+                                                    <h:panelGroup id="igv_display">
+                                                        <h:outputText value="#{managedSaleBean.igv}">
+                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                        </h:outputText>
+                                                    </h:panelGroup>
+                                                    <h:inputHidden id="igv" value="#{managedSaleBean.igv}"  />
+                                                    <h:inputHidden id="igv-percent" value="#{managedSaleBean.igvPercent}" />
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn fs11">
+                                            <label class="control-label col-md-4 text-left">TOTAL</label>
+                                            <div class="col-md-8">
+                                                <p class="form-control-static input-sm text-right">S/.                                                 
+                                                    <h:panelGroup id="total_display">
+                                                        <h:outputText value="#{managedSaleBean.igv + managedSaleBean.subtotal - managedSaleBean.subtotalDiscount - managedSaleBean.igvDiscount}">
+                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                        </h:outputText>
+                                                    </h:panelGroup>
+                                                </p>
+                                                <span class="help-block mt5 text-right">
+                                                    <i class="fa fa-plus"></i> Puntos obtenidos <h:panelGroup id="display_points">#{managedSaleBean.points}</h:panelGroup>
+                                                    <h:inputHidden id="points" value="#{managedSaleBean.points}" />
+                                                </span> 
+                                            </div>
+                                        </div>
+                                        <hr class="short mt5 mb5"/>
+                                        <div class="form-group-btn text-right">
+                                            <button type="button" tabindex="-1" data-dismiss="modal" class="btn btn-sm btn-danger ">
+                                                Cancelar
+                                            </button>
+                                            <p:remoteCommand
+                                                name="save" 
+                                                onstart="begin_load()" 
+                                                oncomplete="end_load()" action="#{managedSaleBean.doSave()}" update=":create-content,:form:table-wrapper"  />
+                                            <button type="button"
+                                                    onclick="SaleM.save()"
+                                                    class="btn  btn-sm btn-primary" >
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+    <ui:include src="/layout/search_actor.xhtml">        
+        <ui:param name="actorSearcher" value="#{managedSaleBean.customerSearcher}" />
+        <ui:param name="updated" value=":formc:customer-info" />
+    </ui:include>
+    <ui:include src="create_customer.xhtml"/>     
+</ui:composition>
+

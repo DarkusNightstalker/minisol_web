@@ -1,0 +1,107 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_managed() {
+            $("#modal-managed").modal({backdrop: 'static', keyboard: false});
+        }
+
+        $(function () {
+            $('#modal-managed').on('shown.bs.modal', function () {
+                $('#form-managed\\:prefix').focus();
+            });
+        });
+    </script>
+    <script  type="text/javascript" src="#{request.contextPath}/js/payment-voucher_man.js"/>
+    <div id="modal-managed" class="modal fade" role="dialog">
+        <div class="modal-dialog ">
+            <h:panelGroup layout="block" id="managed-content" styleClass="modal-content">
+                <script>
+        $(function () {
+            PaymentVoucherManaged.init();
+        });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="fa fa-cogs fa-plus"></i>  <b> Generar vales de consumo</b> 
+                </div>
+                <h:form id="form-managed">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="control-label col-md-4">Prefijo</label>
+                                        <div class="col-md-8">
+                                            <p:inputText id="prefix" maxlength="1" value="#{managedPaymentVoucherBean.prefix}"  styleClass="form-control input-sm"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="control-label col-md-4">Cantidad</label>
+                                        <div class="col-md-8">
+                                            <p:inputText id="quantity"  value="#{managedPaymentVoucherBean.quantity}" styleClass="form-control input-sm"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h:panelGroup layout="block" id="trama-wrapper">
+                                <ui:fragment rendered="#{managedPaymentVoucherBean.prefix.length() ne 0 and managedPaymentVoucherBean.quantity ne null}">
+                                    <div class="form-group form-group-sm mb5">
+                                        <div class="col-md-10 col-md-offset-2">
+                                            <p class="form-control-static">Se generara de #{managedPaymentVoucherBean.initNumeration} - #{managedPaymentVoucherBean.endNumeration}</p>
+                                        </div>
+                                    </div>
+                                </ui:fragment>
+                            </h:panelGroup>
+                            <div class="form-group form-group-sm mb5">
+                                <label class="control-label col-md-2">Fec. Expiración</label>
+                                <div class="col-md-5">
+                                    <p:inputText id="date-expiry" value="#{managedPaymentVoucherBean.dateExpiry}" styleClass="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm mb5">
+                                <label class="control-label col-md-2">Valor</label>
+                                <div class="col-md-5">
+                                    <p:inputText id="value" value="#{managedPaymentVoucherBean.value}" styleClass="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedPaymentVoucherBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-managed').modal('hide');search();"
+                        name="update_payment" update=":form:table-wrapper"  />
+                    <p:remoteCommand 
+                        process="@this,prefix,quantity" 
+                        action="#{managedPaymentVoucherBean.recalculated()}"
+                        onstart="begin_load()"
+                        oncomplete="end_load();"
+                        name="update_trama" update="form-managed:trama-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedPaymentVoucherBean.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();PaymentVoucherManaged.after_save()"
+                        name="save_payment" update="form-managed:valid"  />
+                    <div class="modal-footer">
+                        <button id="btn-save-manage" onclick="PaymentVoucherManaged.before_save()" type="button" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:form id="form">
+        <header id="topbar" class="ph10">
+            <div class="topbar-left">
+                <ol class="breadcrumb">
+                    <li class="crumb-active">
+                        <a href="javascript:void(0)">Registros de compras no domiciliados</a>
+                    </li>
+                    <li class="crumb-icon">
+                        <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                    <li class="crumb-trail">Registros de compras no domiciliados</li>
+                </ol>
+            </div>
+            <div class="topbar-right hidden-xs hidden-sm">
+                <p:commandLink process="@this" update=":create-content" action="#{recordNDPurchaseBean.updateModal()}"  styleClass="btn btn-default btn-sm fw600 ml10" oncomplete="show_create()">
+                    <span class="fa fa-plus pr5"></span> Crear nuevo
+                </p:commandLink>
+            </div>
+        </header>
+        <section id="content" class="table-layout  animated fadeIn">
+
+            <div class="tray tray-center">
+
+                <div class="panel">
+                    <div class="panel-menu p12 admin-form theme-primary">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label class="field select">
+                                    <select id="filter-category" name="filter-category" class="empty">
+                                        <option value="1">Año 2016</option>
+                                    </select>
+                                    <i class="arrow"></i>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" class="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <table class="table admin-form theme-primary fs13 table-hover table-striped">
+
+                                    <tbody>
+                                        <ui:repeat value="#{recordNDPurchaseBean.data}" varStatus="st_data" var="item">
+                                            <tr>
+                                                <td class="">#{item[1]}</td>
+                                                <td class="text-right">
+
+                                                    <p:commandLink process="@this" update=":info-content" action="#{recordNDPurchaseBean.info.refresh(item[0])}"  styleClass="btn btn-default btn-sm text-muted"
+                                                                   oncomplete="App.open_modal('#modal-info','mfp-zoomIn',false)">
+                                                        <i class=" fa fa-info"/>
+                                                    </p:commandLink>
+<!--                                                    <p:commandLink styleClass="btn btn-default btn-sm text-muted">
+                                                        <i class=" glyphicons glyphicons-file_export"/>
+                                                    </p:commandLink>
+                                                    <ui:fragment rendered="#{item[2] eq null}">
+                                                        <p:commandLink process="@this" action="#{recordNDPurchaseBean.upload.loadRecord(item[0])}" update=":upload-content" styleClass="btn btn-default btn-sm text-muted" oncomplete="App.open_modal('#modal-upload','mfp-zoomIn',false)">
+                                                            <i class=" glyphicons glyphicons-cloud-upload"/>
+                                                        </p:commandLink>
+                                                    </ui:fragment>-->
+                                                    <ui:fragment rendered="#{item[2] ne null}">
+                                                        <p:commandLink process="@this" ajax="false" styleClass="btn btn-default btn-sm text-muted">
+                                                            <i class=" glyphicons glyphicons-cloud-download"/>
+                                                            <p:fileDownload value="#{recordNDPurchaseBean.download(item[0])}"/>
+                                                        </p:commandLink>
+                                                    </ui:fragment>
+<!--                                                    <ui:fragment rendered="#{item[2] eq null}">
+                                                        <p:commandLink styleClass="btn btn-default btn-sm text-muted">
+                                                            <i class=" glyphicons glyphicons-refresh"/>
+                                                        </p:commandLink>
+                                                    </ui:fragment>-->
+                                                    <p:commandLink title="Descargar con datos" process="@this" styleClass="btn btn-default btn-sm text-muted" ajax="false">
+                                                        <i class=" glyphicons glyphicons-adress_book"/>
+                                                        <p:fileDownload value="#{recordNDPurchaseBean.make(item[0],true)}"/>
+                                                    </p:commandLink>
+                                                    <p:commandLink title="Descargar sin datos" process="@this" styleClass="btn btn-default btn-sm text-muted" ajax="false">
+                                                        <i class=" glyphicons glyphicons-book"/>
+                                                        <p:fileDownload value="#{recordNDPurchaseBean.make(item[0],false)}"/>
+                                                    </p:commandLink>
+                                                </td>
+                                            </tr> 
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty recordNDPurchaseBean.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <h3 class="text-muted">No exite Libros electronicos registrados</h3>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </section>
+    </h:form>
+
+    <ui:include src="/layout/create_le.xhtml"> 
+        <ui:param name="record" value="#{recordNDPurchaseBean}"/>
+    </ui:include>
+    
+    
+
+    <div id="modal-upload" class="popup-basic popup-lg bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="upload-content" layout="block" styleClass="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-upload"></i>
+                </span>
+                <span class="panel-title">Subir comprobante</span>
+            </div>
+            <h:form enctype="multipart/form-data" id="form-upload">
+                <div class="panel-body">
+                    <div class="admin-form theme-primary">
+                        <div id="import-file-wrapper" class="row">
+                            <div class="col-md-12">
+                                <div class="section">
+                                    <label class="field prepend-icon append-button file">
+                                        <span class="button btn-primary">Buscar Archivo</span>                                    
+                                        <h:inputFile value="#{recordNDPurchaseBean.upload.file}"  class="gui-file" onchange="document.getElementById('form-upload:uploader').value = this.value;"  >
+                                            <f:passThroughAttribute name="accept" value=".pdf"/>
+                                        </h:inputFile>
+                                        <input type="text" class="gui-input" id="form-upload:uploader" placeholder="Seleccione un archivo xls,xslx"/>
+                                        <label class="field-icon">
+                                            <i class="fa fa-upload"></i>
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p:remoteCommand name="update_data" oncomplete="$.magnificPopup.instance.close()"  update=":form:table-wrapper"/>
+                <div class="panel-footer text-right">
+                    <h:commandLink id="button-submit"  styleClass="btn btn-primary" action="#{recordNDPurchaseBean.upload.begin()}">
+                        Comenzar <i class="fa fa-upload"></i>
+                        <f:ajax execute="@form" render="@none" onevent="uploadEvent" />
+                    </h:commandLink>
+                </div>
+                <script>
+                    function uploadEvent(data) {
+                        var status = data.status; // Can be "begin", "complete" or "success".
+                        var source = data.source; // The parent HTML DOM element.
+
+                        switch (status) {
+                            case "begin": // Before the ajax request is sent.
+                                // ...
+                                break;
+
+                            case "complete":
+                                update_data();
+                                break;
+
+                            case "success": // After update of HTML DOM based on ajax response.
+                                // ...
+                                break;
+                        }
+                    }
+
+                </script>
+            </h:form>
+        </h:panelGroup>
+    </div>
+
+    <div id="modal-info" class="popup-basic popup-lg bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="info-content" layout="block" styleClass="panel">
+            <ui:fragment rendered="#{recordNDPurchaseBean.info.data ne null}">
+                <div class="panel-heading">
+                    <span class="panel-icon">
+                        <i class="fa fa-file"></i>
+                    </span>
+                    <span class="panel-title">Libro electronico compras simplificadas - #{recordNDPurchaseBean.info.data[0].month} #{recordNDPurchaseBean.info.data[0].year}</span>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Creación</label>
+                            <div class="col-md-9">
+                                <p class="form-control-static text-muted">
+                                    <h:outputText value="#{recordNDPurchaseBean.info.data[0].createDate}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                    </h:outputText>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Estado</label>
+                            <div class="col-md-9">
+                                <ui:fragment rendered="#{recordNDPurchaseBean.info.data[0].sent}">
+                                    <p class="form-control-static label label-success">
+                                        Enviado el
+                                        <h:outputText value="#{recordNDPurchaseBean.info.data[0].sentDate}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                                        </h:outputText>
+                                    </p>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{not recordNDPurchaseBean.info.data[0].sent}">
+                                    <p class="form-control-static label label-default">
+                                        En proceso
+                                    </p>
+                                </ui:fragment>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+            </ui:fragment>
+        </h:panelGroup>
+    </div>
+</ui:composition>
+
+

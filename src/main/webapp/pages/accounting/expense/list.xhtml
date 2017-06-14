@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javasciprt:void(0)">GASTOS DE CAJA CHICA</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pbn prn pln" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  action="#{managedPurchasePaymentBean.create()}" 
+                                            update=":managed-content" 
+                                            process="@this" 
+                                            onstart="begin_load()"
+                                            oncomplete="end_load();open_managed()" styleClass="metro-tile bg-success light">
+                                <span class="icon-bills text-muted"></span>
+                                <span class="metro-title">Registrar</span>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  action="#{expenseBean.cleanReport()}" 
+                                            oncomplete="end_load();open_report();"
+                                            process="@this" 
+                                            update=":report-content" 
+                                            onstart="begin_load()"
+                                            styleClass="metro-tile bg-dark light">
+                                <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                <span class="metro-title">Reportes</span>
+                            </p:commandLink>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/datatable/toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{expenseBean.pagination}"/>
+                                    <ui:param name="order_factory" value="#{expenseBean.orderFactory}"/>
+                                    <ui:param name="update_script" value="search()"/>
+                                </ui:include>
+                                <table class="table table-condensed theme-primary fs13 table-hover">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{expenseBean.orderFactory}" />
+                                                <ui:param name="label" value="Fecha" />
+                                                <ui:param name="field" value="datePayment" />
+                                                <ui:param name="class" value="text-center col-md-2" />
+                                            </ui:include>        
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{expenseBean.orderFactory}" />
+                                                <ui:param name="label" value="Descripción" />
+                                                <ui:param name="field" value="code" />
+                                                <ui:param name="class" value="text-center col-md-8" />
+                                            </ui:include>                              
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{expenseBean.orderFactory}" />
+                                                <ui:param name="label" value="Cantidad" />
+                                                <ui:param name="field" value="quantity" />
+                                                <ui:param name="class" value="text-center col-md-2" />
+                                            </ui:include>                    
+                                            <th class="text-center" style="min-width: 100px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{expenseBean.pagination.data}"  var="item">
+                                            <tr>
+                                                <td class="text-center">
+                                                    <h:outputText value="#{item[1]}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" />
+                                                    </h:outputText>
+                                                </td>
+                                                <td class="">#{item[3]}</td>
+                                                <td class="text-right pr10">S/. #{item[2]}</td>
+                                                <td class="text-center">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" >
+                                                            <i class="fa fa-cog"/>
+                                                            <span class="caret ml5"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu ptn pbn" role="menu">     
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    action="#{expenseBean.load()}"
+                                                                    oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                                    styleClass="btn btn-xs btn-gradient btn-info">
+                                                                    Información
+                                                                    <f:setPropertyActionListener target="#{expenseBean.id}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    update=":managed-content" 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    oncomplete="end_load();open_managed()" 
+                                                                    styleClass="btn btn-xs btn-gradient btn-system">
+                                                                    Editar
+                                                                    <f:setPropertyActionListener target="#{managedPurchasePaymentBean.idSelected}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    update=":delete-content" 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    oncomplete="end_load();PaymentProof.delete('#{item[4]}');" 
+                                                                    styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                    Eliminar
+                                                                    <f:setPropertyActionListener target="#{expenseBean.id}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty expenseBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <h4 class="text-muted text-center">No se ha encontrado ningun arqueo registrado</h4>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+
+                                <ui:include src="/layout/datatable/footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{paymentProofBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <aside class="tray tray-right tray290" data-tray-height="match" style="height: 858px;">
+                <div class="admin-form form-horizontal">
+                    <h4> Filtrar Gastos</h4>
+                    <hr class="short"/>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-align-justify"></i>
+                                    </span>
+                                    <p:inputTextarea rows="3" style="min-height: 100px" id="document-number" value="#{saleBean.documentNumber}"  styleClass="form-control input-sm" placeholder="Descripcion del gasto" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Rango de fechas </small></h5>
+                    <script>
+                        $(function () {
+                            $("#form\\:date-init").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                            $("#form\\:date-end").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                        });
+                    </script>
+                    <div class="section row mb15">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-init" value="#{saleBean.dateInit}"  styleClass="fs10 form-control" placeholder="Inicio">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-end"  value="#{saleBean.dateEnd}"  styleClass="fs10 form-control" placeholder="Fin" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{saleBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedSaleBean.delete(saleBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{saleBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+                </div>
+            </aside>
+            <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{expenseBean.search()}" process="@form" update="form:table-wrapper" />
+            <p:remoteCommand name="refresh" onstart="begin_load();" oncomplete="end_load()" action="#{expenseBean.refresh()}" process="@form" update="form:table-wrapper" />
+            <p:remoteCommand name="del" action="#{managedPurchasePaymentBean.delete(expenseBean.id)}" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" update="form:table-wrapper" />
+            <p:remoteCommand name="recovery" action="#{managedPurchasePaymentBean.recovery(expenseBean.id)}"  oncomplete="search()" update="form:table-wrapper" />
+
+        </section>
+    </h:form>
+    <ui:include src="managed.xhtml"/> 
+    <ui:include src="report.xhtml"/> 
+    <ui:include src="/layout/delete.xhtml"/> 
+</ui:composition>
+
+

@@ -1,0 +1,167 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Roles</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <p:remoteCommand 
+            name="init_report" 
+            onstart="begin_load()"
+            oncomplete="end_load();open_report();"
+            update=":report-content" 
+            action="#{managedRolBean.create()}" />
+        <p:remoteCommand 
+            name="create" 
+            onstart="begin_load()"
+            oncomplete="end_load();open_managed();"
+            update=":m-rol-content" 
+            action="#{managedRolBean.create()}" />
+
+        <section id="content" class="table-layout">
+            <div class="tray tray-center" style="height: 903px;">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:create()" class="metro-tile bg-success light">
+                                <span class="glyphicon glyphicon-plus text-muted"></span>
+                                <span class="metro-title hidden-xs">Crear</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:init_report()" class="metro-tile bg-dark light">
+                                <span class="glyphicon glyphicon-dashboard text-muted"></span>
+                                <span class="metro-title hidden-xs">Reportes</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <h:panelGroup id="table-wrapper" layout="block" styleClass="panel-body pn">
+                                <div class="table-responsive">
+                                    <div class="dataTables_wrapper form-inline no-footer">
+                                        <ui:include src="/layout/table_toolbar.xhtml">
+                                            <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{rolBean.pagination}"/>
+                                            <ui:param name="order_factory" value="#{rolBean.orderFactory}"/>
+                                            <ui:param name="update_script" value="search()"/>
+                                        </ui:include>
+                                        <table class="table table-condensed table-bordered table-striped theme-warning  fs13">
+                                            <thead>
+                                                <tr class="bg-light">
+                                                    <th class="">Nombre</th>
+                                                    <th class="text-center"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{rolBean.pagination.data}" var="item">
+                                                    <tr>
+                                                        <td class="">#{item[1]}</td>
+                                                        <td class="text-right">
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                    <i class="fa fa-cog"/>
+                                                                    <span class="caret ml5"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-right ptn pbn" role="menu">
+                                                                   
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":m-rol-content"
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            action="#{rolBean.load()}"
+                                                                            styleClass="btn btn-xs btn-gradient btn-info"
+                                                                            oncomplete="end_load();$('#modal-managed').modal()">
+                                                                            Información
+                                                                            <f:setPropertyActionListener value="#{item[0]}" target="#{rolBean.id}" />
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":m-rol-content"
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            styleClass="btn btn-xs btn-gradient btn-system"
+                                                                            oncomplete="end_load();$('#modal-managed').modal()">
+                                                                            Editar
+                                                                            <f:setPropertyActionListener value="#{item[0]}" target="#{managedRolBean.idSelected}" />
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                     <li>
+                                                                        <p:commandLink 
+                                                                            process="@this" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-danger"
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();">
+                                                                            Desactivar
+                                                                            <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </ui:repeat>
+                                                <ui:fragment rendered="#{empty rolBean.pagination.data}">
+                                                    <tfoot>
+                                                        <tr >
+                                                            <td class="text-center" colspan="6">
+                                                                <h4 class="text-muted">No se ha encontrado ningun rol</h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>
+                                            </tbody>
+                                        </table>
+                                        <ui:include src="/layout/datatable/footer.xhtml">
+                                            <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{rolBean.pagination}"/>
+                                        </ui:include>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{rolBean.search()}" process="@form" update="form:table-wrapper" />
+        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" action="#{managedRolBean.delete(rolBean.id)}" process="@form" update="form:table-wrapper" />
+        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{rolBean.refresh()}" process="@form" update="form:table-wrapper" />
+
+    </h:form>
+
+    <ui:include src="managed.xhtml" />
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include src="report.xhtml" />
+</ui:composition>

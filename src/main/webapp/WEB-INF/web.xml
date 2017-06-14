@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Production</param-value>
+    </context-param>
+    <context-param>
+        <!-- PARA QUE PONGA EN CACHE LOS CSS Y JS -->
+        <param-name>com.sun.faces.defaultResourceMaxAge</param-name>
+        <param-value>3628800000</param-value>
+        <!-- 6 weeks. -->
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!-- Para que primero encienda el servlet de JSF -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    <!-- tema Primefaces -->
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>none</param-value>
+    </context-param>
+    <!-- Configuracion para primepush -->
+    <servlet>
+        <servlet-name>Push Servlet</servlet-name>
+        <servlet-class>org.primefaces.push.PushServlet</servlet-class>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Push Servlet</servlet-name>
+        <url-pattern>/primepush/*</url-pattern>
+    </servlet-mapping>
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/login.xhtml</location>
+    </error-page>
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>client</param-value>
+    </context-param>
+    <context-param>
+        <param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
+        <param-value>6Ld7pMESAAAAAHd1VihJkqPUXAJVwU3Cghc8fzrq</param-value>
+    </context-param>
+    <context-param>
+        <param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
+        <param-value>6Ld7pMESAAAAAMhr5WSk5bcRrff8Y08NtDi8Buoq</param-value>
+    </context-param>
+    <!-- CONFIGURACIÓN PARA FILE UPLOAD 
+    <filter>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+    </filter-mapping>-->
+    <context-param>
+        <param-name>primefaces.UPLOADER</param-name>
+        <param-value>auto</param-value>
+    </context-param>
+    <!--
+    -->
+    <!-- tiempo en expirar una sesion -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    <!-- para redirección a la primera página -->
+    <welcome-file-list>
+        <welcome-file>login.xhtml</welcome-file>
+    </welcome-file-list>
+    <!-- utilitario de JSF para conexiones lentas -->
+    <context-param>
+        <param-name>com.sun.faces.enableMissingResourceLibraryDetection</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!-- The Bootstrap listener to start up and shut down Spring's root WebApplicationContext. It is registered to Servlet Container -->
+    <!-- Spring Framework -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            /WEB-INF/hibernate.sf.xml
+            /WEB-INF/service.sf.xml
+        </param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+    </listener>
+    <listener>
+        <listener-class>
+            org.springframework.web.context.request.RequestContextListener
+        </listener-class>
+    </listener>
+    <!-- end Spring Framework -->
+    <!-- web fonts -->
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/vnd.ms-fontobject</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>otf</extension>
+        <mime-type>font/opentype</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/x-font-ttf</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/x-font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svg</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <!-- JasperReports Servlet -->
+    <servlet>
+        <servlet-name>PdfServlet</servlet-name>
+        <servlet-class>net.sf.jasperreports.j2ee.servlets.PdfServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DocxServlet</servlet-name>
+        <servlet-class>net.sf.jasperreports.j2ee.servlets.DocxServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>JExcelApiServlet</servlet-name>
+        <servlet-class>net.sf.jasperreports.j2ee.servlets.JExcelApiServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RtfServlet</servlet-name>
+        <servlet-class>net.sf.jasperreports.j2ee.servlets.RtfServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ImageServlet</servlet-name>
+        <servlet-class>net.sf.jasperreports.j2ee.servlets.ImageServlet</servlet-class>
+    </servlet>
+    <!--JasperReports Servlet Mapping-->
+    <servlet-mapping>
+        <servlet-name>PdfServlet</servlet-name>
+        <url-pattern>/servlets/report/PDF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DocxServlet</servlet-name>
+        <url-pattern>/servlets/report/DOC</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>JExcelApiServlet</servlet-name>
+        <url-pattern>/servlets/report/EXCEL</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RtfServlet</servlet-name>
+        <url-pattern>/servlets/report/RTF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImageServlet</servlet-name>
+        <url-pattern>/servlets/image</url-pattern>
+    </servlet-mapping>
+    <filter>
+        <filter-name>UTF8Filter</filter-name>
+        <filter-class>gkfire.web.filter.UTF8Filter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>gkfire.web.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>UTF8Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/index.xhtml</location>
+    </error-page>
+</web-app>

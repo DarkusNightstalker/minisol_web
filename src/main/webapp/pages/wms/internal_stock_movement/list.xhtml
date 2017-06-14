@@ -1,0 +1,538 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script  type="text/javascript" src="#{request.contextPath}/js/stock-movement_view.js"/>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">MOVIMIENTOS INTERNOS DE STOCK</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <ui:fragment rendered="#{sessionBean.authorize('M_MIN,RS_MIN,RR_MIN,I_MIN,S_MIN')}">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn pb5" style="display: block;">
+                        <div class="topbar-menu row">
+                            <ui:fragment rendered="#{sessionBean.authorize('M_MIN')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  action="#{managedStockMovementBean.create()}" 
+                                                    update=":content-wrapper" 
+                                                    process="@this" 
+                                                    onstart="begin_load()"
+                                                    oncomplete="end_load()" styleClass="metro-tile bg-success light">
+                                        <span class="fa fa-truck text-muted"></span>
+                                        <span class="metro-title" >Nuevo envio</span>
+                                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/internal_stock_movement/manage.xhtml"/>
+                                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('RS_MIN,RR_MIN')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  action="#{ismReportBean.init()}" 
+                                                    update=":create-report" 
+                                                    onstart="begin_load()"
+                                                    oncomplete="end_load();open_reportism();" styleClass="metro-tile bg-dark light">                              
+                                        <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                        <span class="metro-title">Reportes</span>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('I_MIN')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  
+                                        action="#{stockMovementBean.import_.refresh()}" 
+                                        update=":import-content-main" process="@this" 
+                                        oncomplete="open_import_main('IMPORTAR PRODUCTOS Y PRECIOS',true,function(){$('#btn-refresh').trigger('click')})"  
+                                        styleClass="metro-tile bg-system light">
+                                        <span class="glyphicons glyphicons-file_import text-muted"></span>
+                                        <span class="metro-title">Importar</span>
+                                        <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{stockMovementBean.import_}"/>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                        </div>
+                    </div>
+                </ui:fragment>
+
+                <div class="panel mb5">
+                    <div class="panel-heading">
+                        <span class="panel-icon">
+                            <i class="fa fa-table"></i>
+                        </span>
+                        <span class="panel-title">RECEPCIÓNES</span>
+                    </div>
+                    <h:panelGroup id="table-target-wrapper" layout="block" styleClass="panel-body pn">
+                        <div class="table-responsive">
+                            <ui:include src="/layout/datatable/toolbar.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-target-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockMovementBean.pagination}"/>
+                                <ui:param name="suffix"  value="_target"/>
+                                <ui:param name="id_suffix"  value="_target"/>
+                            </ui:include>
+                            <table class="table  table-condensed table-hover theme-warning  fs13">
+                                <thead>
+                                    <tr class="bg-light">
+                                        <th class="">Sede salida</th>
+                                        <th class="">Documento</th>
+                                        <th class="">Fec. Envio</th>
+                                        <th class="">Fec. Recepción</th>
+                                        <th class="text-center">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ui:repeat value="#{stockMovementBean.pagination.data}" var="item">
+                                        <tr>
+                                            <td class="">#{item[1]} #{item[2]} (#{item[3]})</td>
+                                            <td class="">#{item[4]}-#{item[5]}</td>
+                                            <td class="">
+                                                <h:outputText value="#{item[6]}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </td>
+                                            <td class="">
+                                                <h:outputText value="#{item[7]}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </td>
+                                            <td class="text-right">
+                                                <ui:fragment rendered="#{not item[12]}">
+                                                    <span class="badge label-danger fs10">Anulado</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{not item[9]}">
+                                                    <span class="badge label-system disabled fs10">Pendiente</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[9]}">
+                                                    <span class="badge label-system active fs10">Env. a SUNAT</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[11] eq null}">
+                                                    <span class="badge label-alert disabled fs10">En camino</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[11] ne null}">
+                                                    <span class="badge label-alert active fs10">Recibido</span>
+                                                </ui:fragment>
+                                            </td>
+                                            <td class="text-right">
+                                                <p:commandLink 
+                                                    process="@this" 
+                                                    rendered="#{not sessionBean.authorize('M_MIN')}"
+                                                    onstart="begin_load()"
+                                                    action="#{stockMovementBean.load()}"
+                                                    oncomplete="end_load();open_info();" 
+                                                    styleClass="btn btn-xs btn-gradient btn-info">
+                                                    <i class="fa fa-info"/>
+                                                    <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                </p:commandLink>
+                                                <ui:fragment rendered="#{sessionBean.authorize('M_MIN')}">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                            <i class="fa fa-cog"/>
+                                                            <span class="caret ml5"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu ptn pbn" role="menu">
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    update=":info-content" 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    action="#{stockMovementBean.load()}"
+                                                                    oncomplete="end_load();open_info();"
+                                                                    styleClass="btn btn-xs btn-gradient btn-info">
+                                                                    Información
+                                                                    <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                            <ui:fragment rendered="#{sessionBean.authorize('M_MIN') and item[11] eq null and item[12]}">
+                                                                <li>
+                                                                    <p:commandLink 
+                                                                        update=":send-content" 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()"
+                                                                        oncomplete="end_load();SM.receive('#{item[8]}','#{item[4]}','#{item[5]}','#{item[1]} #{item[2]} (#{item[3]})');">
+                                                                        Recepcionar
+                                                                        <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                            </ui:fragment>
+                                                        </ul>
+                                                    </div>
+                                                </ui:fragment>
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+
+                                    <ui:fragment rendered="#{empty stockMovementBean.pagination.data}">
+                                        <tfoot>
+                                            <tr >
+                                                <td class="pl20 text-center" colspan="6">
+                                                    <h4 class="text-muted">No se ha encontrado ninguna recepción</h4>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </tbody>
+                            </table>
+                            <ui:include src="/layout/datatable/footer.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-target-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockMovementBean.pagination}"/>
+                            </ui:include>
+                        </div>
+                    </h:panelGroup>
+                </div>
+                <div class="panel mb5">
+                    <div class="panel-heading">
+                        <span class="panel-icon">
+                            <i class="fa fa-table"></i>
+                        </span>
+                        <span class="panel-title">ENVIOS</span>
+                    </div>
+                    <h:panelGroup id="table-source-wrapper" layout="block" styleClass="panel-body pn">
+                        <div class="table-responsive">
+                            <ui:include src="/layout/datatable/toolbar.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-source-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockMovementBean.paginationSource}"/>
+                                <ui:param name="suffix"  value="_source"/>
+                            </ui:include>
+                            <table class="table table-condensed table-hover theme-warning fs13">
+                                <thead>
+                                    <tr class="bg-light">
+                                        <th class="">Sede llegada</th>
+                                        <th class="">Documento</th>
+                                        <th class="">Fec. Envio</th>
+                                        <th class="">Fec. Recepción</th>
+                                        <th class="text-center">Estado</th>
+                                        <th class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ui:repeat value="#{stockMovementBean.paginationSource.data}" var="item">
+                                        <tr>
+                                            <td class="">#{item[1]} #{item[2]} (#{item[3]})</td>
+                                            <td class="">#{item[4]}-#{item[5]}</td>
+                                            <td class="">
+                                                <h:outputText value="#{item[6]}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </td>
+                                            <td class="">
+                                                <h:outputText value="#{item[7]}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </td>
+                                            <td class="text-right">
+                                                <ui:fragment rendered="#{not item[12]}">
+                                                    <span class="badge label-danger fs10">Anulado</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{not item[9]}">
+                                                    <span class="badge label-system disabled fs10">Pendiente</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[9]}">
+                                                    <span class="badge label-system active fs10">Env. a SUNAT</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[11] eq null}">
+                                                    <span class="badge label-alert disabled fs10">En camino</span>
+                                                </ui:fragment>
+                                                <ui:fragment rendered="#{item[11] ne null}">
+                                                    <span class="badge label-alert active fs10">En camino</span>
+                                                </ui:fragment>
+                                            </td>
+
+                                            <td class="text-right">
+                                                <p:commandLink 
+                                                    process="@this" 
+                                                    rendered="#{not sessionBean.authorize('M_MIN,A_MIN,S_MIN,RE_MIN')}"
+                                                    onstart="begin_load()"
+                                                    action="#{stockMovementBean.load()}"
+                                                    oncomplete="end_load();open_info();" 
+                                                    styleClass="btn btn-xs btn-gradient btn-info">
+                                                    <i class="fa fa-info"/>
+                                                    <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                </p:commandLink>
+                                                <ui:fragment rendered="#{sessionBean.authorize('M_MIN,A_MIN,S_MIN,RE_MIN')}">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                            <i class="fa fa-cog"/>
+                                                            <span class="caret ml5"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    update=":info-content" 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    action="#{stockMovementBean.load()}"
+                                                                    styleClass="btn btn-xs btn-gradient btn-info"
+                                                                    oncomplete="end_load();open_info();">
+                                                                    Información
+                                                                    <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                            <ui:fragment rendered="#{sessionBean.authorize('M_MIN') and item[12]}">
+                                                                <li> 
+                                                                    <p:commandLink 
+                                                                        update=":content-wrapper" 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()" 
+                                                                        styleClass="btn btn-xs btn-gradient btn-system"
+                                                                        oncomplete="end_load()">
+                                                                        Editar
+                                                                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                                                        <f:setPropertyActionListener target="#{managedStockMovementBean.idSelected}" value="#{item[0]}"/>
+                                                                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/internal_stock_movement/manage.xhtml"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                            </ui:fragment>
+                                                            <ui:fragment rendered="#{sessionBean.authorize('A_MIN') and item[12]}">
+                                                                <li>
+                                                                    <p:commandLink 
+                                                                        update=":delete-content" 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()"
+                                                                        styleClass="btn btn-xs btn-gradient btn-danger"
+                                                                        oncomplete="end_load();SM.delete('#{item[8]}','#{item[4]}','#{item[5]}','#{item[1]} #{item[2]} (#{item[3]})');">
+                                                                        Anular
+                                                                        <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                            </ui:fragment>
+                                                            <ui:fragment rendered="#{sessionBean.authorize('RE_MIN') and not item[12]}">
+                                                                <li>
+                                                                    <p:commandLink 
+                                                                        update=":delete-content" 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()"
+                                                                        styleClass="btn btn-xs btn-gradient btn-success"
+                                                                        oncomplete="end_load();SM.recovery('#{item[8]}','#{item[4]}','#{item[5]}','#{item[1]} #{item[2]} (#{item[3]})');">
+                                                                        Restaurar
+                                                                        <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                            </ui:fragment>
+                                                            <ui:fragment rendered="#{sessionBean.authorize('S_MIN') and not item[9]}">
+                                                                <li>
+                                                                    <p:commandLink 
+                                                                        update=":send-content" 
+                                                                        process="@this" 
+                                                                        onstart="begin_load()"
+                                                                        styleClass="btn btn-xs btn-gradient btn-alert"
+                                                                        oncomplete="end_load();SM.send('#{item[8]}','#{item[4]}','#{item[5]}','#{item[1]} #{item[2]} (#{item[3]})');">
+                                                                        Enviar a SUNAT
+                                                                        <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
+                                                                    </p:commandLink>
+                                                                </li>
+                                                            </ui:fragment>
+                                                        </ul>
+                                                    </div>
+                                                </ui:fragment>
+
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+                                </tbody>
+                                <ui:fragment rendered="#{empty stockMovementBean.paginationSource.data}">
+                                    <tfoot>
+                                        <tr >
+                                            <td class="pl20 text-center" colspan="6">
+                                                <h4 class="text-muted">No se ha encontrado ningun registro</h4>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </ui:fragment>
+                            </table>
+
+                            <ui:include src="/layout/datatable/footer.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-source-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockMovementBean.pagination}"/>
+                            </ui:include>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match">
+                <div class="admin-form form-horizontal">
+                    <h4>Filtrar Movimientos</h4>
+                    <hr class="short"/>
+
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-file"></i>
+                                    </span>
+                                    <p:inputText id="document-number" value="#{stockMovementBean.documentNumber}" styleClass="form-control" placeholder="Comprobante" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Buscar recepciones por fechas</small></h5>
+                    <script>
+                        $(function () {
+                            $("#form\\:date-init").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                            $("#form\\:date-end").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                        });
+                    </script>
+                    <div class="section row mb15">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-init" value="#{stockMovementBean.dateInitTarget}"  styleClass="fs10 form-control" placeholder="Inicio">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-end"  value="#{stockMovementBean.dateEndTarget}"  styleClass="fs10 form-control" placeholder="Fin" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <h5><small>Buscar envios por fechas</small></h5>
+                    <script>
+                        $(function () {
+                            $("#form\\:date-init-source").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                            $("#form\\:date-end-source").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                        });
+                    </script>
+                    <div class="section row mb15">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-init-source" value="#{stockMovementBean.dateInitSource}"  styleClass="fs10 form-control" placeholder="Inicio">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-end-source"  value="#{stockMovementBean.dateEndSource}"  styleClass="fs10 form-control" placeholder="Fin" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr class="short"/>
+
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{stockMovementBean.search()}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockMovementBean.delete(stockMovementBean.id)}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                        <p:remoteCommand name="recovery" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockMovementBean.recovery(stockMovementBean.id)}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                        <p:remoteCommand name="send" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockMovementBean.send(stockMovementBean.id)}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                        <p:remoteCommand name="receive" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockMovementBean.receive(stockMovementBean.id)}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{stockMovementBean.refresh()}" process="@form" update="form:table-source-wrapper,form:table-target-wrapper" />
+                    </div>
+
+
+                </div>
+            </aside>
+
+        </section>
+    </h:form>
+    <ui:include rendered="#{sessionBean.authorize('A_MIN')}" src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include rendered="#{sessionBean.authorize('S_MIN')}" src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="send"/>
+        <ui:param name="modal_title" value="ENVIAR COMPROBANTE A LA SUNAT"/>
+        <ui:param name="modal_icon" value="glyphicons glyphicons-message_out shaked animated"/>
+        <ui:param name="accept_option" value="send()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include rendered="#{sessionBean.authorize('M_MIN')}"  src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="receive"/>
+        <ui:param name="modal_title" value="RECEPCIONAR ENVIO"/>
+        <ui:param name="modal_icon" value="fa fa-truck shaked animated"/>
+        <ui:param name="accept_option" value="receive()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include  rendered="#{sessionBean.authorize('RE_MIN')}" src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="recovery"/>
+        <ui:param name="modal_title" value="RESTAURAR ENVIO ANULADO"/>
+        <ui:param name="modal_icon" value="fa fa-refresh shaked animated"/>
+        <ui:param name="accept_option" value="recovery()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+
+    <ui:include src="info.xhtml" />   
+    
+
+    <ui:include  rendered="#{sessionBean.authorize('RS_MIN,RR_MIN')}" src="reports.xhtml" />
+</ui:composition>
+
+

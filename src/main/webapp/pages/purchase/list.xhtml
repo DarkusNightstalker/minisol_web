@@ -1,0 +1,367 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <script  type="text/javascript" src="#{request.contextPath}/js/purchase_view.js"/>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">COMPRAS</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+
+        <section id="content" class="table-layout">
+            <div class="tray tray-center" style="height: 903px;">
+                <ui:fragment rendered="#{sessionBean.authorize('M_PRC,R_PRC,RP_PRC,I_PRC')}">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open ptn prn pln" style="display: block;">
+                        <div class="topbar-menu row">
+                            <ui:fragment rendered="#{sessionBean.authorize('M_PRC')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink 
+                                        onstart="begin_load()"
+                                        oncomplete="end_load();"
+                                        update=":content-wrapper" 
+                                        action="#{managedPurchaseBean.create()}" styleClass="metro-tile bg-success light" >
+                                        <span class="glyphicon glyphicon-shopping-cart text-muted"></span>
+                                        <span class="metro-title hidden-xs" >Comprar</span>
+                                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedPurchaseBean}"/>
+                                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/purchase/managed.xhtml"/>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('R_PRC,RP_PRC')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink
+                                        onstart="begin_load()"
+                                        oncomplete="end_load();open_reportpurchase();"
+                                        update=":create-content" 
+                                        action="#{purchaseReportBean.init()}" styleClass="metro-tile bg-dark light" >
+                                        <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                        <span class="metro-title hidden-xs">Reportes</span>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('I_PRC')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  
+                                        action="#{purchaseBean.import_.refresh()}" 
+                                        onstart="begin_load()"
+                                        update=":import-content-main"
+                                        process="@this" 
+                                        oncomplete="end_load();open_import_main('IMPORTAR COMPRAS',true,function(){$('#btn-refresh').trigger('click')},'purchase','Plantilla de compras')"  
+                                        styleClass="metro-tile bg-system light">
+                                        <span class="glyphicons glyphicons-upload text-muted"></span>
+                                        <span class="metro-title">Importar</span>
+                                        <f:setPropertyActionListener target="#{purchaseBean.import_}" value="#{purchaseBean.import_}"/>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                        </div>
+                    </div>
+                </ui:fragment>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <h:panelGroup id="table-wrapper" layout="block" styleClass="panel-body pn">
+                                <div class="table-responsive">
+                                    <ui:include src="/layout/datatable/toolbar.xhtml">
+                                        <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                        <ui:param name="pagination"  value="#{purchaseBean.pagination}"/>
+                                    </ui:include>
+                                    <table style="width: 100%" class="table-striped table-hover theme-warning table-condensed fs13">
+                                        <thead>
+                                            <tr class="bg-light">
+                                                <th class="text-center">Fecha</th>
+                                                <th class="text-center">Documento</th>
+                                                <th class="pl5 text-left">Proveedor</th>
+                                                <th class="text-center">Total</th>
+                                                <th class="text-center">Estado</th>
+                                                <th class="text-center"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ui:repeat value="#{purchaseBean.pagination.data}" var="item">
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <h:outputText value="#{item[1]}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                                        </h:outputText>
+                                                    </td>
+                                                    <td class="text-center">#{item[2]}-#{item[3]}</td>
+                                                    <td class="">
+                                                        <span>#{item[4]}</span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        S/. <h:outputText value="#{item[5]+item[6]-item[7]}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                        </h:outputText>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <ui:fragment rendered="#{(item[5]+item[6]-item[7]) eq item[9]}">
+                                                            <span class="label label-system fs8" title="Esta compra ffue pagada">Pagado</span>
+                                                        </ui:fragment>
+                                                        <ui:fragment rendered="#{not item[11]}">
+                                                            <span class="label label-danger fs8" title="Esta compra fue anulada">Anulado</span>
+                                                        </ui:fragment>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <p:commandLink 
+                                                            process="@this" 
+                                                            rendered="#{not sessionBean.authorize('M_PRC,A_PRC,P_PRC')}"
+                                                            onstart="begin_load()"
+                                                            action="#{purchaseBean.load()}"
+                                                            oncomplete="end_load();open_info();" 
+                                                            styleClass="btn btn-xs btn-gradient btn-info">
+                                                            <i class="fa fa-info"/>
+                                                            <f:setPropertyActionListener target="#{purchaseBean.id}" value="#{item[0]}"/>
+                                                        </p:commandLink>
+                                                        <ui:fragment rendered="#{sessionBean.authorize('M_PRC,A_PRC,P_PRC')}">
+                                                            <div class="btn-group text-right">
+                                                                <div class="btn-group">
+                                                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                        <i class="fa fa-cog"/>
+                                                                        <span class="caret ml5"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu  ptn pbn" role="menu">     
+                                                                        <li>
+                                                                            <p:commandLink 
+                                                                                process="@this" 
+                                                                                onstart="begin_load()"
+                                                                                action="#{purchaseBean.load()}"
+                                                                                oncomplete="end_load();open_info();" 
+                                                                                styleClass="btn btn-xs btn-gradient btn-info">
+                                                                                Información
+                                                                                <f:setPropertyActionListener target="#{purchaseBean.id}" value="#{item[0]}"/>
+                                                                            </p:commandLink>
+                                                                        </li>
+                                                                        <ui:fragment rendered="#{sessionBean.authorize('M_PRC')}">
+                                                                            <li>
+                                                                                <p:commandLink 
+                                                                                    update=":content-wrapper" 
+                                                                                    process="@this" 
+                                                                                    onstart="begin_load()" 
+                                                                                    oncomplete="end_load()"
+                                                                                    styleClass="btn btn-xs btn-gradient btn-system">
+                                                                                    Editar
+                                                                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedPurchaseBean}"/>
+                                                                                    <f:setPropertyActionListener target="#{managedPurchaseBean.idSelected}" value="#{item[0]}"/>
+                                                                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/purchase/managed.xhtml"/>
+                                                                                </p:commandLink>
+                                                                            </li>
+                                                                        </ui:fragment>
+                                                                        <ui:fragment rendered="#{sessionBean.authorize('A_PRC') and item[11]}">
+                                                                            <li>
+                                                                                <p:commandLink 
+                                                                                    update=":delete-content" 
+                                                                                    process="@this" 
+                                                                                    onstart="begin_load()"
+                                                                                    styleClass="btn btn-xs btn-gradient btn-danger"
+                                                                                    oncomplete="end_load();Purchase.delete('#{item[10]}','#{item[2]}','#{item[3]}','#{item[4]}',#{item[5]+item[6]-item[7]});">
+                                                                                    Anular
+                                                                                    <f:setPropertyActionListener target="#{purchaseBean.id}" value="#{item[0]}"/>
+                                                                                </p:commandLink>
+                                                                            </li>
+                                                                        </ui:fragment>
+                                                                        <ui:fragment rendered="#{sessionBean.authorize('P_PRC') and item[11]}">          
+                                                                            <li>
+                                                                                <p:commandLink 
+                                                                                    update=":payment-content"
+                                                                                    onstart="begin_load()" 
+                                                                                    oncomplete="end_load();open_payments()"
+                                                                                    styleClass="btn btn-xs btn-gradient btn-alert"
+                                                                                    action="#{purchaseBean.load()}">
+                                                                                    Pagos
+                                                                                    <f:setPropertyActionListener target="#{purchaseBean.id}" value="#{item[0]}" />
+                                                                                </p:commandLink>
+                                                                            </li>
+                                                                        </ui:fragment> 
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </ui:fragment>
+                                                    </td>
+                                                </tr>
+                                            </ui:repeat>
+
+                                            <ui:fragment rendered="#{empty purchaseBean.pagination.data}">
+                                                <tfoot>
+                                                    <tr >
+                                                        <td class="pl20" colspan="6">
+                                                            <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </tbody>
+                                    </table>
+
+                                    <ui:include src="/layout/datatable/footer.xhtml">
+                                        <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                        <ui:param name="pagination"  value="#{purchaseBean.pagination}"/>
+                                    </ui:include>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <aside class="tray tray-right tray290" data-tray-height="match" style="height: 858px;">
+                <div class="admin-form form-horizontal">
+                    <h4> Filtrar Compras</h4>
+                    <hr class="short"/>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-file"></i>
+                                    </span>
+                                    <p:inputText id="document-number" value="#{purchaseBean.documentNumber}"  styleClass="form-control input-sm" placeholder="Numero de doc" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Buscar por cliente</small></h5>
+                    <div class="section mb5">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon"> 
+                                        <i class="glyphicons glyphicons-vcard"></i>
+                                    </span>
+                                    <p:inputText id="identity-document" value="#{purchaseBean.identityDocument}"  styleClass="form-control input-sm" placeholder="DNI/RUC" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon"> 
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                    <p:inputText id="customer-name" value="#{purchaseBean.customerName}"  styleClass="form-control input-sm" placeholder="Cliente" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Rango de fechas </small></h5>
+                    <script>
+                        $(function () {
+                            $("#form\\:date-init").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                            $("#form\\:date-end").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                        });
+                    </script>
+                    <div class="section row mb10">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-init" value="#{purchaseBean.dateInit}"  styleClass="fs10 form-control" placeholder="Inicio">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-end"  value="#{purchaseBean.dateEnd}"  styleClass="fs10 form-control" placeholder="Fin" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5><small>Rango de precio(S/.)</small></h5>
+                    <div class="section row mb10">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            S/.
+                                        </span>
+                                        <p:inputText id="total-init" value="#{purchaseBean.totalInit}"  styleClass="form-control" placeholder="0" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            S/.
+                                        </span>
+                                        <p:inputText id="total-end"  value="#{purchaseBean.totalEnd}"  styleClass="form-control" placeholder="1000" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{purchaseBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedPurchaseBean.delete(purchaseBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{purchaseBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </h:form>
+
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+
+ 
+    <ui:include src="info.xhtml" />    
+    <ui:include  rendered="#{sessionBean.authorize('R_PRC,RP_PRC')}"  src="reports.xhtml" />    
+    <ui:include  rendered="#{sessionBean.authorize('P_PRC')}" src="payments.xhtml" />    
+</ui:composition>

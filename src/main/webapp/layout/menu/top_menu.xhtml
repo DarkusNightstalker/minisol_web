@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:form id="form-menu">
+        <ul class="nav sidebar-menu">
+            <li>
+                <p:commandLink id="home-opt" onstart="begin_load()" onclick="change_menu('home-opt')" oncomplete="end_load()" process="@this" update=":content-wrapper"> 
+                    <span class="glyphicon glyphicon-home"></span>
+                    <span class="sidebar-title">Inicio</span>
+                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                </p:commandLink>
+            </li>
+            <ui:fragment rendered="#{sessionBean.authorize('V_IDD,V_FNE,V_PLE,V_UOM,V_CPE,V_STT,V_PDL,V_PDT,V_PER,V_CPY,V_STC')}"> 
+                <li>
+                    <p:commandLink id="registry-opt" onstart="begin_load()" onclick="change_menu('registry-opt')" oncomplete="end_load()" process="@this" update=":content-wrapper" styleClass="accordion-toggle">
+                        <span class="fs18 icon-data-table"></span>
+                        <span class="sidebar-title">Registros</span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/menu/registry.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ui:fragment>      
+            <ui:fragment rendered="#{sessionBean.authorize('V_SAL,V_PRC,V_MIN,V_MRM,V_DEC,V_DES,V_CSH,V_PPA')}">                
+                <li>
+                    <p:commandLink 
+                        id="operations-opt" onstart="begin_load()" onclick="change_menu('operations-opt')" oncomplete="end_load()" process="@this" update=":content-wrapper" styleClass="accordion-toggle" >
+                        <span class="glyphicons glyphicons-global"></span>
+                        <span class="sidebar-title">Operaciones</span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/menu/operations.xhtml"/>
+                    </p:commandLink>
+                </li>      
+            </ui:fragment>      
+            <ui:fragment rendered="#{sessionBean.authorize('V_CTB')}">    
+                <li>
+                    <p:commandLink 
+                        action="#{accountingMenuBean.onLoad(true)}" id="accounting-opt" onstart="begin_load()" onclick="change_menu('accounting-opt')" oncomplete="end_load()" process="@this" update=":content-wrapper" styleClass="accordion-toggle">
+                        <span class="glyphicons glyphicons-calculator"></span>
+                        <span class="sidebar-title">Contabilidad</span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{accountingMenuBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/menu/accounting.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ui:fragment>
+            <ui:fragment rendered="#{sessionBean.authorize('V_USR,V_ROL')}">                
+                <li>
+                    <p:commandLink id="security-opt" onstart="begin_load()" onclick="change_menu('security-opt')" oncomplete="end_load()" process="@this" update=":content-wrapper" styleClass="accordion-toggle">
+                        <span class="glyphicons glyphicons-keys"></span>
+                        <span class="sidebar-title">Seguridad</span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/menu/security.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ui:fragment>
+        </ul>
+    </h:form>
+    <script>
+        var LAST_MENU = "#{navigationBean.topMenú}";
+        $(function () {
+            $("#form-menu\\:#{navigationBean.topMenú}").closest("li").addClass("active")
+        });
+        function change_menu(element) {
+            $("#form-menu\\:" + LAST_MENU).closest("li").removeClass("active")
+            $("#form-menu\\:" + element).closest("li").addClass("active");
+            LAST_MENU = element;
+        }
+    </script>
+</ui:composition>
+
+
+

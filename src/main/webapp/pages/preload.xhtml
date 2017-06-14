@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function begin_load() {
+            $(".pace").removeClass("pace-inactive");
+            $(".pace").addClass("pace-active");
+            //$("#modal-load").modal({
+            //    backdrop: 'static',
+            //    keyboard: false
+            //});
+            //var height = $("#modal-load").height() - 100
+           // $("#load-container").height(height + "px")
+        }
+        function end_load(){
+            $(".pace").removeClass("pace-active");
+            $(".pace").addClass("pace-inactive");
+            //$('#modal-load').modal('hide');
+        }
+        $(function() {
+            $(window).resize(function() {
+                var height = $("#modal-load").height() - 100
+                $("#load-container").height(height + "px")
+            });
+        })
+    </script>
+
+    <div id="modal-load" class="modal fade" role="dialog">
+
+        <div id="load-container" class="modal-dialog" >
+            <span  style="position:fixed;right:50%;bottom:50%">
+                <h1 class="txt-color-white" ><i class="fa fa-cog fa-spin"></i> Cargando...</h1>
+            </span>
+        </div>
+    </div>
+    
+
+</ui:composition>

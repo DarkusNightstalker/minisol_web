@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form id="form">
+
+        <header id="topbar" class="alt">
+            <div class="topbar-left">
+                <ol class="breadcrumb">
+                    <li class="crumb-active">
+                        <a href="javascript:void(0)">Desacargar Plantillas</a>
+                    </li>
+                    <li class="crumb-icon">
+                        <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                </ol>
+            </div>
+        </header>
+        <section id="content" >
+            <div class="row">
+                <ui:fragment rendered="#{sessionBean.authorize('V_SAL')}">
+                    <div class="col-sm-3 col-xl-3">
+                        <a  href="javascript:window.open('#{request.contextPath}/template/sale_template.xlsx', '_blank')"  style="text-decoration: none" >   
+                           <div class="panel panel-tile text-center br-a br-grey bg-info animated fadeIn"  style="border-radius: 5px">
+                                <div class="panel-body">
+                                    <h1 class="fs30 mt5 mbn"><i class="fa fa-dollar"/></h1>
+                                    <h6 style="color: white">Ventas</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PRH')}">
+                    <div class="col-sm-3 col-xl-3">
+                         <a  href="javascript:window.open('#{request.contextPath}/template/purchase_template.xlsx', '_blank')"  style="text-decoration: none" >   
+                            <div class="panel panel-tile text-center br-a br-grey bg-info animated fadeIn"  style="border-radius: 5px">
+                                <div class="panel-body">
+                                    <h1 class="fs30 mt5 mbn"><i class="fa fa-shopping-cart"/></h1>    
+                                    <h6 style="color: white">Compras</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </ui:fragment>
+            </div>
+
+        </section>
+
+    </h:form>
+</ui:composition>

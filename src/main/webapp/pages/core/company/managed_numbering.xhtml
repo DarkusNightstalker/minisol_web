@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_managed_numbering() {
+            $('#modal-manage-numbering').modal();
+        }
+        $(function () {
+            $('#modal-manage-ws').on('shown.bs.modal', function () {
+                $('#form-ws\\:name').focus();
+            }).on('hidden.bs.modal', function () {
+
+            });
+        });
+    </script>
+
+    <div id="modal-manage-numbering" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <h:panelGroup layout="block" id="m-numbering-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        $('#form-supplier\\:address').pressEnter(function () {
+                        });
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="glyphicons glyphicons-barcode mr5"></i><b>EDITAR NÚMERO DE DOCUMENTO</b> 
+                </div>
+                <h:form id="form-numbering">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Tipo 
+                                </label>
+                                <div class="col-md-8">
+                                    <p class="form-control-static input-sm">#{managedCompanyBean.numberingSearcher.documentNumbering.paymentProof.name}</p>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Serie
+                                </label>
+                                <div class="col-md-4">
+                                    <p class="form-control-static input-sm">#{managedCompanyBean.numberingSearcher.documentNumbering.serie}</p>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Numeración
+                                </label>
+                                <div class="col-md-4">
+                                    <script>
+                                        $(function () {
+                                            $("#form-numbering\\:numbering").pressEnter(function () {
+                                                save_ws();
+                                            }).numeric({
+                                                scale: 0,
+                                                negative: false
+                                            });
+                                        })
+                                    </script>
+                                    <p:inputText id="numbering" value="#{managedCompanyBean.numberingSearcher.documentNumbering.numbering}" styleClass="form-control input-sm ">
+                                    </p:inputText>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p:remoteCommand 
+                        action="#{managedCompanyBean.numberingSearcher.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-manage-numbering .close').trigger('click')"
+                        name="save_numbering" update="form:numbering-wrapper"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="save_numbering()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

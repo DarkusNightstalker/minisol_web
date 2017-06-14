@@ -1,0 +1,1001 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript" src="#{request.contextPath}/js/purchase_man.js"/>
+    <script>
+        fixModal();
+    </script>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedPurchaseBean.selected.id eq null ? 'AGREGAR' : 'EDITAR'} COMPRA</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+                <li class="crumb-trail">COMPRAS</li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 20px">     
+        <p:commandLink id="back" oncomplete="end_load();Core.trays();" styleClass="hidden" process="@this" update=":content-wrapper" action="#{purchaseBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/purchase/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{purchaseBean}" target="#{sessionBean.loadable}" />
+        </p:commandLink>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedPurchaseBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedPurchaseBean.doSave('/pages/purchase/list.xhtml', purchaseBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="topbar-dropmenu" class="alt topbar-menu-open pb5 pln prn" style="display: block;">
+                                <div class="topbar-menu row">
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Purchase.back()" class="metro-tile bg-danger light">  
+                                            <span class="fa fa-arrow-left text-muted"></span>
+                                            <span class="metro-title">Lista</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Purchase.refresh()" class="metro-tile bg-warning light">
+                                            <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                            <span class="metro-title" >Reestablecer</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Purchase.save()" class="metro-tile bg-success light">
+                                            <span class="fa fa-save text-muted"></span>
+                                            <span class="metro-title" >Guardar</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon pull-left">
+                                        <i class="fa fa-file-text"></i>
+                                    </span>
+                                    <span class="panel-title pull-left">COMPROBANTE DE COMPRA</span>
+                                    <div class="btn-group pull-right" style="padding-top: 9px">
+                                        <p:inputText id="date-issue" tabindex="1" value="#{managedPurchaseBean.dateIssue}" styleClass="form-control input-sm text-center" placeholder="Fecha de emision" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="panel-body pt10 pb5">
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-2 control-label">Tipo</label>
+                                            <div class="col-md-10">
+                                                <h:selectOneMenu id="payment-proof"  value="#{managedPurchaseBean.paymentProofId}" styleClass="form-control  input-sm">
+                                                    <f:selectItems 
+                                                        value="#{managedPurchaseBean.paymentProofSearcher.data}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-2 control-label">Documento</label>
+                                            <div class="col-xs-3">
+                                                <div class="form-group form-group-sm mbn">
+                                                    <div class="col-xs-12">
+                                                        <p:inputText id="serie"  tabindex="2" value="#{managedPurchaseBean.serie}" styleClass="form-control input-sm" placeholder="Serie" maxlength="4" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-1 text-center">
+                                                <p class="form-control-static text-center input-sm"><i class="fa fa-minus"/></p>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <div class="form-group form-group-sm mbn">
+                                                    <div class="col-xs-12">
+                                                        <p:inputText id="document-number" tabindex="3" value="#{managedPurchaseBean.documentNumber}" styleClass="form-control input-sm" placeholder="Nro correlativo" maxlength="8" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12 col-md-offset-2">
+                                                <div class="checkbox-custom checkbox-info mb5">
+                                                    <input type="checkbox" checked="" id="checkboxExample6"/>
+                                                    <label for="checkboxExample6">Es un comprobante de pago electrónico</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon">
+                                        <i class="glyphicon glyphicon-user"></i>
+                                    </span>
+                                    <span class="panel-title">PROVEEDOR</span>
+                                </div>
+                                <div class="panel-body pt10 pb5">
+                                    <div class="form-horizontal">
+                                        <div class="col-md-12">
+                                            <p:remoteCommand 
+                                                name="search_supplier"
+                                                onstart="begin_load()"  
+                                                onsuccess="end_load()"   
+                                                process="@this,identity-number" 
+                                                action="#{managedPurchaseBean.supplierSearcher.search()}"
+                                                update="form:supplier-info,:s-actor-content,:m-supplier-content,form:exist-supplier"/>
+                                            <p:remoteCommand 
+                                                name="null_customer"
+                                                onstart="begin_load()"  
+                                                onsuccess="end_load()"   
+                                                process="@this" 
+                                                update="form:supplier-info,form:exist-supplier">
+                                                <f:setPropertyActionListener target="#{managedPurchaseBean.supplierSearcher.actor}" value="#{null}" />
+                                            </p:remoteCommand>
+                                            <h:panelGroup  id="supplier-wrapper" layout="block" >
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="col-md-2 control-label input-sm">RUC/DNI</label>
+                                                    <div class="col-md-5">
+                                                        <script>
+                                                            $(function () {
+                                                                Purchase.configure_supplier();
+                                                            });
+                                                        </script>
+                                                        <p:inputText id="identity-number" tabindex="4" styleClass="form-control input-sm" value="#{managedPurchaseBean.supplierSearcher.identityNumber}" />                                                        
+                                                        <h:inputHidden id="exist-supplier" value="#{managedPurchaseBean.supplierSearcher.existSupplier}" />
+
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup id="supplier-info" layout="block">
+
+                                                    <ui:fragment rendered="#{managedPurchaseBean.supplierSearcher.actor ne null}">
+                                                        <div class="form-group form-group-sm mbn">
+                                                            <label class="col-md-2 text-left col-md-offset-2 control-label input-sm">Nombre</label>
+                                                            <div class="col-md-5">
+                                                                <p class="form-control-static input-sm">#{managedPurchaseBean.supplierSearcher.actor.identityNumber.length() == 11 ? (managedPurchaseBean.supplierSearcher.actor.other eq null ? managedPurchaseBean.supplierSearcher.actor.name : managedPurchaseBean.supplierSearcher.actor.other) : managedPurchaseBean.supplierSearcher.actor.name} </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-group-sm mb5">
+                                                            <label class="col-md-2 text-left col-md-offset-2 control-label input-sm">Dirección</label>
+                                                            <div class="col-md-5">
+                                                                <p class="form-control-static input-sm">#{managedPurchaseBean.supplierSearcher.actor.address}</p>
+                                                            </div>
+                                                        </div>
+                                                    </ui:fragment>
+                                                </h:panelGroup>
+                                            </h:panelGroup>
+                                            <div class="form-group form-group-sm mb5">
+                                                <label class="col-md-2 control-label input-sm">Condición</label>
+                                                <div class="col-md-4">
+                                                    <h:selectOneMenu id="cash" value="#{managedPurchaseBean.cash}" styleClass="form-control input-sm">
+                                                        <f:selectItem itemValue="#{true}" itemLabel="Contado"/>
+                                                        <f:selectItem itemValue="#{false}" itemLabel="Credito"/>
+                                                    </h:selectOneMenu>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group form-group-sm mbn">                                       
+                                                <div class="col-md-4 col-md-offset-2">
+                                                    <h:selectOneRadio id="igv"  value="#{managedPurchaseBean.igv}"   layout="custom" styleClass="col-md-12">
+                                                        <f:selectItem itemValue="#{true}" itemLabel="Gravada" />
+                                                        <f:selectItem itemValue="#{false}" itemLabel="No Gravada" />
+                                                        <p:ajax event="change" process="@this" update="form:detail-wrapper" />
+                                                    </h:selectOneRadio>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon pull-left">
+                                        <i class="glyphicons glyphicons-tag"></i>
+                                    </span>
+                                    <span class="panel-title pull-left" >PRODUCTOS</span>
+                                    <div class="btn-group pull-right pt5">
+                                        <p:commandLink 
+                                            id="btn-s-product"
+                                            update=":s-product-content"
+                                            onstart="begin_load()" 
+                                            oncomplete="end_load();$('#modal-search-product').modal();" 
+                                            process="@this,form:detail-wrapper,form:igv"
+                                            styleClass="btn btn-primary btn-sm mr10"
+                                            action="#{managedPurchaseBean.productSearcher.refresh()}">
+                                            <i class="fa fa-search"/> Buscar
+                                        </p:commandLink>
+                                        <p:commandLink 
+                                            update=":m-product-content"
+                                            onstart="begin_load()"
+                                            oncomplete="end_load();$('#modal-add-product').modal()" 
+                                            styleClass="btn btn-system btn-sm"
+                                            process="@this,form:detail-wrapper"
+                                            action="#{managedPurchaseBean.productSearcher.initManaged(true)}">
+                                            <i class="fa fa-plus"/> Agregar
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <h:panelGroup id="detail-wrapper" layout="block" class="form-horizontal">
+                                        <ui:fragment rendered="#{managedPurchaseBean.igv}">                        
+                                            <input type="hidden" id="form:percent-igv" value="#{managedPurchaseBean.constantIGV}" />
+                                        </ui:fragment>
+                                        <script>
+                                            $(function () {
+                                                Purchase.configure_detail();
+                                            });
+                                        </script>
+                                        <table class="table-bordered  mbn">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-2">CÓDIGO</th>
+                                                    <th class="col-md-#{managedPurchaseBean.igv ? 5:6}">PRODUCTO</th>
+                                                    <th class="col-md-1 text-center">CANTIDAD</th>
+                                                    <th class="col-md-1 text-center">P. UNIT.</th>
+                                                    <ui:fragment rendered="#{managedPurchaseBean.igv}">
+                                                        <th class="col-md-1 text-center">IGV</th>
+                                                    </ui:fragment>
+                                                    <th class="col-md-1 text-center">P. VENTA</th>
+                                                    <th class="col-md-1 text-center">SUBTOTAL</th>
+                                                    <th style="min-width: 40px;max-width: 40px"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat id="detaill" value="#{managedPurchaseBean.detailSearcher.data}" var="item" varStatus="st">
+                                                    <tr data-index="#{st.index}">
+                                                        <td>#{item[1]}</td>
+                                                        <td>#{item[2]}</td>
+                                                        <td>
+                                                            <p:inputText id="quantity" converter="javax.faces.BigDecimal" value="#{item[3]}" class="form-control input-sm quantity">
+                                                                <f:passThroughAttribute name="required" value="" />
+                                                                <f:passThroughAttribute name="requiredMessage" value="Campo Obligatorio" />
+                                                                <f:passThroughAttribute name="min" value="0.01" />
+                                                            </p:inputText>
+                                                        </td>
+                                                        <td class="text-right pr5">
+                                                            S/. 
+                                                            <span id="form:detaill:#{st.index}:display-unit-price">
+                                                                <h:outputText value="#{item[4]}" >
+                                                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                </h:outputText>
+                                                            </span>
+                                                            <h:inputHidden id="unit-price" class="unit-price" converter="javax.faces.BigDecimal" value="#{item[4]}" />
+                                                        </td>
+                                                        <ui:fragment rendered="#{managedPurchaseBean.igv}">
+                                                            S/. 
+                                                            <td class="text-right pr5">
+                                                                <span id="form:detaill:#{st.index}:display-igv" class="display-igv">
+                                                                    <h:outputText value="#{item[8]}" >
+                                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                                <h:inputHidden id="igv" converter="javax.faces.BigDecimal" value="#{item[8]}" />
+                                                            </td>
+                                                        </ui:fragment>
+                                                        <td >
+                                                            <p:inputText id="unit-price-sale" converter="javax.faces.BigDecimal" value="#{item[9]}" class="form-control input-sm text-right">
+                                                                <f:passThroughAttribute name="required" value="" />
+                                                                <f:passThroughAttribute name="requiredMessage" value="Campo Obligatorio" />
+                                                                <f:passThroughAttribute name="min" value="0.01" />
+                                                            </p:inputText>
+                                                        </td>
+                                                        <td>
+                                                            <p:inputText id="subtotal" converter="javax.faces.BigDecimal" value="#{item[5]}" class="form-control input-sm subtotal text-right">
+                                                                <f:passThroughAttribute name="required" value="" />
+                                                                <f:passThroughAttribute name="requiredMessage" value="Campo Obligatorio" />
+                                                                <f:passThroughAttribute name="min" value="0.01" />
+                                                            </p:inputText>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <p:commandLink 
+                                                                update="form:detail-wrapper"
+                                                                process="@this,form:detail-wrapper"
+                                                                action="#{managedPurchaseBean.detailSearcher.remove(st.index)}" 
+                                                                styleClass="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"/>
+                                                            </p:commandLink>
+                                                        </td>
+                                                    </tr>         
+                                                </ui:repeat>                                                                                       
+                                            </tbody>
+                                            <ui:fragment rendered="#{empty managedPurchaseBean.detailSearcher.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <td class="text-center" colspan="6"><h4>NO HAY PRODUCTOS AGREGADOS</h4></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </table>
+                                        <div class="row" id="invoice-footer">
+                                            <div class="col-md-12">
+                                                <div class="pull-right">
+                                                    <table class="table table-condensed" id="invoice-summary">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    <b>Sub Total:</b>
+                                                                </th>
+                                                                <th class="text-right">S/. 
+                                                                    <span id="form:display-subtotal">
+                                                                        <h:outputText value="#{managedPurchaseBean.subtotal}">
+                                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                        </h:outputText>
+                                                                    </span>
+                                                                    <h:inputHidden id="subtotal" value="#{managedPurchaseBean.subtotal}" />
+                                                                </th>
+                                                                <th style="min-width: 40px;max-width: 40px"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <b>Descuento</b>
+                                                                </td>
+                                                                <td  class="text-right">
+                                                                    <div class="input-group input-group-sm">
+                                                                        <span class="input-group-addon">
+                                                                            <i class="fa">- S/.</i>
+                                                                        </span>
+                                                                        <p:inputText id="disccount" value="#{managedPurchaseBean.subtotalDiscount}"  disabled="#{empty managedPurchaseBean.detailSearcher.data}" styleClass="form-control input-sm text-right"></p:inputText>
+                                                                    </div>
+                                                                </td>
+                                                                <th style="min-width: 40px;max-width: 40px"></th>
+                                                            </tr>
+                                                            <ui:fragment rendered="#{managedPurchaseBean.igv}">
+                                                                <tr>
+                                                                    <td>
+                                                                        <b>IGV</b>
+                                                                    </td>
+                                                                    <td  class="text-right">
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span class="input-group-addon">
+                                                                                <i class="fa"> S/.</i>
+                                                                            </span>
+                                                                            <p:inputText id="igv-value" value="#{managedPurchaseBean.igv}"  readonly="true" styleClass="form-control input-sm text-right"></p:inputText>
+
+                                                                        </div>
+                                                                    </td>
+                                                                    <th style="min-width: 40px;max-width: 40px"></th>
+                                                                </tr>
+                                                            </ui:fragment>
+                                                            <tr>
+                                                                <td>
+                                                                    <b>Total</b>
+                                                                </td>
+                                                                <td  class="text-right">S/. 
+                                                                    <span id="form:display-total">
+                                                                        <h:outputText value="#{managedPurchaseBean.subtotal +  (managedPurchaseBean.igv ? managedPurchaseBean.subtotal*managedPurchaseBean.constantIGV:0) - managedPurchaseBean.subtotalDiscount}">
+                                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                        </h:outputText>
+                                                                    </span>
+                                                                </td>
+                                                                <th style="min-width: 40px;max-width: 40px"></th>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </h:form>
+
+
+    <script>
+        $(function () {
+            $('#modal-search-product').on('shown.bs.modal', function () {
+                $('#form-search-product\\:terms-product').focus();
+            });
+            $("#modal-search-product .modal").hotKey({key: 'k', modifier: 'ctrl'}, function () {
+                $('#form-search-product\\:btn-create').trigger('click');
+
+            });
+            $("#modal-search-product .modal").hotKey({key: '9', modifier: 'ctrl'}, function () {
+                $('#form-search-product\\:terms-product').focus();
+            });
+        });
+    </script>
+    <div id="modal-search-product" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%;">
+            <h:panelGroup layout="block" id="s-product-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <i class="glyphicons glyphicons-user_add"></i>&nbsp;&nbsp;&nbsp;<b>BUSCAR PRODUCTOS</b> 
+                </div>
+                <h:form id="form-search-product" onkeypress="return event.keyCode != 13;">
+                    <ui:fragment rendered="#{managedPurchaseBean.igv}">                        
+                        <input type="hidden" id="form-search-product:percent-igv" value="#{managedPurchaseBean.constantIGV}" />
+                    </ui:fragment>
+                    <ui:param name="h_row" value="#{100}" />
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="datatable2_wrapper" class="dataTables_wrapper form-horizontal dt-bootstrap no-footer">
+                                        <div class="dt-panelmenu clearfix">
+                                            <div class="form-group form-group-sm mbn">
+                                                <label class="control-label col-md-2 text-left">Buscar Producto</label>
+                                                <div class="col-md-7">
+                                                    <script>
+                                                        $(function () {
+                                                            $("#form-search-product\\:terms-product").pressEnter(function () {
+                                                                search_product();
+                                                            }).on("focus", function () {
+                                                                setCaretAtEnd(this)
+                                                            });
+                                                        });
+                                                    </script>
+                                                    <p:inputText id="terms-product" value="#{managedPurchaseBean.productSearcher.terms}" styleClass="form-control input-sm" placeholder="Por nombre o código de barras"/>
+                                                </div>
+                                                <div class="col-md-3 text-right">
+                                                    <p:commandLink 
+                                                        id="btn-create"
+                                                        update=":m-product-content" 
+                                                        onstart="begin_load()"
+                                                        oncomplete="end_load();$('#modal-add-product').modal()" 
+                                                        styleClass="btn btn-system btn-sm"
+                                                        process="@this,form-search-product:product-table-wrapper"
+                                                        action="#{managedPurchaseBean.productSearcher.initManaged(false)}">
+                                                        <i class="fa fa-plus"/> Nuevo Producto
+                                                    </p:commandLink>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ui:param name="h_row" value="#{100}" />
+                                        <h:panelGroup id="product-table-wrapper" layout="block">
+                                            <script>
+                                                $(function () {
+                                                    Purchase.productSearch.init();
+                                                });
+                                            </script>
+
+                                            <ui:include src="/layout/datatable/toolbar.xhtml">
+                                                <ui:param name="wrapperId"  value="form-search-product:product-table-wrapper"/>
+                                                <ui:param name="oncomplete"  value="Purchase.productSearch.after_search()"/>
+                                                <ui:param name="pagination"  value="#{managedPurchaseBean.productSearcher.pagination}"/>
+                                            </ui:include>
+                                            <p:remoteCommand 
+                                                name="search_product" 
+                                                process="@form"
+                                                onstart="begin_load()"
+                                                oncomplete="end_load();Purchase.productSearch.after_search()"
+                                                action="#{managedPurchaseBean.productSearcher.update()}"
+                                                update="form-search-product:product-table-wrapper"/>
+                                            <table class="table-striped table-hover" id="datatable2" cellspacing="0" width="100%" role="grid" aria-describedby="datatable2_info" 
+                                                   style="width: 100%;height:#{managedPurchaseBean.productSearcher.pagination.data.size() * h_row > 300 ? 300 : (managedPurchaseBean.productSearcher.pagination.data.size() * h_row eq 0 ? h_row : managedPurchaseBean.productSearcher.pagination.data.size() * h_row) }px;display: -moz-groupbox;overflow:hidden">
+                                                <thead>
+                                                    <tr class="bg-dark" style="color:white">
+                                                        <th class="col-xs-2 text-center" >CÓGIGO</th>
+                                                        <th class="col-xs-#{managedPurchaseBean.igv ? 5:6}" >PRODUCTO</th>
+                                                        <th class="col-xs-1 text-center" >CANTIDAD</th>
+                                                        <th class="col-xs-1 text-center" >P. UNIT.</th>
+                                                        <th class="col-xs-1 text-center" >SUBTOTAL</th>
+                                                        <ui:fragment rendered="#{managedPurchaseBean.igv}">
+                                                            <th class="col-xs-1 text-center" >IGV</th>
+                                                        </ui:fragment>
+                                                        <th class="col-xs-1 text-center" >P. VENTA</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="" style="overflow-y: scroll;
+                                                       height: 260px;
+                                                       width: 99.5%;
+                                                       right: -5.5px;
+                                                       position: absolute;">
+                                                    <ui:repeat id="data" value="#{managedPurchaseBean.productSearcher.pagination.data}" var="item" varStatus="st">                                                    
+                                                        <tr data-index="#{st.index}" data-p-id="#{item[0]}"  >
+                                                            <td class="col-xs-2 text-center" style="color : #000  !important">#{item[2]}</td>
+                                                            <td class="col-xs-#{managedPurchaseBean.igv ? 5:6}" style="color : #000  !important">#{item[3].toUpperCase()}</td>
+                                                            <td style="color : #000  !important" class="text-right col-xs-1">
+                                                                <p:inputText id="quantity" converter="javax.faces.BigDecimal" styleClass="form-control input-sm" value="#{item[6]}" />
+                                                            </td>
+                                                            <td style="color : #000  !important" class="text-right col-xs-1">
+                                                                <span id="form-search-product:data:#{st.index}:display-unit-price">
+                                                                    <h:outputText value="#{item[7]}">
+                                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                    </h:outputText>
+                                                                </span>
+                                                                <h:inputHidden id="unit-price" converter="javax.faces.BigDecimal" value="#{item[7]}"  />
+                                                            </td>
+                                                            <td style="color : #000  !important" class="text-right col-xs-1">
+                                                                <p:inputText id="subtotal" converter="javax.faces.BigDecimal" styleClass="form-control input-sm subtotal" value="#{item[8]}" />
+                                                            </td>
+                                                            <ui:fragment rendered="#{managedPurchaseBean.igv}">
+                                                                <td style="color : #000  !important" class="text-right col-xs-1">
+                                                                    <span id="form-search-product:data:#{st.index}:display-igv">
+                                                                        <h:outputText value="#{item[9]}">
+                                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                        </h:outputText>
+                                                                    </span>
+                                                                    <input type="hidden" class="igv" id="form:igv-value" value="#{item[9]}"  />
+                                                                </td>
+                                                            </ui:fragment>
+                                                            <td style="color : #000  !important" class="text-right col-xs-1">
+                                                                <p:inputText id="unit-price-sale" converter="javax.faces.BigDecimal" styleClass="form-control input-sm" value="#{item[5]}">
+                                                                    <f:convertNumber type="currency" currencySymbol="" locale="en-US"  groupingUsed="false"/>
+                                                                </p:inputText>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                    <ui:fragment rendered="#{empty managedPurchaseBean.productSearcher.pagination.data}">
+                                                        <tr>
+                                                            <td class="col-xs-12" colspan="3">
+                                                                <h3 class="text-muted">No se ha encontrado productos</h3>
+                                                            </td>                                                        
+                                                        </tr>
+                                                    </ui:fragment>
+                                                </tbody>
+                                            </table>
+
+                                            <ui:include src="/layout/datatable/footer.xhtml">
+                                                <ui:param name="wrapperId"  value="form-search-product:product-table-wrapper"/>
+                                                <ui:param name="m_rows"   value="#{50}"/>
+                                                <ui:param name="pagination"  value="#{managedPurchaseBean.productSearcher.pagination}"/>
+                                            </ui:include>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <p:commandLink
+                            update=":form:detail-wrapper"
+                            onstart="begin_load()" 
+                            oncomplete="end_load();$('#modal-search-product').modal('hide');" 
+                            styleClass="btn btn-sm btn-success" action="#{managedPurchaseBean.productSearcher.updateDetail()}">
+                            Aceptar
+                        </p:commandLink>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger  btn-sm">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $('#modal-add-product').on('shown.bs.modal', function () {
+                $('#form-add-product\\:name').focus();
+            });
+        });
+    </script>
+    <div id="modal-add-product" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%;">
+            <h:panelGroup layout="block" id="m-product-content" styleClass="modal-content">
+                <script src="#{request.contextPath}/vendor/plugins/holder/holder.min.js"></script>
+                <script>
+        $(function () {
+            Purchase.productManage.init();
+        });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;<b>AGREGAR PRODUCTOS</b> 
+                </div>
+                <h:form id="form-add-product">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="fileupload fileupload-new admin-form" data-provides="fileupload">
+                                        <div class="fileupload-preview thumbnail mb20">
+                                            <img data-src="holder.js/100%x140" alt="holder"/>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <span class="button btn-system btn-file btn-block">
+                                                    <span class="fileupload-new"><i class="fa fa-image"/> Seleccionar</span>
+                                                    <span class="fileupload-exists"><i class="fa fa-image"/> Cambiar</span>
+                                                    <input type="file"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group form-groups-sm mb5">
+                                        <label class="control-label col-md-2">Nombre</label>
+                                        <div class="col-md-10">
+                                            <p:inputText id="name" value="#{managedPurchaseBean.managedProductBean.name}" styleClass="form-control input-sm" placeholder="Ingrese nombre del producto"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"></label>
+                                        <div class="col-md-7">
+                                            <div class="input-group input-group-sm" style="
+                                                 height: 15px;
+                                                 ">
+                                                <span class="input-group-addon" style="
+                                                      height: 27px;
+                                                      padding-bottom: 2px;
+                                                      padding-top: 2px;
+                                                      ">
+                                                    <i class="fa fa-barcode" style="font-size: 10px"></i>
+                                                </span>
+                                                <p:inputText id="barcode" value="#{managedPurchaseBean.managedProductBean.barcode}" styleClass="form-control " style="font-size: 10px" maxlength="13" placeholder="Codigo de barras"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-2">Linea</label>
+                                        <div class="col-md-10">
+                                            <h:panelGroup layout="block" id="product-line-wrapper" styleClass="input-group input-group-sm">
+                                                <script>
+                                                    $(function () {
+                                                        $("#form-add-product\\:product-line").select2({
+                                                            placeholder: "Seleccione una linea de productos",
+                                                            width: "100%",
+                                                            allowClear: true,
+                                                            containerCssClass: ":all:"
+                                                        }).on("change", function () {
+                                                            $("#form-add-product\\description").focus();
+                                                        });
+                                                    });
+                                                </script>
+                                                <h:selectOneMenu id="product-line" value="#{managedPurchaseBean.managedProductBean.productLineId}" styleClass="select2-single form-control input-sm">
+                                                    <f:selectItem/>
+                                                    <f:selectItems 
+                                                        value="#{managedPurchaseBean.managedProductBean.productLineSearcher.data}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"/>
+                                                </h:selectOneMenu> 
+                                                <span class="input-group-btn">
+                                                    <p:commandLink 
+                                                        action="#{managedPurchaseBean.managedProductBean.productLineSearcher.initManaged()}"
+                                                        update=":m-product-line-content"
+                                                        oncomplete="$('#modal-product-line').modal()"
+                                                        styleClass="btn btn-system">
+                                                        <i class="fa fa-plus"/>
+                                                    </p:commandLink>
+                                                </span>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-2">Desc.</label>
+                                        <div class="col-md-10">
+                                            <p:inputTextarea id="description" value="#{managedPurchaseBean.managedProductBean.description}" styleClass="form-control input-sm" rows="5"></p:inputTextarea>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group form-group-sm">
+                                                <label class="control-label col-md-4">Cantidad</label>
+                                                <div class="col-md-8">
+                                                    <p:inputText id="quantity" value="#{managedPurchaseBean.productSearcher.quantity}" styleClass="form-control input-sm"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ui:fragment rendered="#{managedPurchaseBean.igv}">                               
+                                            <div class="col-md-6">
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-4">IGV</label>
+                                                    <div class="col-md-8">
+                                                        <p id="form-add-product:igv" class="form-control-static input-sm">
+                                                            <h:outputText value="#{managedPurchaseBean.productSearcher.subtotal * managedPurchaseBean.constantIGV}">
+                                                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                            </h:outputText>
+                                                        </p>
+                                                        <input type="hidden" id="form-add-product:percent-igv" value="#{managedPurchaseBean.constantIGV}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ui:fragment>   
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group form-group-sm">
+                                                <label class="control-label col-md-4">Subtotal</label>
+                                                <div class="col-md-8">
+                                                    <p:inputText id="subtotal" value="#{managedPurchaseBean.productSearcher.subtotal}" styleClass="form-control input-sm"/>
+                                                </div>
+                                            </div>
+                                        </div>      
+                                    </div>
+                                    <h:inputHidden id="valid" value="#{managedPurchaseBean.productSearcher.valid}" />
+
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-4">Ultimo prec. compra</label>
+                                        <div class="col-md-7">
+                                            <p class="form-control-static input-sm">S/. #{managedProductBean.lastCost}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-4">Costo basico</label>
+                                        <div class="col-md-7">
+                                            <p  id="form-add-product:unit-price" class="form-control-static">S/.  
+                                                <h:outputText value="#{managedPurchaseBean.productSearcher.subtotal / managedPurchaseBean.productSearcher.quantity}">
+                                                    <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                </h:outputText>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-4">Calcular utilidad</label>
+                                        <div class="col-md-7">
+                                            <div class="input-group input-group-sm">
+                                                <script>
+                                                    $(function () {
+                                                        $("#price-calculate").numeric({precision: 3, scale: 0});
+                                                    });
+                                                    function calculate_price(cost) {
+                                                        var percent = $("#percent-utility").val();
+                                                        if (percent == "") {
+                                                            $("#price-calculate").html("S/. 0.00");
+                                                        } else {
+                                                            var rate = parseFloat(percent) / 100;
+                                                            $("#price-calculate").html("S/." + ((1 + rate) * cost).toFixed(2));
+                                                        }
+                                                    }
+                                                </script>
+                                                <input id="percent-utility" class="form-control input-sm" value="0" type="text" placeholder="Numbers"/>
+                                                <span class="input-group-addon">%</span>
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-sm btn-alert" onclick="calculate_price(parseFloat($('#form-add-product\\:unit-price').text().replace('S/.', '')))">Calcular</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-4">Precio calc.</label>
+                                        <div class="col-md-7">
+                                            <p id="price-calculate" class="form-control-static input-sm">S/. 0.00</p>
+                                        </div>
+                                    </div>
+                                    <h:panelGroup layout="block" id="price_wrapper">
+                                        <ui:fragment rendered="#{managedProductBean.managedProductPrice.selectedCompanyId ne null}">
+                                            <div class="section row mbn">
+                                                <div class="col-md-1">
+                                                </div>
+                                                <div class="col-md-11">
+                                                    <div class="section row mbn">
+                                                        <div class="col-md-12">
+                                                            <script>
+                                                                $(function () {
+                                                                    $("#form-add-product .p-quantity").numeric({scale: 2, decimal: "."});
+                                                                    $("#form-add-product .p-price").numeric({scale: 2, decimal: "."});
+                                                                });
+                                                                function edit_psp(index) {
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-quantity").addClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-uom").addClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-price").addClass("hidden");
+                                                                    $(".btn-edit-psp").addClass("hidden");
+                                                                    $(".btn-drop-psp").addClass("hidden");
+                                                                    $("#row_add").addClass("hidden");
+                                                                    $("#btn-cancel-edit-" + index).removeClass("hidden");
+                                                                    $("#form\\:store\\:" + index + "\\:quantity").removeClass("hidden");
+                                                                    $("#form\\:store\\:" + index + "\\:uom").removeClass("hidden");
+                                                                    $("#form\\:store\\:" + index + "\\:price").removeClass("hidden");
+                                                                }
+                                                                function cancel_edit(index) {
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-quantity").removeClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-uom").removeClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:l-price").removeClass("hidden");
+                                                                    $(".btn-edit-psp").removeClass("hidden");
+                                                                    $(".btn-drop-psp").removeClass("hidden");
+                                                                    $("#row_add").removeClass("hidden");
+                                                                    $("#btn-cancel-edit-" + index).addClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:quantity").addClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:uom").addClass("hidden");
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:price").addClass("hidden");
+                                                                }
+                                                            </script>
+
+                                                            <script>
+                                                                $(function () {
+                                                                    $("#form-add-product\\:add_quantity").pressEnter(function () {
+                                                                        setCaretAtEnd(document.getElementById('form-add-product:add_price'));
+                                                                    });
+                                                                    $("#form-add-product\\:add_price").pressEnter(function () {
+                                                                        add_item();
+                                                                    });
+                                                                });
+                                                            </script>
+                                                            <script>
+                                                                function update_item_psp(index, last_value) {
+                                                                    window["update_item" + index]([{name: 'last_value', value: last_value}, {name: 'index', value: index}]);
+                                                                }
+                                                                function configure_quantity(index, last_value) {
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:quantity").pressEnter(function () {
+                                                                        update_item_psp(index, last_value)
+                                                                    });
+                                                                }
+                                                                function configure_price(index, last_value) {
+                                                                    $("#form-add-product\\:store\\:" + index + "\\:price-value").pressEnter(function () {
+                                                                        update_item_psp(index, last_value);
+                                                                    });
+                                                                }
+                                                            </script>   
+                                                            <p:remoteCommand 
+                                                                name="add_item" 
+                                                                update="form-add-product:price_wrapper"
+                                                                onstart="begin_load()"
+                                                                oncomplete="end_load();setCaretAtEnd(document.getElementById('form-add-product:add_quantity'));"
+                                                                process="@this,add_quantity,add_price" 
+                                                                action="#{managedProductBean.managedProductPrice.addItem()}" />
+
+                                                            <table> 
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td class="col-md-3"></td>
+                                                                        <td class="col-md-2"></td>
+                                                                        <td class="col-md-5"></td>
+                                                                        <td class="col-md-2"></td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ui:repeat id="store" value="#{managedProductBean.managedProductPrice.data}" var="item" varStatus="st">
+                                                                        <tr>
+                                                                            <td>
+                                                                                <p:remoteCommand 
+                                                                                    name="update_item#{st.index}"
+                                                                                    oncomplete="cancel_edit(#{st.index})"
+                                                                                    action="#{managedProductBean.managedProductPrice.updateItem()}"
+                                                                                    process="@this,form-add-product:store:#{st.index}:quantity,form-add-product:store:#{st.index}:price-value"
+                                                                                    update="form-add-product:store:#{st.index}:quantity-wrapper,form-add-product:store:#{st.index}:price-wrapper" />
+                                                                                <p:remoteCommand 
+                                                                                    name="remove_item#{st.index}"
+                                                                                    action="#{managedProductBean.managedProductPrice.remove(st.index)}"
+                                                                                    process="@this"
+                                                                                    update="form-add-product:price_wrapper" />
+                                                                                <h:panelGroup id="quantity-wrapper" layout="block">
+                                                                                    <script>
+                                                                                        $(function () {
+                                                                                            configure_quantity(#{st.index}, '#{item[0]},#{item[1]}');
+                                                                                                });
+                                                                                    </script>
+                                                                                    <p id="form-add-product:store:#{st.index}:l-quantity" class="form-control-static text-center">#{item[0]}</p>
+                                                                                    <p:inputText id="quantity" converter="javax.faces.Integer" value="#{item[0]}" styleClass="form-control input-sm text-center p-quantity pr5 pl5 hidden"  placeholder="Cantidad" />
+                                                                                </h:panelGroup>
+                                                                            </td>
+                                                                            <td>
+                                                                                <p class="form-control-static input-sm text-muted text-center"><i class="fa fa-times"/></p>
+                                                                            </td>
+                                                                            <td>
+                                                                                <h:panelGroup id="price-wrapper" layout="block">
+                                                                                    <script>
+                                                                                        $(function () {
+                                                                                            configure_price(#{st.index}, '#{item[0]},#{item[1]}');
+                                                                                                });
+                                                                                    </script>
+                                                                                    <p id="form-add-product:store:#{st.index}:l-price" class="form-control-static text-center">S/. 
+                                                                                        <h:outputText value="#{item[1]}">
+                                                                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                                                        </h:outputText>
+                                                                                    </p>
+                                                                                    <div id="form-add-product:store:#{st.index}:price" class="input-group input-group-sm hidden">
+                                                                                        <span class="input-group-addon">
+                                                                                            S/.
+                                                                                        </span>
+                                                                                        <p:inputText id="price-value" converter="javax.faces.BigDecimal"  value="#{item[1]}"  styleClass="form-control input-sm p-price" placeholder="Precio" />
+                                                                                    </div>
+                                                                                </h:panelGroup>
+                                                                            </td>
+                                                                            <td class="text-center">
+                                                                                <div class="btn-group">
+                                                                                    <button type="button" onclick="edit_psp(#{st.index})" class="btn btn-warning btn-xs btn-edit-psp">
+                                                                                        <i class="fa fa-edit"></i>
+                                                                                    </button>
+                                                                                    <button type="button" onclick="remove_item#{st.index}()" class="btn btn-danger btn-xs  btn-drop-psp">
+                                                                                        <i class="fa fa-trash"></i>
+                                                                                    </button>
+                                                                                    <button type="button"  onclick="cancel_edit(#{st.index})" id="btn-cancel-edit-#{st.index}" class="btn btn-danger btn-xs   hidden">
+                                                                                        <i class="fa fa-times"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </ui:repeat>
+                                                                    <tr id="row_add">
+                                                                        <td>    
+                                                                            <p:inputText id="add_quantity" converter="javax.faces.Integer" value="#{managedProductBean.managedProductPrice.quantity}" styleClass="form-control input-sm text-center p-quantity"  placeholder="Cantidad" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <p class="form-control-static input-sm text-muted text-center"><i class="fa fa-times"/></p>
+                                                                        </td>
+                                                                        <td>
+                                                                            <div id="form-add-product:add_price-wrapper" class="input-group input-group-sm">
+                                                                                <span class="input-group-addon">
+                                                                                    S/.
+                                                                                </span>
+                                                                                <p:inputText id="add_price"  value="#{managedProductBean.managedProductPrice.price}"  styleClass="form-control input-sm p-price" placeholder="Precio" />
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ui:fragment> 
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <p:remoteCommand 
+                            rendered="#{managedPurchaseBean.productSearcher.type}"
+                            process="@this" 
+                            onstart="begin_load()"
+                            oncomplete="end_load();$('#modal-add-product').modal('hide');"
+                            name="update_products" update=":form:detail-wrapper"  />
+                        <p:remoteCommand 
+                            rendered="#{not managedPurchaseBean.productSearcher.type}"
+                            process="@this" 
+                            onstart="begin_load()"
+                            oncomplete="end_load();$('#modal-add-product').modal('hide');"
+                            name="update_products" update=":s-product-content"  />
+
+                        <p:remoteCommand 
+                            name="save_product" 
+                            update="form-add-product:valid"
+                            onstart="begin_load()" 
+                            oncomplete="end_load();Purchase.productManage.after_save()" 
+                            process="@form"
+                            action="#{managedPurchaseBean.productSearcher.save()}"
+                            />
+                        <button type="button" onclick="Purchase.productManage.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+    <ui:include src="/layout/search_actor.xhtml" >
+        <ui:param name="actorSearcher" value="#{managedPurchaseBean.supplierSearcher}" />
+        <ui:param name="updated" value=":form:supplier-info,:form:exist-supplier" />
+    </ui:include>
+    <ui:include src="create_supplier.xhtml" >
+    </ui:include>
+    <ui:include src="product_line.xhtml" >
+        <ui:param name="form" value="form-add-product"/>
+        <ui:param name="mProductBean" value="#{managedPurchaseBean.managedProductBean}" />
+    </ui:include>
+</ui:composition>
+
+

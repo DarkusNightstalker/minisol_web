@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <p:remoteCommand name="change_order" action="#{order_factory.changeFromRequest()}" 
+                     process="@this"
+                     onstart="begin_load()"
+                     oncomplete="end_load();#{update_script}"/>
+    <div class="dt-toolbar-footer">
+        <div class="col-sm-6 col-xs-12 hidden-xs">
+            <div class="dataTables_info" style="width: 100%">
+                <h:outputText escape="false" value="#{pagination.message()}" />
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="dataTables_paginate paging_simple_numbers" id="result-table_paginate">
+                <ul class="pagination pagination-sm pull-right" style="margin-top: 0px;margin-bottom: 0px">
+
+                    <ui:fragment rendered="#{pagination.recordStart eq 1 or pagination.recordStart eq null}">
+                        <li class="paginate_button disabled previous">
+                            <a href="javascript:void(0)"><i class="fa fa-arrow-left"></i></a>
+                        </li>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{pagination.recordStart gt 1}">
+                        <li class="paginate_button previous">
+                            <p:commandLink process="@this" update="#{wrapperId}" action="#{pagination.previous()}">
+                                <i class="fa fa-arrow-left"></i>
+                            </p:commandLink>
+                        </li>
+                    </ui:fragment>
+
+                    <ui:fragment rendered="#{pagination.recordEnd eq pagination.totalRecords or pagination.recordEnd eq null}">
+                        <li class="paginate_button disabled next">
+                            <a href="javascript:void(0)"><i class="fa fa-arrow-right"></i></a>
+                        </li>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{pagination.recordEnd ne pagination.totalRecords and pagination.recordEnd ne null}">
+                        <li class="paginate_button next">
+                            <p:commandLink process="@this" update="#{wrapperId}" action="#{pagination.next()}">
+                                <i class="fa fa-arrow-right"></i>
+                            </p:commandLink>
+                        </li>
+                    </ui:fragment>
+                </ul>
+            </div>
+        </div>
+    </div>
+    ﻿</ui:composition>

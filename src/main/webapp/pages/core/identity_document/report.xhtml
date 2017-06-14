@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        function open_report() {
+            $('#modal-report').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+    <div id="modal-report" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="report-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE DOCUMENTOS DE IDENTIDAD</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-6 prn">
+                            <li class="active">
+                                <a href="#tab14_1" onclick="Report.clean('form-r-idd')" data-toggle="tab">  
+                                    <span  class="fs16 pl5 pt5 pr5 bg-system mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span> Listado de documentos de identidad
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab14_1" class="tab-pane active">
+                                <h:form id="form-r-idd">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-idd");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportIdentityDocumentBean.identityDocumentExport.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportIdentityDocumentBean.identityDocumentExport.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportIdentityDocumentBean.identityDocumentExport.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportIdentityDocumentBean.identityDocumentExport.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-system mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>LISTAD DE DOCUMENTOS DE IDENTIDAD</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <p class="form-control-static"><i>Ningun filtro necesario</i></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

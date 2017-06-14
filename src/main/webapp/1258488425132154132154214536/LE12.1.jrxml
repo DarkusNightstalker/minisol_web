@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TEST" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="6570f907-9833-4214-9096-8e687bfecc98">
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<queryString>
+		<![CDATA[select distinct top 10  PositionTime
+from
+myFile
+where  myFileCode = '75']]>
+	</queryString>
+	<field name="PositionTime" class="java.lang.String"/>
+	<variable name="INITIAL" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{SECONDS}]]></variableExpression>
+		<initialValueExpression><![CDATA[new BigDecimal(0)]]></initialValueExpression>
+	</variable>
+	<variable name="MINUTES" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[new BigDecimal($F{PositionTime}.substring( 0, 2 ))]]></variableExpression>
+	</variable>
+	<variable name="SECONDS" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[new BigDecimal($F{PositionTime}.substring( 3, 5 ))]]></variableExpression>
+	</variable>
+	<variable name="DIFFERENCE_MINUTES" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{MINUTES}.doubleValue()>0 ? $V{SECONDS}.add(new BigDecimal(60).subtract($V{INITIAL})):null]]></variableExpression>
+	</variable>
+	<variable name="DIFFERENCE_SECONDS" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[($V{SECONDS}.subtract( $V{INITIAL} )).abs()]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="36" splitType="Prevent">
+			<textField isBlankWhenNull="false">
+				<reportElement uuid="63b9ec1e-95f3-4273-ae32-e78c9356957e" key="textField-1" x="11" y="10" width="61" height="18">
+					<printWhenExpression><![CDATA[new Boolean($V{MINUTES}.doubleValue()==0)]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="styled"/>
+				<textFieldExpression><![CDATA[$V{DIFFERENCE_SECONDS}!=null && $V{DIFFERENCE_SECONDS}.doubleValue()>5 ?
+"<style forecolor='red'>" + $F{PositionTime} + "</style>" :
+"<style forecolor='black'>" + $F{PositionTime} + "</style>"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement uuid="6fe6b8cd-3453-49d8-bee6-14468120bee7" key="textField-2" x="11" y="10" width="61" height="18">
+					<printWhenExpression><![CDATA[new Boolean($V{MINUTES}.doubleValue()!=0)]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="styled"/>
+				<textFieldExpression><![CDATA[$V{DIFFERENCE_MINUTES}!=null && $V{DIFFERENCE_MINUTES}.doubleValue()>5 ?
+"<style forecolor='red'>" + $F{PositionTime} + "</style> " :
+"<style forecolor='black'>" + $F{PositionTime} + "</style>"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

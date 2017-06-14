@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function show_delete() {
+            $.magnificPopup.open({
+                removalDelay: 500, 
+                items: {
+                    src: '#modal-delete'
+                },
+                callbacks: {
+                    beforeOpen: function (e) {
+                        this.st.mainClass = 'mfp-zoomIn';
+                    }
+                },
+                modal: true,
+                midClick: false
+            });
+        }
+    </script>
+    <div id="modal-delete" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="delete-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-trash"></i>
+                </span>
+                <span class="panel-title">Eliminar</span>
+            </div>
+            <h:form id="form-delete">
+                <div class="panel-body">
+                    <p>Esta seguro que desea eliminar el registro <span class="current-selected"></span> ?</p>
+                </div>
+                <div class="panel-footer text-right">
+                    <button type="button" onclick="del()" class="btn btn-success">
+                        Aceptar
+                    </button>
+                    <button type="button" onclick="$.magnificPopup.close()" class="btn btn-danger">
+                        Cancelar
+                    </button>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>

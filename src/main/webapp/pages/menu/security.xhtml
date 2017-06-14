@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Seguridad</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="">
+            <div class="row ml30 mr30">
+                <div class="col-md-2 text-center mb15">
+                    <p:commandLink  
+                        action="#{userBean.onLoad(true)}" 
+                        onerror="error()" 
+                        onstart="begin_load()"
+                        oncomplete="end_load()"
+                        styleClass="fs11 btn btn-block btn-info"
+                        process="@this" update=":content-wrapper">
+                        <i class="glyphicons glyphicons-user fs30  mt20 mb20"/>
+                        <br/>
+                        <br/> 
+                        Usuarios                        
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{userBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/user/list.xhtml"/>
+                    </p:commandLink>
+                </div>
+                <div class="col-md-2 text-center mb15">
+                    <p:commandLink  
+                        action="#{rolBean.onLoad(true)}" 
+                        onerror="error()" 
+                        onstart="begin_load()"
+                        oncomplete="end_load()" 
+                        styleClass="fs11 btn btn-block  btn-system"
+                        process="@this" update=":content-wrapper">
+                        <i class="glyphicons glyphicons-book fs30  mt20 mb20"/>
+                        <br/>
+                        <br/> Roles
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{rolBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/rol/list.xhtml"/>
+                    </p:commandLink>
+                </div>
+            </div>
+        </section>
+    </h:form>
+</ui:composition>
+
+
+

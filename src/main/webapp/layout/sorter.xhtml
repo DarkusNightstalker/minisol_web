@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"> 
+    <th onclick="change_order([{name: 'property_name', value: '#{field}'}])" class="#{class}" style="#{style}vertical-align: middle;cursor: pointer">
+        <strong>#{label}</strong>
+        <ui:fragment rendered="#{order.showState(field) ne null}">
+            <div class="pull-right">
+                <ui:fragment rendered="#{order.showState(field)}">
+                    <i class="fa fa-sort-asc"/>
+                </ui:fragment>
+                <ui:fragment rendered="#{not  order.showState(field)}">
+                    <i class="fa fa-sort-desc"/>
+                </ui:fragment>
+                <sup><bold>#{order.orderNumber(field)}</bold></sup>
+            </div>
+        </ui:fragment>
+    </th>
+</ui:composition>
+

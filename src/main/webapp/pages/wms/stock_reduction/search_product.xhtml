@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_search() {
+            $("#modal-add").modal();
+        }
+    </script>
+    <div id="modal-add" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">>            
+            <h:panelGroup layout="block" id="add-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">[X]</button>
+                    <h4 class="modal-title"><i class="fa fa-plus"></i> AGREGAR CANTIDADES</h4>
+                </div>
+                <h:form id="form-add">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <h:panelGroup layout="block"  id="load-wrapper">
+                                <script>
+                                    $(function () {
+                                        SR.stockSearch.init();
+                                    });
+                                </script>
+                                <div class="form-group form-group-sm">
+                                    <label class="control-label col-md-1">Buscar</label>
+                                    <div class="col-md-5">
+                                        <input id="form-add:search" type="text" class="form-control input-sm"/>
+                                    </div>
+                                </div>
+                                <table style="
+                                       height:350px;
+                                       display: -moz-groupbox;" class="table table-bordered table-condensed mbn">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width: 37px;max-width:37px"></th>
+                                            <th class="col-md-2">Código</th>
+                                            <th class="col-md-6">Producto</th>
+                                            <th class="col-md-2">Cant. disp.</th>
+                                            <th class="col-md-2">Pérdida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll;
+                                           height: 330px;
+                                           width: 99%;
+                                           position: absolute;">
+                                        <ui:repeat value="#{managedStockReductionBean.stockSearcher.data}" var="item">
+                                            <tr>
+                                                <td  style="min-width: 37px;max-width:37px" class="text-center ptn pbn"><i class="fa fs14 fa-barcode"/></td>
+                                                <td class="col-md-2 ptn pbn">#{item[1]}</td>
+                                                <td class="col-md-6 ptn pbn">#{item[2]}</td>
+                                                <td class="col-md-2 ptn pbn">
+                                                    <h:outputText value="#{item[3]}">
+                                                        <f:convertNumber minFractionDigits="0" maxFractionDigits="0" />
+                                                    </h:outputText>  #{item[4]}</td>
+                                                <td class="col-md-2 ptn pbn">                                                  
+                                                    <p:inputText 
+                                                        value="#{item[5]}"
+                                                        converter="javax.faces.BigDecimal" 
+                                                        styleClass="form-control input-sm" > 
+                                                        <f:passThroughAttribute name="max" value="#{item[3]}"/>
+                                                        <f:passThroughAttribute name="data-msg-max" value="No puede ser mayor de #{item[3]}"/>
+                                                    </p:inputText>
+                                                </td>
+                                            </tr>                
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </h:panelGroup>   
+                        </div>
+                    </div>   
+                    <div class="modal-footer">
+                        <p:remoteCommand 
+                            name="add_items"
+                            process="@form" 
+                            onstart="begin_load();"
+                            onsuccess="end_load(); $('#modal-add .close').trigger('click')"
+                            update=":form:detail-wrapper"
+                            action="#{managedStockReductionBean.detailSearcher.addItem()}"                                         
+                            />
+                        <button onclick="SR.stockSearch.save()" type="button" class="btn btn-sm btn-primary pull-right">
+                            Agregar productos
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+
+

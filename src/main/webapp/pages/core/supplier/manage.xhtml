@@ -1,0 +1,197 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">#{managedSupplierBean.selected.id eq null ? 'Nuevo' : 'Editar'} Cliente y/o Proveedor</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+                <li class="crumb-trail">Proveedores</li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 20px">     
+        <p:commandLink id="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" styleClass="hidden" process="@this" update=":content-wrapper" action="#{actorBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/core/supplier/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{actorBean}" target="#{sessionBean.loadable}" />
+        </p:commandLink>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedSupplierBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedSupplierBean.doSave('/pages/core/supplier/list.xhtml', actorBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open pln prn" style="display: block;">
+                        <div class="topbar-menu row">
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:Actor.back()" class="metro-tile bg-danger light">  
+                                    <span class="fa fa-arrow-left text-muted"></span>
+                                    <span class="metro-title">Volver a lista</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:Actor.refresh()" class="metro-tile bg-warning light">
+                                    <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                    <span class="metro-title">Reestablecer</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:Actor.save()" class="metro-tile bg-success light">
+                                    <span class="fa fa-save text-muted"></span>
+                                    <span class="metro-title">Guardar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group form-group-sm mbn">
+                                    <label class="col-md-2 control-label">Documento</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:identity-document").select2({
+                                                            placeholder: 'Seleccione un tipo de documento',
+                                                            width: "100%",
+                                                            containerCssClass: ":all:"
+                                                        })
+                                                    })
+                                                </script>
+                                                <h:selectOneMenu id="identity-document" styleClass="form-control input-sm" value="#{managedSupplierBean.identityDocumentId}">
+                                                    <f:selectItem />
+                                                    <f:selectItems
+                                                        value="#{managedSupplierBean.identityDocumentSearcher.data}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"/>
+                                                    <p:ajax event="change" listener="#{managedSupplierBean.identityDocumentSearcher.changeLength()}" update="form:identity_number-wrapper" process="@this" />
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group form-group-sm mbn">
+                                            <h:panelGroup id="identity_number-wrapper" layout="block" class="col-md-12">
+                                                <script>
+                                                    $(function () {
+                                                        var element = $("#form\\:identity-number");
+                                                        element.numeric({scale: 0, negative: false});
+                                                        if (element.val().length > parseInt(element.attr("maxlength"))) {
+                                                            element.val(element.val().substring(0, parseInt(element.attr("maxlength"))));
+                                                        }
+                                                        element.on("input", function () {
+                                                            if (this.value.length == parseInt($(this).attr("maxlength"))) {
+                                                                search();
+                                                            } else if (this.value.length == (parseInt($(this).attr("maxlength")) - 1)) {
+                                                                nullify();
+                                                            }
+                                                        });
+                                                    });
+                                                </script>
+                                                <p:inputText maxlength="#{managedSupplierBean.identityDocumentId eq null ? '0' : managedSupplierBean.length.toString()}"  disabled="#{managedSupplierBean.identityDocumentId eq null}" value="#{managedSupplierBean.identityNumber}"  styleClass="form-control input-sm " id="identity-number" placeholder="#{managedSupplierBean.identityDocumentId eq null ? '---' : 'Número de documento'}" />
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p:remoteCommand name="search" 
+                                                 action="#{managedSupplierBean.search()}" 
+                                                 process="@this,identity-number,identity-document"
+                                                 update="form:data-wrapper"/>
+                                <p:remoteCommand name="nullify" 
+                                                 action="#{managedSupplierBean.setAllowedDocument(false)}" 
+                                                 process="@this"
+                                                 update="form:data-wrapper"/>
+                                <h:panelGroup id="data-wrapper" layout="block">
+
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="col-md-2 control-label" >Nombre y/o Razon Social</label>
+                                        <div class="col-md-10" >
+                                            <p:inputText id="name" readonly="#{not managedSupplierBean.allowedDocument}" value="#{managedSupplierBean.name}"  class="form-control input-sm" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="col-md-2 control-label" >Dirección</label>
+                                        <div class="col-md-10" >
+                                            <p:inputText id="address" readonly="#{not managedSupplierBean.allowedDocument}"  value="#{managedSupplierBean.address}"  class="form-control input-sm" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="col-md-2 control-label" >Representante</label>
+                                        <div class="col-md-10" >
+                                            <p:inputText id="representative" readonly="#{not managedSupplierBean.allowedDocument}"  value="#{managedSupplierBean.representative}"  class="form-control input-sm" />
+                                            <span class="help-block mt5"><i class="fa fa-user"></i> En el caso de tener un representante</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mb5">
+                                        <script>
+                                         
+                                        </script>
+                                        <div class="col-md-5 col-md-offset-2" >
+                                            <button id="btn-customer" onclick="change_customer()" type="button" class="btn  #{managedSupplierBean.customer ? 'btn-alert' : 'btn-default'}  btn-block">
+                                                <i class="fa fa-user fa-2x"/>                                              
+                                                <br/>
+                                                CLIENTE
+                                                <span></span>  
+                                            </button>
+                                            <h:selectBooleanCheckbox id="customer" value="#{managedSupplierBean.customer}" styleClass="hidden rol" />
+                                        </div>
+                                        <div class="col-md-5" >
+                                            <button id="btn-supplier" onclick="change_supplier()" type="button" class="btn #{managedSupplierBean.supplier ? 'btn-alert' : 'btn-default'}  btn-block">
+                                                <i class="fa fa-user fa-2x"/>
+                                                <br/>   
+                                                PROVEEDOR
+                                                <span></span>  
+                                            </button>
+                                            <h:selectBooleanCheckbox id="supplier" value="#{managedSupplierBean.supplier}" styleClass="hidden rol" />
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="form-group form-group-sm mb5">
+                                        <div class="col-md-10 col-md-offset-2" >
+                                            <p class="form-control-static"><b>Actualmente este cliente tiene #{managedSupplierBean.points} puntos validos de descuento</b></p>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                                <div class="form-group form-group-sm mb5">
+                                    <div class="col-md-2" >
+                                    </div>
+                                    <ui:fragment rendered="#{managedSupplierBean.selected.id eq null}">
+                                        <div class="col-md-4" >
+                                            <div class="checkbox-custom checkbox-primary mb5">
+                                                <h:selectBooleanCheckbox value="#{managedSupplierBean.createAgain}" id="create-again" />
+                                                <label for="form:create-again">Crear nuevo al terminar</label>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </h:form>
+    <script src="#{request.contextPath}/js/actor_man.js" />
+</ui:composition>
+
+

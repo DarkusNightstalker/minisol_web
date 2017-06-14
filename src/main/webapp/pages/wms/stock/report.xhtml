@@ -1,0 +1,479 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        fixModal();
+        function open_report() {
+            $('#modal-report').modal({backdrop: 'static', keyboard: false});
+        }
+        function open_search_product() {
+            $('#modal-search-product').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+    <div id="modal-report" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="report-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE EXISTENCIAS</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-6 prn">
+                            <li class="active">
+                                <a href="#tab14_1" onclick="Report.clean('form-r-expense')" data-toggle="tab">  
+                                    <span  class="fs16 pl5 pt5 pr5 bg-system mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Existencia actual
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_2" onclick="Report.clean('form-r-expense-ws')" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-alert mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Existencia total
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_3" onclick="Report.clean('form-r-kardex-valuate');anulateValuateProduct();" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-warning mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unidades Valorizadas total
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_4" onclick="Report.clean('form-r-kardex-physical');anulatePhysicalProduct();" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-primary mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unidades Físicas total
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab14_1" class="tab-pane active">
+                                <h:form id="form-r-stock-actual">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-stock-actual");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf"   action="#{reportStockBean.currentStock.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.currentStock.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.currentStock.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.currentStock.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-system mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>EXISTENCIA ACTUAL</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <p class="form-control-static"><i>Ningun filtro necesario</i></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div id="tab14_2" class="tab-pane">   
+                                <h:form id="form-r-stock-total">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-stock-total");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportStockBean.totalStock.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.totalStock.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.totalStock.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.totalStock.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-alert mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>EXISTENCIA TOTAL</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-stock-total:many-company-value')" id="company"  />
+                                                        <label class="fs11" for="form-r-stock-total:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportStockBean.totalStock.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                            <div id="tab14_3" class="tab-pane">   
+                                <h:form id="form-r-kardex-valuate">
+                                    <p:remoteCommand process="@this" update="form-r-kardex-valuate:name-wrapper" name="anulateValuateProduct">                                        
+                                        <f:setPropertyActionListener target="#{reportStockBean.kardexValuate.params['name_product']}" value="#{null}" />
+                                    </p:remoteCommand>
+                                    <p:remoteCommand process="@this" onstart="begin_load()" oncomplete="end_load()" action="#{reportStockBean.productSearcher.searchByBarcode()}" update="form-r-kardex-valuate:name-wrapper" name="searchValuateProduct">      
+                                    </p:remoteCommand>
+                                    <script>
+                                        $(function () {
+                                            $("#form-r-kardex-valuate\\:barcode").pressEnter(function () {
+                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
+                                                    $("#form-r-kardex-valuate\\:date-init").focus();
+                                                } else {
+                                                    searchValuateProduct([{name: 'barcode', value: this.value}]);
+                                                }
+                                            }).on("blur", function () {
+                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
+                                                } else {
+                                                    this.value = "";
+                                                }
+                                            }).on("input", function () {
+                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
+                                                    anulateValuateProduct();
+                                                }
+                                            });
+                                            Report.configure("form-r-kardex-valuate");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportStockBean.kardexValuate.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.kardexValuate.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.kardexValuate.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.kardexValuate.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-warning mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>INVENTARIO UNIDADES VALORIZADAS</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Cod. Barras.</label>
+                                            <div class="col-md-7">
+                                                <div class="input-group input-group-sm">
+                                                    <p:inputText id="barcode" value="#{reportStockBean.kardexValuate.params['barcode_product']}" class="form-control none-pass">
+                                                       <f:passThroughAttribute name="maxlength" value="13"/>
+                                                        <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
+                                                    </p:inputText>
+                                                    <span class="input-group-btn">
+                                                        <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
+                                                            <i class="fa fa-search"/>
+                                                        </p:commandLink>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup id="name-wrapper" layout="block">
+                                            <ui:fragment rendered="#{reportStockBean.kardexValuate.params['name_product'] ne null}">
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="col-md-3 control-label">Nombre prod.</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">#{reportStockBean.kardexValuate.params['name_product']}</p>
+                                                    </div>
+                                                </div>
+                                            </ui:fragment>
+                                        </h:panelGroup>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Inicio.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText id="date-init" value="#{reportStockBean.kardexValuate.params['date_init']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Fin.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText value="#{reportStockBean.kardexValuate.params['date_end']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-kardex-valuate:many-company-value')" id="company" styleClass="chk-company">
+                                                        </h:selectBooleanCheckbox>
+                                                        <label class="fs11" for="form-r-kardex-valuate:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportStockBean.kardexValuate.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                            <div id="tab14_4" class="tab-pane">   
+                                <h:form id="form-r-kardex-physical">
+                                    <p:remoteCommand process="@this" update="form-r-kardex-physical:name-wrapper" name="anulatePhysicalProduct">                                        
+                                        <f:setPropertyActionListener target="#{reportStockBean.kardexPhysical.params['name_product']}" value="#{null}" />
+                                    </p:remoteCommand>
+                                    <p:remoteCommand process="@this" onstart="begin_load()" oncomplete="end_load()" action="#{reportStockBean.productSearcher.searchByBarcode()}" update="form-r-kardex-physical:name-wrapper" name="searchPhysicalProduct">      
+                                    </p:remoteCommand>
+                                    <script>
+                                        $(function () {
+                                            $("#form-r-kardex-physical\\:barcode").pressEnter(function () {
+                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
+                                                    $("#form-r-kardex-physical\\:date-init").focus();
+                                                } else {
+                                                    searchPhysicalProduct([{name: 'barcode', value: this.value}]);
+                                                }
+                                            }).on("blur", function () {
+                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
+                                                } else {
+                                                    this.value = "";
+                                                }
+                                            }).on("input", function () {
+                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
+                                                    anulatePhysicalProduct();
+                                                }
+                                            });
+                                            Report.configure("form-r-kardex-physical");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportStockBean.kardexPhysical.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.kardexPhysical.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.kardexPhysical.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.kardexPhysical.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-primary mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>INVENTARIO UNIDADES FISICAS </b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Cod. Barras.</label>
+                                            <div class="col-md-7">
+                                                <div class="input-group input-group-sm">
+                                                    <p:inputText id="barcode" value="#{reportStockBean.kardexPhysical.params['barcode_product']}" class="form-control none-pass" >
+                                                        <f:passThroughAttribute name="maxlength" value="13"/>
+                                                        <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
+                                                    </p:inputText>
+                                                    <span class="input-group-btn">                                                        
+                                                        <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
+                                                            <i class="fa fa-search"/>
+                                                        </p:commandLink>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup id="name-wrapper" layout="block">
+                                            <ui:fragment rendered="#{reportStockBean.kardexPhysical.params['name_product'] ne null}">
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="col-md-3 control-label">Nomb. prod.</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static">#{reportStockBean.kardexPhysical.params['name_product']}</p>
+                                                    </div>
+                                                </div>
+                                            </ui:fragment>
+                                        </h:panelGroup>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Inicio.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText id="date-init" value="#{reportStockBean.kardexPhysical.params['date_init']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Fin.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText value="#{reportStockBean.kardexPhysical.params['date_end']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-kardex-physical:many-company-value')" id="company"  />
+                                                        <label class="fs11" for="form-r-kardex-physical:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportStockBean.kardexPhysical.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+
+    <div id="modal-search-product" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="info-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-info-circle"/>  BUSCAR PRODUCTO</h4>
+                </div>
+                <h:form id="form-search-product">
+                    <p:remoteCommand  
+                        name="searchProducts" 
+                        process="@this,terms" 
+                        action="#{reportStockBean.productSearcher.search()}" 
+                        onstart="begin_load();"
+                        oncomplete="end_load();"
+                        update=":form-search-product"/>
+                    <p:remoteCommand  
+                        name="selectReportProduct" 
+                        process="@this" 
+                        action="#{reportStockBean.productSearcher.select()}" 
+                        onstart="begin_load();"
+                        oncomplete="end_load();$('#modal-search-product .close').trigger('click')"
+                        update=":form-r-kardex-valuate,:form-r-kardex-physical"/>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm mb5">
+                                <label class="col-md-2 control-label">Buscar</label>
+                                <div class="col-md-7">
+                                    <script>
+                                        $(function(){
+                                            $("#form-search-product\\:terms").pressEnter(function(){
+                                                searchProducts();
+                                            });
+                                        });
+                                    </script>
+                                    <p:inputText id="terms" value="#{reportStockBean.productSearcher.terms}" styleClass="form-control input-sm" placeholder="Nombre o codigo de barras"/>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-12">
+                                    <h:panelGroup layout="block" id="table-wrapper">
+                                        <ui:include src="/layout/datatable/toolbar.xhtml">
+                                            <ui:param name="wrapperId"  value="form-search-product:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{reportStockBean.productSearcher.pagination}"/>
+                                            <ui:param name="order_factory" value="#{reportStockBean.productSearcher.orderFactory}"/>
+                                            <ui:param name="update_script" value="search()"/>
+                                        </ui:include>
+                                        <table class="table table-hover table-bordered table-condensed fs13">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center" valign="middle" >Codigo</th> 
+                                                    <th  valign="middle" >Nombre</th> 
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{reportStockBean.productSearcher.pagination.data}" var="item" varStatus="st">
+                                                    <tr onclick="selectReportProduct([{name: 'index', value: #{st.index}}])">
+                                                        <td>#{item[1]}</td>
+                                                        <td>#{item[2]}</td>
+                                                    </tr>
+                                                </ui:repeat>
+                                            </tbody>                                                
+                                            <ui:fragment rendered="#{empty reportStockBean.productSearcher.pagination.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="2" class="text-center">
+                                                            <h4 class="text-muted">No se ha encontrado registros</h4>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </table>
+                                        <ui:include src="/layout/datatable/footer.xhtml">
+                                            <ui:param name="wrapperId"  value="form-search-product:table-wrapper"/>
+                                            <ui:param name="pagination"  value="#{reportStockBean.productSearcher.pagination}"/>
+                                        </ui:include>
+
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

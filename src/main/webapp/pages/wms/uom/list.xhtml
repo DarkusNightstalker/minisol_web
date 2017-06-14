@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        $(function () {
+            Core.trays();
+        });
+    </script>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Unidades de Medida</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <ui:fragment rendered="#{sessionBean.authorize('M_UOM')}">
+                            <div class="col-xs-4 col-sm-2">
+                                <p:commandLink  action="#{managedUoMBean.create()}" 
+                                                update=":content-wrapper" 
+                                                process="@this" 
+                                                onstart="begin_load()"
+                                                oncomplete="end_load()" styleClass="metro-tile bg-success light">
+                                    <span class="glyphicons glyphicons-cargo text-muted"></span>
+                                    <span class="metro-title">Registrar</span>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/uom/manage.xhtml"/>
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedUoMBean}"/>
+                                </p:commandLink>
+                            </div>                           
+                        </ui:fragment>
+                        <ui:fragment rendered="#{sessionBean.authorize('R_UOM')}">
+                            <div class="col-xs-4 col-sm-2">
+                                <p:commandLink  
+                                    oncomplete="end_load();open_report();"
+                                    action="#{reportUoMBean.clearReports()}"
+                                    process="@this" 
+                                    update=":report-content" 
+                                    onstart="begin_load()"
+                                    styleClass="metro-tile bg-dark light">
+                                    <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                    <span class="metro-title">Reportes</span>
+                                </p:commandLink>
+                            </div>                           
+                        </ui:fragment>
+                        <ui:fragment rendered="#{sessionBean.authorize('I_UOM')}">
+                            <div class="col-xs-4 col-sm-2">
+                                <p:commandLink  
+                                    action="#{uomBean.import_.refresh()}" 
+                                    update=":import-content-main" process="@this" 
+                                    oncomplete="open_import_main('IMPORTAR UNIDADES DE MEDIDA',true,function(){$('#btn-refresh').trigger('click')})"  
+                                    styleClass="metro-tile bg-system light">
+                                    <span class="glyphicons glyphicons-file_import text-muted"></span>
+                                    <span class="metro-title">Importar</span>
+                                    <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{uomBean.import_}"/>
+                                </p:commandLink>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/table_toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{uomBean.pagination}"/>
+                                    <ui:param name="order_factory" value="#{uomBean.orderFactory}"/>
+                                    <ui:param name="update_script" value="search()"/>
+                                </ui:include>
+                                <table class="table admin-form theme-warning fs13  table-bordered table-condensed">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:include src="/layout/sorter.xhtml">
+                                                <ui:param name="order" value="#{uomBean.orderFactory}" />
+                                                <ui:param name="label" value="Código" />
+                                                <ui:param name="field" value="code" />
+                                                <ui:param name="class" value="col-md-2" />
+                                            </ui:include>
+                                            <ui:include src="/layout/sorter.xhtml">
+                                                <ui:param name="order" value="#{uomBean.orderFactory}" />
+                                                <ui:param name="label" value="Nombre" />
+                                                <ui:param name="field" value="name" />
+                                                <ui:param name="class" value="col-md-10" />
+                                            </ui:include>
+                                            <th class="text-center" style="min-width: 100px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{uomBean.pagination.data}"  var="item">
+                                            <tr>
+                                                <td class="">#{item[1]} </td>
+                                                <td >#{item[2]} </td>
+                                                <td class="text-center">
+                                                    <ui:fragment rendered="#{sessionBean.authorize('M_UOM,A_UOM')}">
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                                <i class="fa fa-cog"/>
+                                                                <span class="caret ml5"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu ptn pbn" role="menu"> 
+                                                                <ui:fragment rendered="#{sessionBean.authorize('M_UOM')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":content-wrapper" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load()" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-system">
+                                                                            Editar
+                                                                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/uom/manage.xhtml"/>
+                                                                            <f:setPropertyActionListener target="#{managedUoMBean.idSelected}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{sessionBean.authorize('A_UOM')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":delete-content" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();UoM.delete('#{item[1]}','#{item[2]}');" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                            Anular
+                                                                            <f:setPropertyActionListener target="#{uomBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+                                                            </ul>
+                                                        </div>
+                                                    </ui:fragment>
+                                                    <div class="btn-group">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty uomBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+                                <ui:include src="/layout/table_footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{uomBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match">
+
+
+
+                <!-- menu quick links -->
+                <div class="admin-form form-horizontal">
+
+                    <h4>Filtrar unidades de medida</h4>
+
+                    <hr class="short"/>
+                    <div class="section mb5">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-barcode"></i>
+                                    </span>
+                                    <p:inputText value="#{uomBean.code}"  tabindex="1" id="code" styleClass="form-control" placeholder="Código" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-cargo"></i>
+                                    </span>
+                                    <p:inputText value="#{uomBean.name}"  tabindex="2" id="name" styleClass="form-control" placeholder="Nombre" />
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{uomBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" action="#{managedUoMBean.delete(uomBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{uomBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+                </div>
+            </aside>
+
+        </section>
+    </h:form>
+    <ui:include rendered="#{sessionBean.authorize('A_UOM')}" src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include rendered="#{sessionBean.authorize('R_UOM')}" src="report.xhtml"/>
+
+    <script type="text/javascript" src="#{request.contextPath}/js/uom_view.js"/>
+</ui:composition>
+
+

@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_reportism() {
+            $('#modal-report-ism').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report-ism').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+
+    <div id="modal-report-ism" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">            
+            <h:panelGroup layout="block" id="create-report" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">[X]</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE MOVIMIENTOS INTERNOS</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-4 prn">
+                            <li class="active">
+                                <a href="#tab1" onclick="Report.clean('form-r-expense')" data-toggle="tab">  
+                                    <span class="fs20 pl5 pr5 bg-system mr15"><i class="icon-documents-text"/></span> Lista de envíos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab2" onclick="Report.clean('form-r-expense-ws')" data-toggle="tab">
+                                    <span class="fs20 pl5 pr5 bg-alert mr15"><i class="icon-documents-text"/></span> Lista de recepciones
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab1" class="tab-pane active">
+                                <h:form id="form-r-expense">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-expense");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportISMBean.reportIsmSend.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx" action="#{reportISMBean.reportIsmSend.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx" action="#{reportISMBean.reportIsmSend.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html" action="#{reportISMBean.reportIsmSend.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p><span class="pl5 pr5 bg-system mr10"><i class="icon-documents-text"/></span><b>LISTA DE ENVIOS A OTRAS SEDES</b></p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Fecha inicio</label>
+                                            <div class="col-md-3">
+                                                <p:inputText class="form-control d" value="#{reportISMBean.reportIsmSend.params['date_start']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                            <label class="col-md-3 control-label">Fecha Fin</label>
+                                            <div class="col-md-3">
+                                                <p:inputText class="form-control d" value="#{reportISMBean.reportIsmSend.params['date_end']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div id="tab2" class="tab-pane">   
+                                <h:form id="form-r-expense-ws">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-expense-ws");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportISMBean.reportIsmReception.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx" action="#{reportISMBean.reportIsmReception.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx" action="#{reportISMBean.reportIsmReception.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html" action="#{reportISMBean.reportIsmReception.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p><span class="pl5 pr5 bg-system mr10"><i class="icon-documents-text"/></span><b>LISTA DE RECEPCIONES DE OTRAS SEDES</b></p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Fecha inicio</label>
+                                            <div class="col-md-3">
+                                                <p:inputText class="form-control d" value="#{reportISMBean.reportIsmReception.params['date_start']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                            <label class="col-md-3 control-label">Fecha Fin</label>
+                                            <div class="col-md-3">
+                                                <p:inputText class="form-control d" value="#{reportISMBean.reportIsmReception.params['date_end']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="excel" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="word" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

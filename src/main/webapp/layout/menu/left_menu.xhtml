@@ -1,0 +1,473 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    ﻿
+    <h:form id="form-menu">
+        <ul class="nav sidebar-menu">
+            <li class="sidebar-label pt20">Menu</li>
+            <li class="active">
+                <p:commandLink onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper"> 
+                    <span class="glyphicon glyphicon-home"></span>
+                    <span class="sidebar-title">Inicio</span>
+                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                </p:commandLink>
+            </li> 
+            <li>
+                <a class="accordion-toggle" href="#">
+                    <span class="fs18 icon-data-table"></span>
+                    <span class="sidebar-title">Registros</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="nav sub-nav">
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa fa-university"></span>
+                            SUNAT
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <a href="layout_sidebar-left-static.html">
+                                    Documentos de Identidad
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-static.html">
+                                    Entidades Financieras
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-static.html">
+                                    Libros Electrónicos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-static.html">
+                                    Unidad de Medida 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-fixed.html">
+                                    Entidades financieras 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-widgets.html">
+                                    Tipos de Operaciones 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-minified.html">
+                                    Documentos de Identidad 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-left-light.html">
+                                    Comprobantes de Pago 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-right-static.html">
+                                    Tipo de existencia 
+                                </a>
+                            </li>
+                            <li>
+                                <a href="layout_sidebar-right-fixed.html">
+                                    Métodos de valuación 
+                                </a>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{productBean.onLoad(true)}" 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Libros Electronicos
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{productBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/product/list.xhtml"/>
+                                </p:commandLink>
+                                <a href="layout_sidebar-right-fixed.html">
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p:commandLink 
+                            action="#{productBean.onLoad(true)}" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            onerror="error()"
+                            process="@this" update=":content-wrapper">
+                            <span class="fa fa-tags"></span> Productos
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{productBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/product/list.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                    <li>
+                        <p:commandLink  action="#{identityDocumentBean.onLoad(true)}" 
+                                        onerror="error()" onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper">
+                            <span class="glyphicons glyphicons-briefcase"></span> Clientes
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/identity_document/view.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                    <li>
+                        <p:commandLink  action="#{identityDocumentBean.onLoad(true)}" 
+                                        onerror="error()" onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper">
+                            <span class="imoon imoon-user3"></span> Proveedores
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/identity_document/view.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                    <li>
+                        <p:commandLink  action="#{identityDocumentBean.onLoad(true)}" 
+                                        onerror="error()" onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper">
+                            <span class="glyphicons glyphicons-cargo"></span> Categorias de Unid. Med.
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/identity_document/view.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                    <li>
+                        <p:commandLink  action="#{uomBean.onLoad(true)}" 
+                                        onerror="error()" 
+                                        onstart="begin_load()"
+                                        oncomplete="end_load()" 
+                                        process="@this" update=":content-wrapper">
+                            <span class="glyphicons glyphicons-cargo"></span> Unidades de Medida
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{uomBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/uom/list.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a class="accordion-toggle" href="#">
+                    <span class="glyphicons glyphicons-global"></span>
+                    <span class="sidebar-title">Operaciones</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="nav sub-nav">
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa fa-dollar"></span>
+                            Ventas
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Generar nueva venta
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de ventas
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/list.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa fa-shopping-cart"></span>
+                            Compras
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Generar nueva compra
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de compras
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="glyphicons glyphicons-truck"></span>
+                            Mov. de Stock
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    action="#{stockBean.onLoad(true)}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Stock actual
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock/list.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{stockBean.onLoad(true)}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de Movimientos de Stock
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock/list.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{managedStockMovementBean.create()}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registrar Mov. entre sedes
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_movement/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{managedStockMovementBean.create()}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registrar Merma
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_movement/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{managedStockMovementBean.create()}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registrar Devolución a Proveedor
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_movement/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{managedStockReturnCustomerBean.create()}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registrar Devolución de cliente
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockReturnCustomerBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_movement/customer_return.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </li>
+            <li>
+                <a class="accordion-toggle" href="#">
+                    <span class="glyphicons glyphicons-notes_2"></span>
+                    <span class="sidebar-title">Reportes</span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="nav sub-nav">
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa fa-dollar"></span>
+                            Ventas
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Generar nueva venta
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de ventas
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Reporte de ventas
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa fa-shopping-cart"></span>
+                            Compras
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Generar nueva compra
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de compras
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Reportes de compras
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/sale/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="accordion-toggle menu-open" href="#">
+                            <span class="fa fa-dropbox"></span>
+                            Mov. de Stock
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="nav sub-nav" style="">
+                            <li>
+                                <p:commandLink 
+                                    action="#{stockBean.onLoad(true)}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Stock actual
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock/list.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{stockBean.onLoad(true)}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Registro de Movimientos de Stock
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock/list.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                            <li>
+                                <p:commandLink 
+                                    action="#{managedStockMovementBean.create()}"
+                                    onstart="begin_load()" 
+                                    oncomplete="end_load()" 
+                                    onerror="error()"
+                                    process="@this" update=":content-wrapper">
+                                    Generar Movimiento de stock
+                                    <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                                    <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_movement/create.xhtml"/>
+                                </p:commandLink>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </li>
+            <ui:fragment rendered="#{sessionBean.currentUser.superUser}">
+                <li class="sidebar-label pt20">Sistema</li>
+                <li>
+                    <a class="accordion-toggle" href="#">
+                        <span class="glyphicons glyphicons-keys"></span>
+                        <span class="sidebar-title">Seguridad</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="nav sub-nav">
+                        <li>
+                            <p:commandLink action="#{userBean.onLoad(true)}"
+                                           onerror="error()" onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper">
+                                <span class="fa fa-user"></span> Usuarios
+                                <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{userBean}"/>
+                                <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/user.xhtml"/>
+                            </p:commandLink>
+                        </li>
+                        <li>
+                            <p:commandLink  action="#{electronicBookBean.onLoad(true)}"
+                                            onerror="error()" onstart="begin_load()" oncomplete="end_load()" process="@this" update=":content-wrapper">
+                                <span class="fa fa-cogs"></span> Configuraciones
+                                <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{accountingEntryBean}"/>
+                                <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/configure.xhtml"/>
+                            </p:commandLink>
+                        </li>
+                    </ul>
+                </li>
+            </ui:fragment>
+        </ul>
+    </h:form>
+</ui:composition>

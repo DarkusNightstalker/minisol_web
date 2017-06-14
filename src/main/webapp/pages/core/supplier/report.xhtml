@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        function open_report() {
+            $('#modal-report').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+    <div id="modal-report" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="report-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE PERSONAS/EMPRESAS</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-6 prn">
+                            <li class="active">
+                                <a href="#tab14_1" onclick="Report.clean('form-r-expense')" data-toggle="tab">  
+                                    <span  class="fs16 pl5 pt5 pr5 bg-system mr15">
+                                        <i class="glyphicons glyphicons-user"/></span>  Clientes registrados
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_2" onclick="Report.clean('form-r-expense-ws')" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-alert mr15">
+                                        <i class="glyphicons glyphicons-building"/></span>  Proveedores registrados
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab14_1" class="tab-pane active">
+                                <h:form id="form-r-customer">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-customer");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportActorBean.customerExport.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportActorBean.customerExport.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportActorBean.customerExport.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportActorBean.customerExport.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-system mr10">
+                                            <i class="glyphicons glyphicons-user"/>
+                                        </span>
+                                        <b>CLIENTES REGISTRADOS</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <ui:repeat id="options" value="#{actorBean.identityDocumentSearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-customer:many-identity-document-value')" id="actor"  />
+                                                        <label class="fs13" for="form-r-customer:options:#{st.index}:actor">#{c[2]}</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportActorBean.customerExport.params['id_identity_documents']}" converter="gkfire.converter.ListShort" id='many-identity-document-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div id="tab14_2" class="tab-pane">
+                                <h:form id="form-r-supplier">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-supplier");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportActorBean.supplierExport.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportActorBean.supplierExport.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportActorBean.supplierExport.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportActorBean.supplierExport.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-alert mr10">
+                                            <i class="glyphicons glyphicons-building"/>
+                                        </span>
+                                        <b>PROVEEDORES REGISTRADOS</b>
+                                    </p>
+                                    <div class="form-horizontal"> 
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <ui:repeat id="options" value="#{actorBean.identityDocumentSearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-supplier:many-identity-document-value')" id="actor"  />
+                                                        <label class="fs13" for="form-r-supplier:options:#{st.index}:actor">#{c[2]}</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportActorBean.supplierExport.params['id_identity_documents']}" converter="gkfire.converter.ListShort" id='many-identity-document-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

@@ -1,0 +1,261 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script  type="text/javascript" src="#{request.contextPath}/js/sale_veri.js"/>
+    <div id="modal-verify-sale" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width:80%">            
+            <h:panelGroup layout="block" id="verify-content" styleClass="modal-content">
+                <h:form id="formv">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                        <span class=""><i class="fa fa-tasks"></i><b> VENTAS EN COLA</b> </span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-12">
+                                    <p:inputText id="terms" styleClass="form-control input-sm" placeholder="Buscar venta en la sede" />
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm mbn">
+                                <table id="formv:table" style="width: 100%" class="table-condensed table-bordered table-striped table-hover theme-warning tc-checkbox-1 fs13">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th class=" col-md-1 text-center">FECHA</th>
+                                            <th class=" col-md-3 text-center">CPE</th>
+                                            <th class=" col-md-6 ">CLIENTE</th>
+                                            <th class=" col-md-2 ">TOTAL</th>
+                                            <th class="text-center" style="min-width:300px;max-width:300px;width:300px !important"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{verifySaleBean.data}" var="item">
+                                            <tr>
+                                                <td class="text-center">#{item[1]}</td>
+                                                <td class="text-center">#{item[2]}</td>
+                                                <td class="text-left">#{item[3]}</td>
+                                                <td class="text-rigth">S/. #{item[4]}</td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-xs btn-info fs10">
+                                                        Cont.
+                                                    </button>
+                                                    <button class="btn btn-xs btn-system fs10">
+                                                        Cred.
+                                                    </button>
+                                                    <button class="btn btn-xs btn-danger fs10">
+                                                        Anul.
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="4">
+                                                <h4>No hay registros</h4>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <h:panelGroup id="refresher" styleClass="hidden" layout="block">                                
+                                <h:outputText escape="false" value="#{verifySaleBean.serializeNewData()}" />
+                            </h:panelGroup>
+                            <p:remoteCommand
+                                update='formv:refresher'
+                                process="@this"
+                                onstart="begin_load"
+                                oncomplete="end_load();SaleVerification.async()"
+                                name="verify_update" 
+                                action="#{verifySaleBean.asyncUpdate()}" />
+                            <p:remoteCommand
+                                update=':verify-info-content'
+                                process="@this"
+                                oncomplete="open_verify_info()"
+                                name="send_verify_cr" 
+                                action="#{verifySaleBean.info.load(false,false,false)}" />                            
+                            <p:remoteCommand
+                                update=':verify-info-content'
+                                process="@this"
+                                oncomplete="open_verify_info()"
+                                name="send_verify_ct" 
+                                action="#{verifySaleBean.info.load(true,false,false)}" />
+                            <p:remoteCommand
+                                update=':verify-info-content'
+                                process="@this"
+                                oncomplete="open_verify_info()"
+                                name="send_verify_visa" 
+                                action="#{verifySaleBean.info.load(false,true,false)}" />
+                            <p:remoteCommand
+                                update=':verify-info-content'
+                                process="@this"
+                                oncomplete="open_verify_info()"
+                                name="send_consumption_voucher" 
+                                action="#{verifySaleBean.info.load(true,false,true)}" />
+                            <p:remoteCommand
+                                process="@this"
+                                name="delete_verify" 
+                                action="#{verifySaleBean.delete()}" />
+                        </div>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+
+    <div id="modal-verify-info" class="modal fade" role="dialog">
+        <div class="modal-dialog">            
+            <h:panelGroup layout="block" id="verify-info-content" styleClass="modal-content">
+                <h:form id="formv-info">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                        <span class=""><i class="fa fa-tasks"></i><b> VENTA AL #{verifySaleBean.info.contado ? 'CONTADO' :'CREDITO'} #{verifySaleBean.info.vouchers ? ' CON VALES DE CONSUMO' :''} </b> </span>
+                    </div>
+                    <div class="modal-body ptn">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <p class="form-control-static mbn mtn">#{verifySaleBean.info.data[1]}</p>
+                                </div>
+                            </div>
+                            <ui:fragment rendered="#{verifySaleBean.info.data[3] ne null}">
+                                <div class="form-group form-group-sm">
+                                    <div class="col-md-12">
+                                        <p class="form-control-static mbn mtn">#{verifySaleBean.info.data[3]}</p>
+                                    </div>
+                                </div>
+                            </ui:fragment>
+                            <div class="form-group form-group-sm mbn">
+                                <table id="formv-info:table"
+                                       style="border:1px solid #82c0e9; width: 100%;height:223px;display: -moz-groupbox;overflow:hidden"  
+                                       class=" table-bordered table-hover theme-warning tc-checkbox-1 fs13">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th class=" col-md-3 text-center">CANTIDAD</th>
+                                            <th class=" col-md-9 text-center">DESCRIPCION</th>
+                                            <th style="min-width:100px;max-width:100px;">SUBTOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="overflow-y: scroll;
+                                           height: 120px;
+                                           width: 99.5%;
+                                           right: -5.5px;
+                                           position: absolute;">
+                                        <ui:repeat value="#{verifySaleBean.info.detail}" var="item">
+                                            <tr>
+                                                <td class="col-md-3 text-center">#{item[1]}</td>
+                                                <td class="col-md-9 text-left">#{item[0]}</td>
+                                                <td  style="min-width:100px;max-width:100px;" class="text-right">S/. #{item[4]}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" >
+                                                <table class="col-md-12">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="col-md-6 ptn pbn">
+                                                                <ui:fragment rendered="#{verifySaleBean.info.vouchers}">
+                                                                    <div class="form-group form-group-sm mbn">
+                                                                        <label class="col-md-6 ptn  control-label">Vale de Compra</label>
+                                                                        <div class="col-md-6">
+                                                                            <p:inputText style="height: 20px" value="#{verifySaleBean.info.vourcherCodes[0]}" class="form-control input-sm ptn pbn payment-voucher" />
+                                                                        </div>
+                                                                    </div>
+                                                                </ui:fragment>
+                                                            </td>
+                                                            <td class="col-md-6 text-right pr5">
+                                                                Subtotal
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </th>
+                                            <th  style="min-width:100px;max-width:100px;" class="text-right">S/. #{verifySaleBean.info.data[4]}</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2" >
+                                                <table class="col-md-12">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="col-md-6 ptn pbn">
+                                                                <ui:fragment rendered="#{verifySaleBean.info.vouchers}">
+                                                                    <div class="form-group form-group-sm mbn">
+                                                                        <label class="col-md-6 ptn  control-label">Vale de Compra</label>
+                                                                        <div class="col-md-6">
+                                                                            <p:inputText style="height: 20px" value="#{verifySaleBean.info.vourcherCodes[1]}" class="form-control input-sm ptn pbn payment-voucher" /></div>
+                                                                    </div>
+                                                                </ui:fragment>
+                                                            </td>
+                                                            <td class="col-md-6 text-right pr5">
+                                                                IGV
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </th>
+                                            <th style="min-width:100px;max-width:100px;" class="text-right">S/. #{verifySaleBean.info.data[5]}</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2" class="">
+                                                <table class="col-md-12">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="col-md-6 ptn pbn">
+                                                                <ui:fragment rendered="#{verifySaleBean.info.vouchers}">
+                                                                    <div class="form-group form-group-sm mbn">
+                                                                        <label class="col-md-6 ptn  control-label">Vale de Compra</label>
+                                                                        <div class="col-md-6">
+                                                                            <p:inputText style="height: 20px" value="#{verifySaleBean.info.vourcherCodes[2]}" class="form-control input-sm ptn pbn payment-voucher" /></div>
+                                                                    </div>
+                                                                </ui:fragment>
+                                                            </td>
+                                                            <td class="col-md-6 text-right pr5">
+                                                                Desc.
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table></th>
+                                            <th style="min-width:100px;max-width:100px;" class="text-right">S/. -#{verifySaleBean.info.data[6]}</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2" class="text-right pr5"><b>Total</b></th>
+                                            <th style="min-width:100px;max-width:100px;" class="text-right">S/. #{verifySaleBean.info.data[4]+verifySaleBean.info.data[5]-verifySaleBean.info.data[6]}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <ui:fragment rendered="#{verifySaleBean.info.vouchers}">
+                            <script>
+                                $(function () {
+                                    SaleVerification.init();
+                                })
+                            </script>
+                            <p:remoteCommand process="@form" onstart="begin_load()" oncomplete="end_load();SaleVerification.after_print(#{verifySaleBean.info.data[0]})" name="after_verify_vouchers" action="#{verifySaleBean.info.print()}"  />
+                            <p:remoteCommand name="proceed" process="@form" onstart="begin_load()"  update="formv-info:valid"  action="#{verifySaleBean.info.verifyVouchers()}" oncomplete="end_load();SaleVerification.after_verify_vouchers()" />
+                            <h:inputHidden id="valid" value="#{verifySaleBean.info.vouchersVerified}" />
+                            <button type="button" onclick="SaleVerification.before_verify_vouchers()" id="formv-info:proceed" class="btn btn-info">
+                                PROCEDER
+                            </button>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{not verifySaleBean.info.vouchers}">
+                            <p:commandLink action="#{verifySaleBean.info.print()}"  oncomplete="SaleVerification.after_print(#{verifySaleBean.info.data[0]})" id="proceed" styleClass="btn btn-info">
+                                PROCEDER
+                            </p:commandLink>
+
+                        </ui:fragment>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

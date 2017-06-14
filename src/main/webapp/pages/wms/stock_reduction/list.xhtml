@@ -1,0 +1,377 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script  type="text/javascript" src="#{request.contextPath}/js/stock-movement_view.js"/>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">MERMAS DE EXISTENCIAS</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pln prn pb5" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  action="#{managedStockReductionBean.create()}" 
+                                            update=":content-wrapper" 
+                                            process="@this" 
+                                            onstart="begin_load()"
+                                            oncomplete="end_load()" styleClass="metro-tile bg-success light">
+                                <span class="fa fa-truck text-muted"></span>
+                                <span class="metro-title" >Nueva merma</span>
+                                <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_reduction/manage.xhtml"/>
+                                <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockReductionBean}"/>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:verify()" class="metro-tile bg-dark light">
+                                <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                <span class="metro-title hidden-xs" >Reportes</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  
+                                action="#{stockReductionBean.import_.refresh()}" 
+                                update=":import-content-main" process="@this" 
+                                oncomplete="open_import_main('IMPORTAR PRODUCTOS Y PRECIOS',true,function(){$('#btn-refresh').trigger('click')})"  
+                                styleClass="metro-tile bg-system light">
+                                <span class="glyphicons glyphicons-upload text-muted"></span>
+                                <span class="metro-title">Importar</span>
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{stockReductionBean.import_}"/>
+                            </p:commandLink>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h:panelGroup id="table-wrapper" layout="block" styleClass="panel-body pn">
+                        <div class="table-responsive">
+                            <ui:include src="/layout/datatable/toolbar.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockReductionBean.pagination}"/>
+                            </ui:include>
+                            <table class="table table-condensed theme-warning fs13">
+                                <thead>
+                                    <tr class="bg-light">
+                                        <th class="">Documento</th>
+                                        <th class="">Responsable</th>
+                                        <th class="">Fec. Emisión</th>
+                                        <th class="text-center"></th>
+                                        <th class="text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ui:repeat value="#{stockReductionBean.pagination.data}" var="item">
+                                        <tr >
+                                            <td class="">#{item[2]}-#{item[3]}</td>
+                                            <td class="">#{item[4]}</td>
+                                            <td class="">
+                                                <h:outputText value="#{item[5]}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </td>
+                                            <td class="text-right">
+                                                <ui:fragment rendered="#{not item[6]}">
+                                                    <span class="badge label-danger fs10">Anulado</span>
+                                                </ui:fragment>
+                                            </td>
+                                            <td class="text-right">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                                        <i class="fa fa-cog"/>
+                                                        <span class="caret ml5"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <li>
+                                                            <p:commandLink 
+                                                                update=":info-content" 
+                                                                process="@this" 
+                                                                onstart="begin_load()"
+                                                                action="#{stockReductionBean.load()}"
+                                                                oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false);">
+                                                                Información
+                                                                <f:setPropertyActionListener target="#{stockReductionBean.id}" value="#{item[0]}"/>
+                                                            </p:commandLink>
+                                                        </li>
+                                                        <li class="#{item[6] ? '' : 'disabled'}"> 
+                                                            <p:commandLink 
+                                                                rendered="#{item[6]}"
+                                                                update=":content-wrapper" 
+                                                                process="@this" 
+                                                                onstart="begin_load()" 
+                                                                oncomplete="end_load()">
+                                                                Editar
+                                                                <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockReductionBean}"/>
+                                                                <f:setPropertyActionListener target="#{managedStockReductionBean.idSelected}" value="#{item[0]}"/>
+                                                                <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_reduction/manage.xhtml"/>
+                                                            </p:commandLink>
+                                                            <ui:fragment rendered="#{not item[6]}">
+                                                                <a href="javascript:void(0)">Editar</a>
+                                                            </ui:fragment>
+                                                        </li>
+                                                        <li class="#{item[6] ? '' : 'active'}">
+                                                            <p:commandLink 
+                                                                rendered="#{item[6]}"
+                                                                update=":delete-content" 
+                                                                process="@this" 
+                                                                onstart="begin_load()"
+                                                                oncomplete="end_load();SM.delete('#{item[1]}','#{item[2]}','#{item[3]}','#{item[4]}');">
+                                                                Anular
+                                                                <f:setPropertyActionListener target="#{stockReductionBean.id}" value="#{item[0]}"/>
+                                                            </p:commandLink>
+                                                            <ui:fragment rendered="#{not item[6]}">
+                                                                <a href="javascript:void(0)">Anulado</a>
+                                                            </ui:fragment>
+                                                        </li>
+                                                        <ui:fragment rendered="#{not item[6]}">
+                                                            <li>
+                                                                <p:commandLink 
+                                                                    update=":delete-content" 
+                                                                    process="@this" 
+                                                                    onstart="begin_load()"
+                                                                    oncomplete="end_load();SM.recovery('#{item[1]}','#{item[2]}','#{item[3]}','#{item[4]}');">
+                                                                    Restaurar
+                                                                    <f:setPropertyActionListener target="#{stockReductionBean.id}" value="#{item[0]}"/>
+                                                                </p:commandLink>
+                                                            </li>
+                                                        </ui:fragment>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+                                </tbody>
+                                <ui:fragment rendered="#{empty stockReductionBean.pagination.data}">
+                                    <tfoot>
+                                        <tr >
+                                            <td class="pl20 text-center" colspan="6">
+                                                <h4 class="text-muted">No se ha encontrado ninguna merma</h4>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </ui:fragment>
+                            </table>
+
+                            <ui:include src="/layout/datatable/footer.xhtml">
+                                <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                <ui:param name="pagination"  value="#{stockReductionBean.pagination}"/>
+                            </ui:include>
+                        </div>
+                    </h:panelGroup>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match">
+                <div class="admin-form form-horizontal">
+                    <h4>Filtrar Mermas</h4>
+                    <hr class="short"/>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-file"></i>
+                                    </span>
+                                <p:inputText id="document-number" value="#{stockReductionBean.documentNumber}" styleClass="form-control" placeholder="Comprobante" />
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                     <h5><small>Rango de fechas </small></h5>
+                    <script>
+                        $(function () {
+                            $("#form\\:date-init").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                            $("#form\\:date-end").datetimepicker({
+                                format: 'DD/MM/YYYY',
+                                pickTime: false
+                            });
+                        });
+                    </script>
+                    <div class="section row mb15">
+                        <div class="col-md-6">           
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-init" value="#{stockReductionBean.dateInit}"  styleClass="fs10 form-control" placeholder="Inicio">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">        
+                            <div class="form-group form-group-sm mbn">
+                                <div class="col-md-12">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-calendar"/>
+                                        </span>
+                                        <p:inputText id="date-end"  value="#{stockReductionBean.dateEnd}"  styleClass="fs10 form-control" placeholder="Fin" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy"  />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr class="short"/>
+
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{stockReductionBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockReductionBean.delete(stockReductionBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="recovery" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedStockReductionBean.recovery(stockReductionBean.id)}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{stockReductionBean.refresh()}" process="@form" update="form:table-wrapper" />
+                    </div>
+
+
+                </div>
+            </aside>
+
+        </section>
+    </h:form>
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="recovery"/>
+        <ui:param name="modal_title" value="RESTAURAR MERMA ANULADO"/>
+        <ui:param name="modal_icon" value="fa fa-refresh shaked animated"/>
+        <ui:param name="accept_option" value="recovery()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+
+    <div id="modal-info" class="white-popup-block popup-lg popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="info-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-info"></i>
+                </span>
+                <span class="panel-title ">#{stockReductionBean.selected.company.name} <small class="fs10"> <b>RUC:</b>#{stockReductionBean.selected.company.ruc}</small></span>
+            </div>
+            <h:form id="form-info">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group form-group-sm">
+                            <div class="col-md-12">
+                                <h3>#{stockReductionBean.selected.paymentProof.name.toUpperCase()}
+                                    <small>#{stockReductionBean.selected.serie}-#{stockReductionBean.selected.documentNumber}</small>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group form-group-sm">
+                                    <label class="control-label col-md-4">Lugar</label>
+                                    <div class="col-md-8">
+                                        <p class="form-control-static input-sm" style="padding-top: 8px">#{stockReductionBean.selected.company.address} - #{stockReductionBean.selected.company.city}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-group-sm ">
+                                    <label class="control-label col-md-4" style="padding-top: 8px">Fec emisión</label>
+                                    <div class="col-md-8">
+                                        <p class="form-control-static input-sm "  style="padding-top: 8px">
+                                            <h:outputText value="#{stockReductionBean.selected.dateIssue}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                                            </h:outputText>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-md-2">Encargado</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static input-sm" style="padding-top: 8px">#{stockReductionBean.selected.responsible.name}</p>
+                                <span class="help-block mt5">
+                                    <small><i class="glyphicons glyphicons-vcard"></i> <b>#{stockReductionBean.selected.responsible.identityDocument.abbr} : </b> #{stockReductionBean.selected.responsible.identityNumber}</small>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <div class="col-md-12">
+                                <table class="table table-striped table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Cantidad</th>
+                                            <th>Producto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{stockReductionBean.infoDetail.data}" var="item" varStatus="st">
+                                            <tr>
+                                                <td>#{st.index+1}</td>
+                                                <td><h:outputText value="#{item[0]}">
+                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                    </h:outputText> #{item[1]}</td>
+                                                <td>#{item[2]}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer text-right mr5">
+
+                    <p:commandLink 
+                        rendered="#{stockReductionBean.selected.active}"
+                        update=":content-wrapper" 
+                        styleClass="btn btn-warning"
+                        process="@this" 
+                        onstart="$.magnificPopup.close();begin_load()" 
+                        oncomplete="end_load()">
+                        <i class="fa fa-edit"/> Editar
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockReductionBean}"/>
+                        <f:setPropertyActionListener target="#{managedStockReductionBean.idSelected}" value="#{stockReductionBean.selected.id}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_reduction/manage.xhtml"/>
+                    </p:commandLink>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>
+
+

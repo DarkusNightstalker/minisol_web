@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_create_responsible() {
+            $('#modal-responsible').modal();
+        }
+        $(function () {
+            $('#modal-responsible').on('shown.bs.modal', function () {
+                $('#form-responsible\\:identity-number').focus();
+            }).on('hidden.bs.modal', function () {
+                $('#form\\:identity-number').focus();
+            });
+        });
+    </script>
+
+    <div id="modal-responsible" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <h:panelGroup layout="block" id="m-responsible-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        $('#form-responsible\\:address').pressEnter(function () {
+                            SaleM.responsible.before_save();
+                        });
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="glyphicons glyphicons-user_add mr5"></i><b>REGISTRAR CLIENTE</b> 
+                </div>
+                <h:form id="form-responsible">
+                    <script>
+                        $(function () {
+                            SR.responsible.init();
+                        });
+                    </script>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <div class="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-responsible\\:identity-document").select2({
+                                                        placeholder: "Tipo de Documento",
+                                                        width: "100%",
+                                                        allowClear: true,
+                                                        containerCssClass: ":all:"
+                                                    });
+                                                });
+                                            </script>
+                                            <h:selectOneMenu value="#{managedStockReductionBean.managedSupplierBean.identityDocumentId}"  id="identity-document" styleClass="select2-single form-control input-sm">
+                                                <f:selectItem/>
+                                                <f:selectItems 
+                                                    value="#{managedStockReductionBean.managedSupplierBean.identityDocumentSearcher.data}"
+                                                    var="item"
+                                                    itemLabel="#{item[3]}"
+                                                    itemValue="#{item[0]}"/> 
+                                                <p:ajax event="change" listener="#{managedStockReductionBean.managedSupplierBean.identityDocumentSearcher.changeLength()}" update="form-responsible:info-wrapper,form-responsible:identity_number-wrapper" process="@this" />
+                                            </h:selectOneMenu>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <h:panelGroup id="identity_number-wrapper" layout="block" styleClass="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-responsible\\:identity-number").numeric({scale: 0, negative: false});
+                                                    $('#form-responsible\\:identity-number').pressEnter(function () {
+                                                        if($('#form-responsible\\:other').length == 0){
+                                                            $('#form-responsible\\:name').focus();
+                                                        }else
+                                                        $('#form-responsible\\:other').focus();
+                                                    });
+                                                });
+                                            </script>
+                                            <p:inputText id="identity-number" value="#{managedStockReductionBean.managedSupplierBean.identityNumber}" styleClass="form-control input-sm">
+                                                <f:passThroughAttribute name="minlength" value="#{managedStockReductionBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-minlength" value="Tamaño minimo #{managedStockReductionBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="maxlength" value="#{managedStockReductionBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-maxlength" value="Tamaño maximo #{managedStockReductionBean.managedSupplierBean.length}"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="short mb5 mt5"/>
+                            <h:panelGroup layout="block" id="info-wrapper">
+                                <script>
+                                    $(function () {
+                                        $('#form-responsible\\:other').pressEnter(function () {
+                                            $('#form-responsible\\:name').focus();
+                                        });
+                                        $('#form-responsible\\:name').pressEnter(function () {
+                                            $('#form-responsible\\:address').focus();
+                                        });
+                                    });
+                                </script>
+                                <ui:fragment rendered="#{managedStockReductionBean.managedSupplierBean.length eq 11}">
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-sm-4">
+                                            Nombre comerc.
+                                        </label>
+                                        <div class="col-md-8">
+                                            <p:inputText id="other" value="#{managedStockReductionBean.managedSupplierBean.other}" styleClass="form-control input-sm name" />
+                                        </div>
+                                    </div>
+                                </ui:fragment>
+                                <div class="form-group form-group-sm mbn">
+                                    <label class="control-label col-sm-4">
+                                        Nombre #{managedStockReductionBean.managedSupplierBean.length eq 11 ? 'RUC' : ''}
+                                    </label>
+                                    <div class="col-md-8">
+                                        <p:inputText id="name" value="#{managedStockReductionBean.managedSupplierBean.name}" styleClass="form-control input-sm name" />
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Direccion
+                                </label>
+                                <div class="col-md-8">
+                                    <p:inputText id="address" value="#{managedStockReductionBean.managedSupplierBean.address}" styleClass="form-control input-sm " />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedStockReductionBean.managedSupplierBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-responsible .close').trigger('click')"
+                        name="update_responsible" update="form:responsible-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedStockReductionBean.responsibleSearcher.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();SR.responsible.after_save()"
+                        name="save_responsible" update="form-responsible:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="SR.responsible.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

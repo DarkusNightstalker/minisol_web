@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <bean id="dataCompanyService"                   class="cs.bms.service.DataCompanyService"/>
+    
+    <bean id="productService"                       class="cs.bms.service.ProductService"/>
+    <bean id="productLineService"                   class="cs.bms.service.ProductLineService"/>
+    <bean id="productSalePriceService"              class="cs.bms.service.ProductSalePriceService"/>
+    <bean id="productCostPriceService"              class="cs.bms.service.ProductCostPriceService"/>
+    <bean id="stockService"                         class="cs.bms.service.StockService"/>
+    <bean id="stockTypeService"                     class="cs.bms.service.StockTypeService"/>
+    <bean id="uomService"                           class="cs.bms.service.UoMService"/>
+    <bean id="internalStockMovementDetailService"   class="cs.bms.service.InternalStockMovementDetailService"/>
+    <bean id="internalStockMovementService"         class="cs.bms.service.InternalStockMovementService"/>
+    <bean id="operationTypeService"                 class="cs.bms.service.OperationTypeService"/>
+    <bean id="openingBalanceService"                class="cs.bms.service.OpeningBalanceService"/>
+    <bean id="stockReductionDetailService"          class="cs.bms.service.StockReductionDetailService"/>
+    <bean id="stockReductionService"                class="cs.bms.service.StockReductionService"/>
+    <bean id="stockReturnCustomerDetailService"     class="cs.bms.service.StockReturnCustomerDetailService"/>
+    <bean id="stockReturnCustomerService"           class="cs.bms.service.StockReturnCustomerService"/>
+    <bean id="stockReturnSupplierDetailService"     class="cs.bms.service.StockReturnSupplierDetailService"/>
+    <bean id="stockReturnSupplierService"           class="cs.bms.service.StockReturnSupplierService"/>
+    
+    <bean id="cashRegisterService"                  class="cs.bms.service.CashRegisterService"/>
+    <bean id="cashRegisterDetailService"            class="cs.bms.service.CashRegisterDetailService"/>
+    <bean id="accountingEntryService"               class="cs.bms.service.AccountingEntryService"/>
+    <bean id="accountingRecordDetailService"        class="cs.bms.service.AccountingRecordDetailService"/>
+    <bean id="accountingRecordService"              class="cs.bms.service.AccountingRecordService"/>
+    <bean id="electronicBookCategoryService"        class="cs.bms.service.ElectronicBookCategoryService"/>
+    <bean id="electronicBookService"                class="cs.bms.service.ElectronicBookService"/>
+    <bean id="paymentProofService"                  class="cs.bms.service.PaymentProofService"/>
+    <bean id="documentNumberingService"             class="cs.bms.service.DocumentNumberingService"/>
+    <bean id="paymentVoucherService"                class="cs.bms.service.PaymentVoucherService"/>
+        
+    <bean id="saleService"                          class="cs.bms.service.SaleService"/>
+    <bean id="salePaymentService"                   class="cs.bms.service.SalePaymentService"/>
+    <bean id="saleDetailService"                    class="cs.bms.service.SaleDetailService"/>
+    
+    <bean id="purchaseService"                      class="cs.bms.service.PurchaseService"/>
+    <bean id="purchasePaymentService"               class="cs.bms.service.PurchasePaymentService"/>
+    <bean id="purchaseDetailService"                class="cs.bms.service.PurchaseDetailService"/>
+    <bean id="sellerService"                        class="cs.bms.service.SellerService"/>
+    
+    <bean id="actorService"                         class="cs.bms.service.ActorService"/>
+    <bean id="workShiftService"                     class="cs.bms.service.WorkShiftService"/>
+    <bean id="financialEntityService"               class="cs.bms.service.FinancialEntityService"/>
+    <bean id="identityDocumentService"              class="cs.bms.service.IdentityDocumentService"/>
+    <bean id="companyService"                       class="cs.bms.service.CompanyService"/>
+    <bean id="companyGroupService"                  class="cs.bms.service.CompanyGroupService"/>
+
+    <bean id="countryService"                       class="cs.bms.service.CountryService"/>
+    <bean id="regionService"                        class="cs.bms.service.RegionService"/>
+    <bean id="subregionService"                     class="cs.bms.service.SubregionService"/>
+    <bean id="districtService"                      class="cs.bms.service.DistrictService"/>
+   
+    <bean id="userService"                          class="cs.bms.service.UserService"/>
+    <bean id="rolService"                           class="cs.bms.service.RolService"/>
+    <bean id="specialPermissionService"             class="cs.bms.service.SpecialPermissionService"/>
+    <bean id="permissionService"                    class="cs.bms.service.PermissionService"/>
+    <bean id="permissionCategoryService"            class="cs.bms.service.PermissionCategoryService"/>
+    
+    <import resource="hibernate.sf.xml"/>
+</beans>

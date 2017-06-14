@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Libros Electrónicos</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center ">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <span class="panel-title hidden-xs"><i class="fa fa-book"/>#{bean141.electronicBook.name}</span>
+                            </div>
+                            <div class="panel-menu admin-form theme-primary">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="field select">
+                                            <h:selectOneMenu  value="#{bean141.year}"  styleClass="empty">
+                                                <f:selectItems 
+                                                    value="#{bean141.years}" 
+                                                    var="item"
+                                                    itemLabel="Año #{item}"
+                                                    itemValue="#{item}"/>
+                                            </h:selectOneMenu>
+                                            <i class="arrow double"></i>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <p:commandLink  onclick="alert('No implementado')"
+                                                        update=":content-wrapper" 
+                                                        process="@this" 
+                                                        onstart="begin_load()"
+                                                        oncomplete="end_load()" styleClass="btn btn-sm btn-success">
+                                            <span class="fa fa-plus"></span> &nbsp;
+                                            <span class="metro-title">CREAR LIBRO</span>
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                            </div>
+                            <h:panelGroup id="table-wrapper" layout="block" styleClass="panel-body pn">
+                                <div class="table-responsive">
+                                    <table class="table admin-form theme-warning tc-checkbox-1 fs13">
+                                        <thead>
+                                            <tr class="bg-light">
+                                                <th class="text-center"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ui:repeat value="#{bean141.data}" var="item">
+                                                <tr>
+                                                    <td class="">
+                                                        #{item[3]}
+                                                    </td>
+                                                </tr>
+                                            </ui:repeat>
+                                        </tbody>
+                                        <ui:fragment rendered="#{empty bean141.data}">
+                                            <tfoot>
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <h2 class="text-muted">No se ha registrado ningun libro electronico &#x2639;</h2>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </ui:fragment>
+                                    </table>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </h:form>
+</ui:composition>
+
+

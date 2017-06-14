@@ -1,0 +1,543 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedCompanyBean.selected.id eq null ? 'Nueva' : 'Editar'} Sede</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+                <li class="crumb-trail">Sedes</li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">     
+        <p:commandLink id="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" styleClass="hidden" process="@this" update=":content-wrapper" action="#{companyBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/core/company/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{companyBean}" target="#{sessionBean.loadable}" />
+        </p:commandLink>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedCompanyBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedCompanyBean.doSave('/pages/core/company/list.xhtml', companyBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pb5 pln prn" style="display: block;">
+                                <div class="topbar-menu row">
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Company.back()" class="metro-tile bg-danger light">  
+                                            <span class="fa fa-arrow-left text-muted"></span>
+                                            <span class="metro-title">VOLVER A LISTA</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Company.refresh()" class="metro-tile bg-warning light">
+                                            <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                            <span class="metro-title" >REESTABLECER</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Company.save()" class="metro-tile bg-success light">
+                                            <span class="fa fa-save text-muted"></span>
+                                            <span class="metro-title" >GUARDAR</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon"><i class="fa fa-table"/></span>
+                                    <span class="panel-title">INFORMACIÓN BASICA</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="control-label col-md-3">RUC</label>
+                                            <div class="col-md-5">
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:ruc").on("input", function () {
+                                                            alert("")
+                                                            if (this.value.length == 11) {
+                                                                process_ruc();
+                                                            } else if (this.value.length == 10) {
+                                                                process_ruc;
+                                                            }
+                                                        });
+                                                    });
+                                                </script>
+                                                <p:remoteCommand oncomplete="begin_load()" onstart="end_load()" name="process_ruc" action="#{managedCompanyBean.paymentProofSearcher.update()}" update="form:serie-wrapper" process="@this,ruc" />
+                                                <p:inputText id="ruc" value="#{managedCompanyBean.ruc}" maxlength="11"  styleClass="form-control" />
+                                            </div>                                                
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="control-label col-md-3">Nombre</label>
+                                            <div class="col-md-9">
+                                                <p:inputText id="name" value="#{managedCompanyBean.name}" styleClass="form-control" />
+                                            </div>                                                
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="control-label col-md-3">Nombre comercial</label>
+                                            <div class="col-md-9">
+                                                <p:inputText id="comercial-name" value="#{managedCompanyBean.title}" styleClass="form-control" />
+                                            </div>                                                
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="control-label col-md-6">Telf. 1</label>
+                                                    <div class="col-md-6">
+                                                        <p:inputText id="phone1" value="#{managedCompanyBean.phone1}" styleClass="form-control" />
+                                                    </div>                                                
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group form-group-sm mb5">
+                                                    <label class="control-label col-md-3">Telf. 2</label>
+                                                    <div class="col-md-6">
+                                                        <p:inputText id="phone2" value="#{managedCompanyBean.phone2}" styleClass="form-control" />
+                                                    </div>                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="control-label col-md-3">Grupo</label>
+                                            <div class="col-md-9">
+
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:company-group").select2({
+                                                            placeholder: "Seleccione un grupo",
+                                                            allowClear: true,
+                                                            width: "100%",
+                                                            containerCssClass: ":all:"
+                                                        });
+                                                    });
+                                                </script>
+                                                <h:selectOneMenu id="company-group" value="#{managedCompanyBean.companyGroupId}" styleClass="form-control input-sm">
+                                                    <f:selectItem/>
+                                                    <f:selectItems
+                                                        value="#{managedCompanyBean.companyGroupSearcher.data}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                </h:selectOneMenu>
+                                            </div>                                                
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="control-label col-md-3">Descripción</label>
+                                            <div class="col-md-9">
+                                                <p:inputTextarea  id="description" value="#{managedCompanyBean.description}"  rows="3" styleClass="form-control" />
+                                            </div>                                                
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-3 col-md-offset-3 mrn prn" >
+                                                <button id="btn-sold" onclick="Company.change_function('sold', 'primary')" type="button" class="btn  #{managedCompanyBean.sold ? 'btn-primary' : 'btn-default'}  btn-block">
+                                                    <i class="fa fa-dollar fa-2x"/>                                              
+                                                    <br/>
+                                                    VENTAS
+                                                    <span></span>  
+                                                </button>
+                                                <h:selectBooleanCheckbox value="#{managedCompanyBean.sold}" id="sold"  styleClass="hidden rol">
+                                                    <p:ajax 
+                                                        process="@this,ruc" 
+                                                        onstart="begin_load()" 
+                                                        oncomplete="end_load()" 
+                                                        event="change" 
+                                                        update="form:serie-wrapper" 
+                                                        listener="#{managedCompanyBean.paymentProofSearcher.update()}" />
+                                                </h:selectBooleanCheckbox>
+                                            </div>
+                                            <div class="col-md-3 mln mrn pln prn" >
+                                                <button id="btn-buy" onclick="Company.change_function('buy', 'alert')" type="button" class="btn #{managedCompanyBean.buy ? 'btn-alert' : 'btn-default'}  btn-block">
+                                                    <i class="fa fa-shopping-cart fa-2x"/>
+                                                    <br/>   
+                                                    COMPRAS
+                                                    <span></span>  
+                                                </button>
+                                                <h:selectBooleanCheckbox value="#{managedCompanyBean.buy}" id="buy" styleClass="hidden rol">
+                                                    <p:ajax 
+                                                        process="@this,ruc" 
+                                                        onstart="begin_load()" 
+                                                        oncomplete="end_load()" 
+                                                        event="change" 
+                                                        update="form:serie-wrapper" 
+                                                        listener="#{managedCompanyBean.paymentProofSearcher.update()}" />
+                                                </h:selectBooleanCheckbox>
+                                            </div>
+                                            <div class="col-md-3 mln pln" >
+                                                <button id="btn-stored" onclick="Company.change_function('stored', 'system')" type="button" class="btn #{managedCompanyBean.stored ? 'btn-system' : 'btn-default'}  btn-block">
+                                                    <i class="fa fa-truck fa-2x"/>
+                                                    <br/>   
+                                                    ALMACEN
+                                                    <span></span>  
+                                                </button>
+                                                <h:selectBooleanCheckbox value="#{managedCompanyBean.stored}" id="stored"  styleClass="hidden rol">
+                                                    <p:ajax 
+                                                        process="@this,ruc" 
+                                                        onstart="begin_load()" 
+                                                        oncomplete="end_load()" 
+                                                        event="change" 
+                                                        update="form:serie-wrapper" 
+                                                        listener="#{managedCompanyBean.paymentProofSearcher.update()}" />
+                                                </h:selectBooleanCheckbox>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon"><i class="fa fa-barcode"/></span>
+                                    <span class="panel-title">SERIES CPE</span>
+                                </div>
+                                <div class="panel-body">
+                                    <h:panelGroup id="serie-wrapper" layout="block" styleClass="form-horizontal">
+                                        <ui:fragment rendered="#{not empty managedCompanyBean.paymentProofSearcher.data}">
+
+                                            <div class="form-group form-group-sm">
+                                                <label class="control-label col-md-2">CPE</label>
+                                                <div class="col-md-9">
+                                                    <h:selectOneMenu id="payment-proof" value="#{managedCompanyBean.numberingSearcher.paymentProofId}" class="form-control input-sm">
+                                                        <f:selectItems
+                                                            value="#{managedCompanyBean.paymentProofSearcher.data}"
+                                                            var="item"
+                                                            itemValue="#{item[0]}"
+                                                            itemLabel="#{item[1]}"
+                                                            />
+                                                    </h:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm">
+                                                <label class="control-label  col-md-2">Serie</label>
+                                                <div class="col-md-4">
+                                                    <p:inputText id="serie" value="#{managedCompanyBean.numberingSearcher.serieCreated}" class="form-control" />
+                                                </div> 
+                                                <div class="col-md-3">
+                                                    <p:commandLink
+                                                        action="#{managedCompanyBean.numberingSearcher.create()}"
+                                                        process="@this,serie,payment-proof"
+                                                        onstart="begin_load();"
+                                                        oncomplete="end_load();"
+                                                        update="form:serie-wrapper"
+                                                        styleClass="btn btn-system btn-sm">
+                                                        <i class="fa fa-plus"/> Agregar
+                                                    </p:commandLink>
+                                                </div>
+
+                                            </div>
+                                            <h:panelGroup id="numbering-wrapper" layout="block" styleClass="form-group">
+                                                <div class="col-md-6 ">                                                    
+                                                    <ui:repeat value="#{managedCompanyBean.paymentProofSearcher.data}" var="item" varStatus="st">
+                                                        <ui:fragment rendered="#{st.index % 2 eq 0}">
+                                                            <table frame="box" class="table mb10 table-hover theme-warning table-condensed fs13">
+                                                                <thead>
+                                                                    <tr class="primary">
+                                                                        <th colspan="3" class="text-center">#{item[1].toUpperCase()}</th>
+                                                                    </tr>
+                                                                    <tr class="primary">
+                                                                        <th class="text-center">Serie</th>
+                                                                        <th class="text-center">Número Acual</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ui:repeat value="#{managedCompanyBean.numberingSearcher.data[item[0]]}" varStatus="st" var="data">
+                                                                        <tr>
+                                                                            <td class="text-center">#{data[1]}</td>
+                                                                            <td class="text-center">#{data[2]}</td>
+                                                                            <td class="text-center">
+                                                                                <p:commandLink
+                                                                                    update=":m-numbering-content"
+                                                                                    onstart="begin_load();"
+                                                                                    oncomplete="end_load();open_managed_numbering();"
+                                                                                    action="#{managedCompanyBean.numberingSearcher.edit(item[0],st.index)}" 
+                                                                                    styleClass="btn btn-xs btn-alert">
+                                                                                    <i class="fa fa-edit"/>
+                                                                                </p:commandLink>
+                                                                                <p:commandLink styleClass="btn btn-xs btn-danger">
+                                                                                    <i class="fa fa-trash"/>
+                                                                                </p:commandLink>
+                                                                            </td>
+                                                                        </tr>    
+                                                                    </ui:repeat>
+
+                                                                    <ui:fragment rendered="#{empty managedCompanyBean.numberingSearcher.data[item[0]]}">
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td class="text-center" colspan="3"><h5 style="margin-top: 3px;margin-bottom: 3px">No hay series registradas</h5></td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </ui:fragment>
+                                                                </tbody>
+                                                            </table>     
+                                                        </ui:fragment>
+                                                    </ui:repeat>
+                                                </div>
+                                                <div class="col-md-6 ">                                     
+                                                    <ui:repeat value="#{managedCompanyBean.paymentProofSearcher.data}" var="item" varStatus="st">
+                                                        <ui:fragment rendered="#{st.index % 2 ne 0}">
+                                                            <table frame="box" class="table mb10 table-hover theme-warning table-condensed fs13">
+                                                                <thead>
+                                                                    <tr class="primary">
+                                                                        <th colspan="3" class="text-center">#{item[1].toUpperCase()}</th>
+                                                                    </tr>
+                                                                    <tr class="primary">
+                                                                        <th class="text-center">Serie</th>
+                                                                        <th class="text-center">Número Acual</th>
+                                                                        <th></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ui:repeat value="#{managedCompanyBean.numberingSearcher.data[item[0]]}" varStatus="st" var="data">
+                                                                        <tr>
+                                                                            <td class="text-center">#{data[1]}</td>
+                                                                            <td class="text-center">#{data[2]}</td>
+                                                                            <td class="text-center">
+                                                                                <p:commandLink
+                                                                                    update=":m-numbering-content"
+                                                                                    onstart="begin_load();"
+                                                                                    oncomplete="end_load();open_managed_numbering();"
+                                                                                    action="#{managedCompanyBean.numberingSearcher.edit(item[0],st.index)}" 
+                                                                                    styleClass="btn btn-xs btn-alert">
+                                                                                    <i class="fa fa-edit"/>
+                                                                                </p:commandLink>
+                                                                                <p:commandLink styleClass="btn btn-xs btn-danger">
+                                                                                    <i class="fa fa-trash"/>
+                                                                                </p:commandLink>
+                                                                            </td>
+                                                                        </tr>    
+                                                                    </ui:repeat>
+
+                                                                    <ui:fragment rendered="#{empty managedCompanyBean.numberingSearcher.data[item[0]]}">
+                                                                        <tfoot>
+                                                                            <tr>
+                                                                                <td class="text-center" colspan="3"><h5 style="margin-top: 3px;margin-bottom: 3px">No hay series registradas</h5></td>
+                                                                            </tr>
+                                                                        </tfoot>
+                                                                    </ui:fragment>
+                                                                </tbody>
+                                                            </table>     
+                                                        </ui:fragment>
+                                                    </ui:repeat>
+
+                                                </div>
+
+                                            </h:panelGroup>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{empty managedCompanyBean.paymentProofSearcher.data}">
+                                            <h3>SE NECESITA EL RUC PARA MOSTRAR ESTA INFORMACIÓN</h3>
+                                        </ui:fragment>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>         
+                        <div class="col-md-5">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon"><i class="fa fa-map-marker"/></span>
+                                    <span class="panel-title">LOCALIZACIÓN</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="form-group  form-group-sm">
+                                            <label class="control-label col-md-3">Departamento</label>
+                                            <div class="col-md-9">
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:region").select2({
+                                                            placeholder: "Seleccione un departamento",
+                                                            allowClear: true,
+                                                            width: "100%",
+                                                            containerCssClass: ":all:"
+                                                        });
+                                                    });
+                                                </script>
+                                                <h:selectOneMenu id="region" value="#{managedCompanyBean.locationSearcher.regionId}" styleClass="form-control input-sm">
+                                                    <f:selectItem/>
+                                                    <f:selectItems
+                                                        value="#{managedCompanyBean.locationSearcher.regionData}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                    <p:ajax event="change" onstart="begin_load()" oncomplete="end_load()" process="@this" listener="#{managedCompanyBean.locationSearcher.updateSubregions()}" update="form:subregion-wrapper" />
+                                                </h:selectOneMenu>
+                                            </div>                                                
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="control-label col-md-3">Provincia</label>
+                                            <h:panelGroup id="subregion-wrapper" layout="block" styleClass="col-md-9">
+
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:subregion").select2({
+                                                            placeholder: "Seleccione una provincia",
+                                                            allowClear: true,
+                                                            width: "100%",
+                                                            containerCssClass: ":all:"
+                                                        });
+                                                    });
+                                                </script>
+                                                <h:selectOneMenu  id="subregion" value="#{managedCompanyBean.locationSearcher.subregionId}"  styleClass="form-control input-sm">
+                                                    <f:selectItem/>
+                                                    <f:selectItems
+                                                        value="#{managedCompanyBean.locationSearcher.subregionData}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                    <p:ajax event="change" onstart="begin_load()" oncomplete="end_load()" process="@this" listener="#{managedCompanyBean.locationSearcher.updateDistricts()}" update="form:district-wrapper" />
+                                                </h:selectOneMenu>
+                                            </h:panelGroup>                       
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="control-label col-md-3">Distrito</label>
+                                            <h:panelGroup  id="district-wrapper" layout="block" styleClass="col-md-9">
+
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:district").select2({
+                                                            placeholder: "Seleccione un distrito",
+                                                            allowClear: true,
+                                                            width: "100%",
+                                                            containerCssClass: ":all:"
+                                                        });
+                                                    });
+                                                </script>
+                                                <h:selectOneMenu id="district" value="#{managedCompanyBean.districtId}"  styleClass="form-control input-sm">
+                                                    <f:selectItem/>
+                                                    <f:selectItems
+                                                        value="#{managedCompanyBean.locationSearcher.districtData}"
+                                                        var="item"
+                                                        itemLabel="#{item[1]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                </h:selectOneMenu>
+                                            </h:panelGroup>                       
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="control-label col-md-3">Ciudad</label>
+                                            <div class="col-md-9">
+                                                <p:inputText  id="city" value="#{managedCompanyBean.city}" styleClass="form-control" />
+                                            </div>                       
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="control-label col-md-3">Dirección</label>
+                                            <div class="col-md-9">
+                                                <p:inputText id="address" value="#{managedCompanyBean.address}" styleClass="form-control" />
+                                            </div>                       
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="control-label col-md-3">Referencia</label>
+                                            <div class="col-md-9">
+                                                <p:inputTextarea id="address-reference" value="#{managedCompanyBean.addressReference}" rows="3" styleClass="form-control" />
+                                            </div>                       
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+
+                                    <span class="panel-icon pull-left">
+                                        <i class="fa fa-clock-o"></i>
+                                    </span>
+                                    <span class="panel-title pull-left">TURNOS</span>
+                                    <div class="btn-group pull-right" style="padding-top: 8px">
+                                        <p:commandLink 
+                                            update=":m-ws-content"
+                                            onstart="begin_load()"
+                                            oncomplete="end_load();open_managed_ws();" 
+                                            styleClass="btn btn-system btn-sm"
+                                            process="@this"
+                                            action="#{managedCompanyBean.workShiftSearcher.create()}">
+                                            <i class="fa fa-plus"/> Agregar
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                                <h:panelGroup layout="block" id="ws-table-wrapper" styleClass="panel-body pn">
+                                    <table class="table table-hover theme-warning table-condensed fs13">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Hora Inicio</th>
+                                                <th>Hora Fin</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ui:repeat value="#{managedCompanyBean.workShiftSearcher.data}" var="item" varStatus="st">
+                                                <tr class="#{item[4] ? '' : 'danger'}">
+                                                    <td>#{item[1]}</td>
+                                                    <td>
+                                                        <h:outputText value="#{item[2]}">
+                                                            <f:convertDateTime pattern="hh:mm a"/>
+                                                        </h:outputText>
+                                                    </td>
+                                                    <td>
+                                                        <h:outputText value="#{item[3]}">
+                                                            <f:convertDateTime pattern="hh:mm a"/>
+                                                        </h:outputText>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <p:commandLink
+                                                            update=":m-ws-content"
+                                                            onstart="begin_load();"
+                                                            oncomplete="end_load();open_managed_ws();"
+                                                            action="#{managedCompanyBean.workShiftSearcher.edit(st.index)}" 
+                                                            styleClass="btn btn-xs btn-alert">
+                                                            <i class="fa fa-edit"/>
+                                                        </p:commandLink>
+                                                    </td>
+                                                </tr>
+                                            </ui:repeat>                     
+                                            <ui:fragment rendered="#{empty managedCompanyBean.workShiftSearcher.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="4" class="text-center"><h4>No hay turnos configurados</h4></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </tbody>
+                                    </table>
+                                </h:panelGroup>
+                            </div>
+                        </div>                        
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </h:form>
+    <ui:include src="managed_work_shift.xhtml" />
+    <ui:include src="managed_numbering.xhtml" />
+    <script src="#{request.contextPath}/js/company_man.js" />-
+</ui:composition>
+
+

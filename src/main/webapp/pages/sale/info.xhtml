@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_info() {
+            $('#modal-info').modal();
+        }
+        $(function () {
+//            $('#modal-report-ism').on('shown.bs.modal', function () {
+//                $('#formc\\:identity-number').focus();
+//            });
+        });
+    </script>
+    <div id="modal-info" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">            
+            <h:panelGroup layout="block" id="info-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">[X]</button>
+                    <h4 class="modal-title">#{saleBean.selected.sourceCompany.name} <small class="fs10"> <b>RUC:</b>#{stockMovementBean.selected.sourceCompany.ruc}</small></h4>
+                </div>
+                <h:form id="form-info">                    
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-12">
+                                    <h3>#{stockMovementBean.selected.paymentProof.name.toUpperCase()}
+                                        <small>#{stockMovementBean.selected.serie}-#{stockMovementBean.selected.documentNumber}</small>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-2">Pto partida</label>
+                                        <div class="col-md-10">
+                                            <p class="form-control-static input-sm">#{stockMovementBean.selected.sourceCompany.address} - #{stockMovementBean.selected.sourceCompany.city}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-2">Pto llegada</label>
+                                        <div class="col-md-10">
+                                            <p class="form-control-static input-sm">#{stockMovementBean.selected.targetCompany.address} - #{stockMovementBean.selected.targetCompany.city}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-2">Fec partida</label>
+                                        <div class="col-md-10">
+                                            <p class="form-control-static input-sm">
+                                                <h:outputText value="#{stockMovementBean.selected.dateShipping}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-2">Fec llegada</label>
+                                        <div class="col-md-10">
+                                            <p class="form-control-static input-sm">
+                                                <h:outputText value="#{stockMovementBean.selected.dateArrival}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </h:outputText></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="well well-sm">
+                                        <div class="form-group form-group-sm">
+                                            <div class="col-md-12">
+                                                <h5><i class="fa fa-building"/>&nbsp;&nbsp;&nbsp;DATOS DEL DESTINATARIO</h5>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn">
+                                            <label class="control-label col-md-2">RUC</label>
+                                            <div class="col-md-10">
+                                                <p class="form-control-static input-sm">#{stockMovementBean.selected.targetCompany.ruc}</p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn">
+                                            <label class="control-label col-md-2">Nombre</label>
+                                            <div class="col-md-10">
+                                                <p class="form-control-static input-sm">#{stockMovementBean.selected.targetCompany.name}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <ui:fragment rendered="#{stockMovementBean.selected.carrier ne null}">
+                                        <div class="well well-sm">
+                                            <div class="form-group form-group-sm">
+                                                <div class="col-md-12">
+                                                    <h5><i class="fa fa-truck"/>&nbsp;&nbsp;&nbsp;TRANSPORTE PÚBLICO</h5>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm mbn">
+                                                <label class="control-label col-md-2">RUC</label>
+                                                <div class="col-md-10">
+                                                    <p class="form-control-static input-sm">#{stockMovementBean.selected.carrier.identityNumber}</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm mbn">
+                                                <label class="control-label col-md-2">Nombre</label>
+                                                <div class="col-md-10">
+                                                    <p class="form-control-static input-sm">#{stockMovementBean.selected.carrier.name}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{stockMovementBean.selected.carrier eq null}">
+                                        <div class="well well-sm">
+                                            <div class="form-group form-group-sm">
+                                                <div class="col-md-12">
+                                                    <h5><i class="fa fa-car"/>&nbsp;&nbsp;&nbsp;TRANSPORTE PRIVADO</h5>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm mbn">
+                                                <label class="control-label col-md-2">Descrip.</label>
+                                                <div class="col-md-10">
+                                                    <p class="form-control-static input-sm">#{stockMovementBean.selected.transportDescription}</p>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm mbn">
+                                                <label class="control-label col-md-2">Lic. conducir</label>
+                                                <div class="col-md-10">
+                                                    <p class="form-control-static input-sm">#{stockMovementBean.selected.driverLicense}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-12">
+                                    <table class="table table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Cantidad</th>
+                                                <th>Producto</th>
+                                                <th>Peso</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ui:repeat value="#{stockMovementBean.infoDetail.data}" var="item" varStatus="st">
+                                                <tr>
+                                                    <td>#{st.index+1}</td>
+                                                    <td><h:outputText value="#{item[0]}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                        </h:outputText> #{item[1]}</td>
+                                                    <td>#{item[2]}</td>
+                                                    <td><h:outputText value="#{item[3]}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                        </h:outputText> #{item[4]}</td>
+                                                </tr>
+                                            </ui:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>             
+                    <div class="modal-footer">
+                        <button type="button" onclick="SM.print('#{request.contextPath}',#{stockMovementBean.selected.id})" class="btn btn-primary"><i class="fa fa-print"/> Imprimir</button>
+
+                        <p:commandLink 
+                            rendered="#{stockMovementBean.selected.active}"
+                            update=":content-wrapper" 
+                            styleClass="btn btn-warning"
+                            process="@this" 
+                            onstart="$.magnificPopup.close();begin_load()" 
+                            oncomplete="end_load()">
+                            <i class="fa fa-edit"/> Editar
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockMovementBean}"/>
+                            <f:setPropertyActionListener target="#{managedStockMovementBean.idSelected}" value="#{stockMovementBean.selected.id}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/internal_stock_movement/manage.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

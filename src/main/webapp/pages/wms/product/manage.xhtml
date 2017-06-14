@@ -1,0 +1,488 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript" src="#{request.contextPath}/js/product_man.js" />
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedProductBean.selected.id eq null ? 'Agregar' : 'Editar'} producto</a>
+                </li>
+                <li class="crumb-trail">Productos</li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+
+        </div>
+    </header>
+    <h:form id="form" styleClass="pt20">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" process="@this" update=":content-wrapper" action="#{productBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/wms/product/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{productBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedProductBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedProductBean.doSave('/pages/wms/product/list.xhtml', productBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="topbar-dropmenu" class="alt topbar-menu-open pln prn" style="display: block;">
+                                <div class="topbar-menu row">
+                                    <div class="col-xs-4 col-sm-2">
+                                        <p:commandLink onstart="begin_load()" oncomplete="end_load();Core.trays();"  process="@this" update=":content-wrapper" action="#{productBean.onLoad(true)}"  styleClass="metro-tile bg-danger light">  
+                                            <span class="fa fa-arrow-left text-muted"></span>
+                                            <span class="metro-title">Volver a lista</span>
+                                            <f:setPropertyActionListener value="/pages/wms/product/list.xhtml" target="#{navigationBean.content}" />
+                                            <f:setPropertyActionListener value="#{productBean}" target="#{sessionBean.loadable}" />
+                                        </p:commandLink>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <p:commandLink   process="@this" action="#{managedProductBean.refresh()}" update=":content-wrapper" styleClass="metro-tile bg-warning light">
+                                            <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                            <span class="metro-title">Reestablecer</span>
+                                        </p:commandLink>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:Product.save()" class="metro-tile bg-primary light">
+                                            <span class="fa fa-save text-muted"></span>
+                                            <span class="metro-title">Guardar</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <span class="panel-title hidden-xs"><i class="fa fa-photo"/> Imagen</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="section row mbn">
+                                            <div class="col-md-12">
+                                                <div class="fileupload fileupload-new admin-form" data-provides="fileupload">
+                                                    <div class="fileupload-preview thumbnail mb20">
+                                                        <img data-src="holder.js/100%x140" alt="holder"/>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <span class="button btn-system btn-file btn-block">
+                                                                <span class="fileupload-new">Select</span>
+                                                                <span class="fileupload-exists">Change</span>
+                                                                <input type="file"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <span class="panel-title hidden-xs"><i class="fa fa-table"/> Datos principales</span>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div class="section row mbn">
+                                            <div class="col-md-12 pl15">
+                                                <div class="form-group form-groups-sm mb5">
+                                                    <label class="control-label col-md-2">Nombre</label>
+                                                    <div class="col-md-10">
+                                                        <p:inputText id="name" tabindex="1" value="#{managedProductBean.name}" styleClass="form-control input-sm" placeholder="Ingrese nombre del producto"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-2"></label>
+                                                    <div class="col-md-7">
+                                                        <div class="input-group input-group-sm" style="
+                                                             height: 15px;
+                                                             ">
+                                                            <span class="input-group-addon" style="
+                                                                  height: 27px;
+                                                                  padding-bottom: 2px;
+                                                                  padding-top: 2px;
+                                                                  ">
+                                                                <i class="fa fa-barcode" style="font-size: 10px"></i>
+                                                            </span>
+                                                            <p:inputText id="barcode" tabindex="2" value="#{managedProductBean.barcode}" styleClass="form-control " style="font-size: 10px" maxlength="13" placeholder="Codigo de barras"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-2">Linea</label>
+                                                    <div class="col-md-10">
+                                                        <h:panelGroup layout="block" id="product-line-wrapper" styleClass="input-group input-group-sm">
+                                                            <script>
+                                                                $(function () {
+                                                                    $("#form\\:product-line").select2({
+                                                                        placeholder: "Seleccione una linea de productos",
+                                                                        width: "100%",
+                                                                        allowClear: true,
+                                                                        containerCssClass: ":all:"
+                                                                    });
+                                                                })
+                                                            </script>
+                                                            <h:selectOneMenu id="product-line" value="#{managedProductBean.productLineId}" styleClass="select2-single form-control input-sm">
+                                                                <f:selectItem/>
+                                                                <f:selectItems 
+                                                                    value="#{managedProductBean.productLineSearcher.data}"
+                                                                    var="item"
+                                                                    itemLabel="#{item[1]}"
+                                                                    itemValue="#{item[0]}"/>
+                                                            </h:selectOneMenu> 
+                                                            <span class="input-group-btn">
+                                                                <p:commandLink 
+                                                                    tabindex="-1"
+                                                                    action="#{managedProductBean.productLineSearcher.initManaged()}"
+                                                                    update=":m-product-line-content"
+                                                                    oncomplete="App.open_modal('#modal-product-line','mfp-zoomIn',false)"
+                                                                    styleClass="btn btn-system">
+                                                                    <i class="fa fa-plus"/>
+                                                                </p:commandLink>
+                                                            </span>
+                                                        </h:panelGroup>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-2">Desc.</label>
+                                                    <div class="col-md-10">
+                                                        <p:inputTextarea id="description" tabindex="3"  value="#{managedProductBean.description}" styleClass="form-control" rows="5"></p:inputTextarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel">
+                                        <div class="panel-heading ">
+                                            <span class="panel-icon">
+                                                <i class="fa fa-dollar"></i>
+                                            </span>
+                                            <span class="panel-title">PRECIOS DE VENTA</span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="form-horizontal">
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-4">Ultimo prec. compra</label>
+                                                    <div class="col-md-7">
+                                                        <p class="form-control-static input-sm">S/. #{managedProductBean.lastCost}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-4">Costo basico</label>
+                                                    <div class="col-md-7">
+                                                        <p class="form-control-static input-sm">S/. 
+                                                            
+                                                            #{managedProductBean.basicCost}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-4">Calcular utilidad</label>
+                                                    <div class="col-md-7">
+                                                        <div class="input-group input-group-sm">
+                                                            <p:inputText id="percent-utility"  tabindex="4" styleClass="form-control input-sm"  type="text">
+                                                                <f:passThroughAttribute name="data-cost" value="#{managedProductBean.basicCost}" />
+                                                            </p:inputText>
+                                                            <span class="input-group-addon">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-4">Precio calc.</label>
+                                                    <div class="col-md-7">
+                                                        <p id="price-calculate" class="form-control-static input-sm">S/. 0.00</p>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup layout="block" id="price_wrapper">
+                                                    <ui:fragment rendered="#{managedProductBean.managedProductPrice.selectedCompanyId ne null}">
+
+                                                        <div class="section row mbn">
+                                                            <div class="col-md-1">
+
+                                                            </div>
+                                                            <div class="col-md-11">
+                                                                <div class="section row mbn">
+                                                                    <div class="col-md-12">
+                                                                        <script>
+                                                                            $(function () {
+                                                                                Product.configureSalePrices();
+                                                                            });
+                                                                        </script>
+                                                                        <p:remoteCommand 
+                                                                            name="add_item" 
+                                                                            update="form:price_wrapper" 
+                                                                            process="@this,add_quantity,add_price" action="#{managedProductBean.managedProductPrice.addItem()}" />
+
+                                                                        <table> 
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <td class="col-md-3"></td>
+                                                                                    <td class="col-md-2"></td>
+                                                                                    <td class="col-md-5"></td>
+                                                                                    <td class="col-md-2"></td>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <ui:repeat id="store" value="#{managedProductBean.managedProductPrice.data}" var="item" varStatus="st">
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <p:remoteCommand 
+                                                                                                name="update_item#{st.index}"
+                                                                                                oncomplete="cancel_edit(#{st.index})"
+                                                                                                action="#{managedProductBean.managedProductPrice.updateItem()}"
+                                                                                                process="@this,form:store:#{st.index}:quantity,form:store:#{st.index}:price-value"
+                                                                                                update="form:store:#{st.index}:quantity-wrapper,form:store:#{st.index}:price-wrapper" />
+                                                                                            <p:remoteCommand 
+                                                                                                name="remove_item#{st.index}"
+                                                                                                action="#{managedProductBean.managedProductPrice.remove(st.index)}"
+                                                                                                process="@this"
+                                                                                                update="form:price_wrapper" />
+                                                                                            <h:panelGroup id="quantity-wrapper" layout="block">
+                                                                                                <script>
+                                                                                                    $(function () {
+                                                                                                        Product.configure_quantity(#{st.index}, '#{item[0]},#{item[1]}');
+                                                                                                    });
+                                                                                                </script>
+                                                                                                <p id="form:store:#{st.index}:l-quantity" class="form-control-static text-center">#{item[0]}</p>
+                                                                                                <p:inputText id="quantity" converter="javax.faces.Integer" value="#{item[0]}" styleClass="form-control input-sm text-center p-quantity pr5 pl5 hidden"  placeholder="Cantidad" />
+                                                                                            </h:panelGroup>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <p class="form-control-static input-sm text-muted text-center"><i class="fa fa-times"/></p>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <h:panelGroup id="price-wrapper" layout="block">
+                                                                                                <script>
+                                                                                                    $(function () {
+                                                                                                        Product.configure_price(#{st.index}, '#{item[0]},#{item[1]}');
+                                                                                                    })
+                                                                                                </script>
+                                                                                                <p id="form:store:#{st.index}:l-price" class="form-control-static text-center">S/. 
+                                                                                                    <h:outputText value="#{item[1]}">
+                                                                                                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                                                                                    </h:outputText>
+                                                                                                </p>
+                                                                                                <div id="form:store:#{st.index}:price" class="input-group input-group-sm hidden">
+                                                                                                    <span class="input-group-addon">
+                                                                                                        S/.
+                                                                                                    </span>
+                                                                                                    <p:inputText id="price-value" converter="javax.faces.BigDecimal"  value="#{item[1]}"  styleClass="form-control input-sm p-price" placeholder="Precio" />
+                                                                                                </div>
+                                                                                            </h:panelGroup>
+                                                                                        </td>
+                                                                                        <td class="text-center">
+                                                                                            <div class="btn-group">
+                                                                                                <button type="button" onclick="Product.edit_psp(#{st.index})" class="btn btn-warning btn-xs btn-edit-psp">
+                                                                                                    <i class="fa fa-edit"></i>
+                                                                                                </button>
+                                                                                                <button type="button" onclick="remove_item#{st.index}()" class="btn btn-danger btn-xs  btn-drop-psp">
+                                                                                                    <i class="fa fa-trash"></i>
+                                                                                                </button>
+                                                                                                <button type="button"  onclick="Product.cancel_edit(#{st.index})" id="btn-cancel-edit-#{st.index}" class="btn btn-danger btn-xs   hidden">
+                                                                                                    <i class="fa fa-times"></i>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </ui:repeat>
+                                                                                <tr id="row_add">
+                                                                                    <td>    
+                                                                                        <p:inputText id="add_quantity"  tabindex="6" converter="javax.faces.Integer" value="#{managedProductBean.managedProductPrice.quantity}" styleClass="form-control input-sm text-center p-quantity"  placeholder="Cantidad" />
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p class="form-control-static input-sm text-muted text-center"><i class="fa fa-times"/></p>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div id="form:add_price-wrapper" class="input-group input-group-sm">
+                                                                                            <span class="input-group-addon">
+                                                                                                S/.
+                                                                                            </span>
+                                                                                            <p:inputText id="add_price"  tabindex="7"  value="#{managedProductBean.managedProductPrice.price}"  styleClass="form-control input-sm p-price" placeholder="Precio" />
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </ui:fragment> 
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel">
+                                        <div class="panel-heading ">
+                                            <span class="panel-icon ">
+                                                <i class="fa fa-user"></i>
+                                            </span>
+                                            <span class="panel-title ">Proveedores</span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="form-horizontal">
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-8 text-left">Listado de Proveedores habiles</label>
+                                                    <div class="col-md-4 text-right">
+                                                        <p:commandLink
+                                                            process="@this,suppliers" 
+                                                            action="#{managedProductBean.managedSupplier.addItem()}"
+                                                            update="form:supplier-search-wrapper,form:supplier-wrapper"
+                                                            styleClass="btn btn-system btn-sm">
+                                                            <i class="glyphicon glyphicon-plus"></i> Agregar
+                                                        </p:commandLink>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <h:panelGroup id="supplier-search-wrapper" layout="block" styleClass="col-md-12">
+                                                        <script>
+                                                            $(function () {
+                                                                Product.configure_suppliers();
+                                                            });
+                                                        </script>
+                                                        <h:selectOneMenu id="suppliers" value="#{managedProductBean.managedSupplier.selectedSupplier}" styleClass="select2-single form-control input-sm">
+                                                            <f:selectItem/> 
+                                                            <f:selectItems 
+                                                                value="#{managedProductBean.managedSupplier.searchData}"
+                                                                var="item"
+                                                                itemLabel="#{item[1]}||#{item[2]}||#{item[3]}"
+                                                                itemValue="#{item[0]}"/>
+                                                        </h:selectOneMenu>
+                                                    </h:panelGroup>
+                                                </div>
+                                                <h:panelGroup id="supplier-wrapper" layout="block">
+                                                    <ui:fragment rendered="#{empty managedProductBean.managedSupplier.data}">
+                                                        <div class="form-group form-group-sm">
+                                                            <h1 class="mtn text-center mbn">
+                                                                <small>
+                                                                    <span class="fa-stack fa-lg">
+                                                                        <i class="fa fa-building fa-stack-1x"></i>
+                                                                        <i class="fa fa-ban fa-stack-2x text-danger"></i>
+                                                                    </span>
+                                                                    <br/>NO SE HA SELECCIONADO NINGÚN PROVEEDOR
+                                                                </small>
+                                                            </h1>
+                                                        </div>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{not empty managedProductBean.managedSupplier.data}">
+                                                        <table class="table table-condensed">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="w50"></th>
+                                                                    <th class=""></th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <ui:repeat value="#{managedProductBean.managedSupplier.data}" var="item" varStatus="st">
+                                                                    <tr>
+                                                                        <td><i class="fs40 icon-admin2"/></td>
+                                                                        <td>#{item[3]}<br/><small class="fs9"><b>#{item[1]}</b> : #{item[2]}</small></td>
+                                                                        <td>
+                                                                            <p:commandLink process="@this"
+                                                                                           update="form:supplier-search-wrapper,form:supplier-wrapper" action="#{managedProductBean.managedSupplier.removedItem(st.index)}" styleClass="btn btn-xs btn-danger">
+                                                                                <i class="fa fa-trash"/>
+                                                                            </p:commandLink>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ui:repeat>
+                                                            </tbody>
+                                                        </table>
+                                                    </ui:fragment>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+    <div id="modal-product-line" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="m-product-line-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-trash"></i>
+                </span>
+                <span class="panel-title">REGISTRAR LINEA DE PRODUCTOS</span>
+            </div>
+            <h:form id="form-product-line">
+                <script>
+                    $(function () {
+                        Product.productLine.init();
+                    })
+                </script>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-sm-2">
+                                Nombre
+                            </label>
+                            <div class="col-md-10">
+                                <p:inputText id="name" value="#{managedProductBean.managedProductLineBean.name}" styleClass="form-control input-sm text-uppercase" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h:inputHidden id="valid" value="#{managedProductBean.productLineSearcher.valid}" />
+
+                <p:remoteCommand 
+                    process="@this" 
+                    onstart="begin_load()"
+                    oncomplete="end_load();$.magnificPopup.close();"
+                    name="update_product_line" update="form:product-line-wrapper"  />
+                <p:remoteCommand 
+                    action="#{managedProductBean.productLineSearcher.save()}"
+                    process="@form" 
+                    onstart="begin_load()"
+                    oncomplete="end_load();Product.productLine.after_save()"
+                    name="save_product_line" update="form-product-line:valid"  />
+                <div class="panel-footer text-right">
+                    <button type="button" onclick="Product.productLine.before_save()" class="btn btn-success">
+                        Guardar
+                    </button>
+                    <button type="button" onclick="$.magnificPopup.close()" class="btn btn-danger ">
+                        Cancelar
+                    </button>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+    <script type="text/javascript" src="#{request.contextPath}/vendor/plugins/holder/holder.min.js"></script>
+</ui:composition>
+
+

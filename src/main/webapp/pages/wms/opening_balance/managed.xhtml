@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_managed() {
+            $("#modal-managed").modal({backdrop: 'static', keyboard: false});
+        }
+
+        $(function () {
+            $('#modal-managed').on('shown.bs.modal', function () {
+            });
+        });
+    </script>
+    <script  type="text/javascript" src="#{request.contextPath}/js/opening-balance_man.js"/>
+    <div id="modal-managed" class="modal fade" role="dialog">
+        <div class="modal-dialog ">
+            <h:panelGroup layout="block" id="managed-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        OpeningBalanceManaged.init();
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="fa fa-cogs fa-plus"></i> <b> Generar saldos iniciales</b> 
+                </div>
+                <h:form id="form-managed">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="control-label col-md-3">Año</label>
+                                    <div class="col-md-9">
+                                        <p class="form-control-static input-sm">#{managedOpeningBalance.year}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <label class="col-md-3 control-label">Sedes</label>
+                                    <div class="col-md-9">
+                                        <ui:repeat id="companies" value="#{managedOpeningBalance.companySearcher.data}" varStatus="st" var="c">
+                                            <div class="checkbox-custom mb5 mt5">
+                                                <h:selectBooleanCheckbox  value="#{managedOpeningBalance.companySearcher.selected[c[0]]}"  id="option"  />
+                                                <label class="fs11" for="form-managed:companies:#{st.index}:option">#{c[2]}</label>
+                                            </div>
+                                        </ui:repeat>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedOpeningBalance.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-managed').modal('hide');search();"
+                        name="update_opening_balance" update=":form:table-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedOpeningBalance.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();OpeningBalanceManaged.after_save()"
+                        name="save_opening_balance" update="form-managed:valid"  />
+                    <div class="modal-footer">
+                        <button id="btn-save-manage" onclick="OpeningBalanceManaged.before_save()" type="button" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

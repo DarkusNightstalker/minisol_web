@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_create_supplier() {
+            $('#modal-supplier').modal();
+        }
+        $(function () {
+            $('#modal-supplier').on('shown.bs.modal', function () {
+                $('#form-supplier\\:identity-number').focus();
+            }).on('hidden.bs.modal', function () {
+                $('#form\\:identity-number').focus();
+            });
+        });
+    </script>
+
+    <div id="modal-supplier" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <h:panelGroup layout="block" id="m-supplier-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        $('#form-supplier\\:address').pressEnter(function () {
+                            Purchase.supplier.before_save();
+                        });
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="glyphicons glyphicons-user_add mr5"></i><b>REGISTRAR PROVEEDOR</b> 
+                </div>
+                <h:form id="form-supplier">
+                    <script>
+                        $(function () {
+                            Purchase.supplier.init();
+                        });
+                    </script>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <div class="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-supplier\\:identity-document").select2({
+                                                        placeholder: "Tipo de Documento",
+                                                        width: "100%",
+                                                        allowClear: true,
+                                                        containerCssClass: ":all:"
+                                                    });
+                                                });
+                                            </script>
+                                            <h:selectOneMenu value="#{managedPurchaseBean.managedSupplierBean.identityDocumentId}"  id="identity-document" styleClass="select2-single form-control input-sm">
+                                                <f:selectItem/>
+                                                <f:selectItems 
+                                                    value="#{managedPurchaseBean.managedSupplierBean.identityDocumentSearcher.data}"
+                                                    var="item"
+                                                    itemLabel="#{item[3]}"
+                                                    itemValue="#{item[0]}"/> 
+                                                <p:ajax event="change" listener="#{managedPurchaseBean.managedSupplierBean.identityDocumentSearcher.changeLength()}" update="form-supplier:info-wrapper,form-supplier:identity_number-wrapper" process="@this" />
+                                            </h:selectOneMenu>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <h:panelGroup id="identity_number-wrapper" layout="block" styleClass="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-supplier\\:identity-number").numeric({scale: 0, negative: false});
+                                                    $('#form-supplier\\:identity-number').pressEnter(function () {
+                                                        if($('#form-supplier\\:other').length == 0){
+                                                            $('#form-supplier\\:name').focus();
+                                                        }else
+                                                        $('#form-supplier\\:other').focus();
+                                                    });
+                                                });
+                                            </script>
+                                            <p:inputText id="identity-number" value="#{managedPurchaseBean.managedSupplierBean.identityNumber}" styleClass="form-control input-sm">
+                                                <f:passThroughAttribute name="minlength" value="#{managedPurchaseBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-minlength" value="Tamaño minimo #{managedPurchaseBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="maxlength" value="#{managedPurchaseBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-maxlength" value="Tamaño maximo #{managedPurchaseBean.managedSupplierBean.length}"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="short mb5 mt5"/>
+                            <h:panelGroup layout="block" id="info-wrapper">
+                                <script>
+                                    $(function () {
+                                        $('#form-supplier\\:other').pressEnter(function () {
+                                            $('#form-supplier\\:name').focus();
+                                        });
+                                        $('#form-supplier\\:name').pressEnter(function () {
+                                            $('#form-supplier\\:address').focus();
+                                        });
+                                    });
+                                </script>
+                                <ui:fragment rendered="#{managedPurchaseBean.managedSupplierBean.length eq 11}">
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-sm-4">
+                                            Nombre comerc.
+                                        </label>
+                                        <div class="col-md-8">
+                                            <p:inputText id="other" value="#{managedPurchaseBean.managedSupplierBean.other}" styleClass="form-control input-sm name" />
+                                        </div>
+                                    </div>
+                                </ui:fragment>
+                                <div class="form-group form-group-sm mbn">
+                                    <label class="control-label col-sm-4">
+                                        Nombre #{managedPurchaseBean.managedSupplierBean.length eq 11 ? 'RUC' : ''}
+                                    </label>
+                                    <div class="col-md-8">
+                                        <p:inputText id="name" value="#{managedPurchaseBean.managedSupplierBean.name}" styleClass="form-control input-sm name" />
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Direccion
+                                </label>
+                                <div class="col-md-8">
+                                    <p:inputText id="address" value="#{managedPurchaseBean.managedSupplierBean.address}" styleClass="form-control input-sm " />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedPurchaseBean.managedSupplierBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-supplier .close').trigger('click')"
+                        name="update_supplier" update="form:supplier-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedPurchaseBean.supplierSearcher.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();Purchase.supplier.after_save()"
+                        name="save_supplier" update="form-supplier:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="Purchase.supplier.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">Registros</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="">
+            <div class="row ml30 mr30">
+                <ui:fragment rendered="#{sessionBean.authorize('V_IDD')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{identityDocumentBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()"
+                            styleClass="fs11 btn btn-block btn-info"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-nameplate fs30  mt20 mb20"/>
+                            <br/>
+                            Documentos<br/> de Identificacion
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{identityDocumentBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/identity_document/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_FEN')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{financialEntityBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-alert"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-bank fs30  mt20 mb20"/>
+                            <br/>
+                            Entidades <br/>Financieras
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{financialEntityBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/financial_entity/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PLE')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{electronicBookBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block  btn-system"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-book fs30  mt20 mb20"/>
+                            <br/>
+                            Libros<br/> Electrónicos
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{electronicBookBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/accounting/electronic_book/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_UOM')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{uomBean.onLoad(true)}" 
+                            onerror="error();" 
+                            onstart="begin_load();"
+                            oncomplete="end_load();" 
+                            styleClass="fs11 btn btn-block btn-dark"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-show_thumbnails fs30  mt20 mb20"/>
+                            <br/>
+                            Unidades<br/> de Medida
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{uomBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/uom/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PAP')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{paymentProofBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-primary"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-file fs30  mt20 mb20"/>
+                            <br/>
+                            Comprobantes <br/>de pago
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{paymentProofBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/accounting/payment_proof/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PAP')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink
+                            action="#{stockTypeBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block dark btn-warning"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-inbox fs30  mt20 mb20"/>
+                            <br/>
+                            Tipos<br/> de Existencia
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockTypeBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_type/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PRL')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{productLineBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block dark btn-primary"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-coins fs30  mt20 mb20"/>
+                            <br/>
+                            Lineas <br/>de Productos
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{productLineBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/product_line/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PRD')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink 
+                            action="#{productBean.onLoad(true)}" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            onerror="error()"
+                            styleClass="fs11 btn btn-block btn-success"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-tags fs30  mt20 mb20"/>
+                            <br/>
+                            <br/>
+                            Productos
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{productBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/product/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_ACT')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{actorBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-danger"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-group fs30  mt20 mb20"/>
+                            <br/>
+                            Personas <br/>y Empresas
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{actorBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/supplier/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_CPY')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{companyBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-system"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-building fs30  mt20 mb20"/>
+                            <br/>
+                            <br/>
+                            Sedes
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{companyBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/core/company/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_STK')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{stockBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-dark"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-truck fs30  mt20 mb20"/>
+                            <br/>
+                            <br/>
+                            Existencias
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{stockBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+                <ui:fragment rendered="#{sessionBean.authorize('V_PVR')}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{paymentVoucherBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()" 
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block btn-success"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-leather fs30  mt20 mb20"/>
+                            <br/>
+                            Vales de 
+                            <br/>Consumo
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{paymentVoucherBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/accounting/payment_voucher/list.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
+            </div>
+        </section>
+    </h:form>
+</ui:composition>
+
+
+

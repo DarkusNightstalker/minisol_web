@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedPaymentProofBean.selected.id eq null ? 'AGREGAR' : 'EDITAR'} COMPROBANTE DE PAGO</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" styleClass="pt20">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();"  process="@this" update=":content-wrapper" action="#{paymentProofBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/accounting/payment_proof/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{purchaseBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedPaymentProofBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedPaymentProofBean.doSave('/pages/accounting/payment_proof/list.xhtml', paymentProofBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12"> 
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open pln prn" style="display: block;">
+                        <div class="topbar-menu row">
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:PaymentProof.back()" class="metro-tile bg-danger light">
+                                    <span class="fa fa-arrow-left text-muted"></span>
+                                    <span class="metro-title">Volver a lista</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:PaymentProof.refresh()" class="metro-tile bg-warning light">
+                                    <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                    <span class="metro-title">Reestablecer</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:PaymentProof.save()" class="metro-tile bg-primary light">
+                                    <span class="fa fa-save text-muted"></span>
+                                    <span class="metro-title">Guardar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-lg-4 control-label">Código</label>
+                                            <div class="col-lg-8">
+                                                <p:inputText id="code" tabindex="1" value="#{managedPaymentProofBean.code}"  class="form-control input-sm" maxlength="2" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-lg-4 control-label">Abbr.</label>
+                                            <div class="col-lg-8">
+                                                <p:inputText id="abbr" tabindex="2" value="#{managedPaymentProofBean.abbr}"  class="form-control input-sm" maxlength="10" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="col-lg-2 control-label" >Nombre</label>
+                                    <div class="col-lg-10">
+                                        <p:inputTextarea id="name"  tabindex="3" value="#{managedPaymentProofBean.name}"  class="form-control input-sm" maxlength="380" />
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="col-lg-2 control-label" >Usado en</label>
+                                    <div class="col-lg-10">
+                                        <div class="row">
+                                            <div class="col-xs-6 prn">
+                                                <button data-check="sale" data-select="success" type="button" class="btn rol btn-#{managedPaymentProofBean.forSale ? 'success' : 'default'} btn-block"> 
+                                                    <i class="fa fa-dollar mb5 fa-3x"/><br/>
+                                                    VENTAS          
+                                                    <span>    
+                                                        <ui:fragment rendered="#{managedPaymentProofBean.forSale}">
+                                                            <i class="fa fs13 fa-check" style="position: absolute;left: 25px;top:10px"/>
+                                                        </ui:fragment>
+                                                    </span>
+                                                </button>
+                                            </div> 
+                                            <div class="col-xs-6 pln">
+                                                <button data-check="purchase" data-select="warning"  type="button" class="btn rol btn-#{managedPaymentProofBean.forPurchase ? 'warning' : 'default'} btn-block"> 
+                                                    <i class="fa fa-shopping-cart mb5 fa-3x"/><br/>
+                                                    COMPRAS              
+                                                    <span>                       
+                                                        <ui:fragment rendered="#{managedPaymentProofBean.forPurchase}">
+                                                            <i class="fa fs13 fa-check" style="position: absolute;left: 25px;top:10px"/>
+                                                        </ui:fragment>          
+                                                    </span>
+                                                </button>                                                
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-6 prn">
+                                                <button data-check="stored"  data-select="system"    type="button" class="btn rol btn-#{managedPaymentProofBean.forStored ? 'system' : 'default'} btn-block"> 
+                                                    <i class="fa fa-truck mb5 fa-3x"/><br/>
+                                                    ENVIOS            
+                                                    <span>                                  
+                                                        <ui:fragment rendered="#{managedPaymentProofBean.forStored}">
+                                                            <i class="fa fs13 fa-check" style="position: absolute;left: 25px;top:10px"/>
+                                                        </ui:fragment>
+                                                    </span>
+                                                </button>                                                
+                                            </div>
+                                            <div class="col-xs-6 pln">
+                                                <button  data-check="return"  data-select="dark" type="button" class="btn rol btn-#{managedPaymentProofBean.forReturn ? 'dark' : 'default'} btn-block"> 
+                                                    <i class="fa fa-dropbox mb5 fa-3x"/><br/>
+                                                    DEVOLUCIONES       
+                                                    <span>
+                                                        <ui:fragment rendered="#{managedPaymentProofBean.forReturn}">
+                                                            <i class="fa fs13 fa-check" style="position: absolute;left: 25px;top:10px"/>
+                                                        </ui:fragment>
+                                                    </span>
+                                                </button>                                                
+                                            </div>
+                                        </div>
+                                        <h:selectBooleanCheckbox id="sale" value="#{managedPaymentProofBean.forSale}" styleClass="hidden" />
+                                        <h:selectBooleanCheckbox id="purchase" value="#{managedPaymentProofBean.forPurchase}" styleClass="hidden" />
+                                        <h:selectBooleanCheckbox id="stored" value="#{managedPaymentProofBean.forStored}"  styleClass="hidden"  />
+                                        <h:selectBooleanCheckbox id="return" value="#{managedPaymentProofBean.forReturn}" styleClass="hidden"  />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2">
+
+                                    </div>
+                                    <ui:fragment rendered="#{managedPaymentProofBean.selected.id eq null}">
+                                        <div class="col-md-4" >
+                                            <div class="checkbox-custom checkbox-primary mb5">
+                                                <h:selectBooleanCheckbox value="#{managedPaymentProofBean.createAgain}" id="create-again" />
+                                                <label for="form:create-again">Crear nuevo al terminar</label>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </h:form>
+    <script src="#{request.contextPath}/js/payment-proof_man.js" />
+</ui:composition>
+
+

@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">    
+    <script>
+        $(function () {
+            $('#modal-product-line').on('shown.bs.modal', function () {
+                $('#form-product-line\\:name').focus();
+            });
+        });
+    </script>
+    <div id="modal-info" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="info-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-info-circle"></i>USUARIO #{userBean.selected.username}</h4>
+                    <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;<b>REGISTRAR LINEA DE PRODUCTOS</b> 
+                </div>
+                <h:form id="form-product-line">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <label class="control-label col-sm-2">
+                                    Nombre
+                                </label>
+                                <div class="col-md-10">
+                                    <script>
+                                        $(function(){
+                                            $("#form-product-line\\:name").pressEnter(function(){
+                                                ProductLine.before_save();
+                                            })
+                                        })
+                                    </script>
+                                    <p:inputText id="name" value="#{mProductBean.managedProductLineBean.name}" styleClass="form-control input-sm text-uppercase" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{mProductBean.productLineSearcher.valid}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-product-line').modal('hide');"
+                        name="update_product_line" update="#{form}:product-line-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{mProductBean.productLineSearcher.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();ProductLine.after_save()"
+                        name="save_product_line" update="form-product-line:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="ProductLine.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+
+</ui:composition>
+
+

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"> 
+
+    <context:annotation-config/>
+    
+    <bean id="dataCompanyDao" class="cs.bms.dao.DataCompanyDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    <bean id="saleDao" class="cs.bms.dao.SaleDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="saleDetailDao" class="cs.bms.dao.SaleDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="salePaymentDao" class="cs.bms.dao.SalePaymentDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    <bean id="purchaseDao" class="cs.bms.dao.PurchaseDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="purchasePaymentDao" class="cs.bms.dao.PurchasePaymentDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="purchaseDetailDao" class="cs.bms.dao.PurchaseDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="sellerDao" class="cs.bms.dao.SellerDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+                
+    <bean id="stockReductionDao" class="cs.bms.dao.StockReductionDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockReductionDetailDao" class="cs.bms.dao.StockReductionDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockReturnCustomerDao" class="cs.bms.dao.StockReturnCustomerDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockReturnCustomerDetailDao" class="cs.bms.dao.StockReturnCustomerDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockReturnSupplierDao" class="cs.bms.dao.StockReturnSupplierDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockReturnSupplierDetailDao" class="cs.bms.dao.StockReturnSupplierDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="productDao" class="cs.bms.dao.ProductDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="productLineDao" class="cs.bms.dao.ProductLineDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="productSalePriceDao" class="cs.bms.dao.ProductSalePriceDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="productCostPriceDao" class="cs.bms.dao.ProductCostPriceDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="openingBalanceDao" class="cs.bms.dao.OpeningBalanceDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockDao" class="cs.bms.dao.StockDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="stockTypeDao" class="cs.bms.dao.StockTypeDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="uomDao" class="cs.bms.dao.UoMDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="internalStockMovementDao" class="cs.bms.dao.InternalStockMovementDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="operationTypeDao" class="cs.bms.dao.OperationTypeDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="internalStockMovementDetailDao" class="cs.bms.dao.InternalStockMovementDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+
+    <bean id="accountingEntryDao" class="cs.bms.dao.AccountingEntryDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="accountingRecordDao" class="cs.bms.dao.AccountingRecordDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="accountingRecordDetailDao" class="cs.bms.dao.AccountingRecordDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="electronicBookCategoryDao" class="cs.bms.dao.ElectronicBookCategoryDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="electronicBookDao" class="cs.bms.dao.ElectronicBookDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="paymentProofDao" class="cs.bms.dao.PaymentProofDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="documentNumberingDao" class="cs.bms.dao.DocumentNumberingDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="cashRegisterDao" class="cs.bms.dao.CashRegisterDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="cashRegisterDetailDao" class="cs.bms.dao.CashRegisterDetailDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="paymentVoucherDao" class="cs.bms.dao.PaymentVoucherDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+        
+    <bean id="actorDao" class="cs.bms.dao.ActorDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="workShiftDao" class="cs.bms.dao.WorkShiftDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="companyDao" class="cs.bms.dao.CompanyDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>   
+    <bean id="companyGroupDao" class="cs.bms.dao.CompanyGroupDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>   
+    <bean id="identityDocumentDao" class="cs.bms.dao.IdentityDocumentDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="financialEntityDao" class="cs.bms.dao.FinancialEntityDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    <bean id="countryDao" class="cs.bms.dao.CountryDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="regionDao" class="cs.bms.dao.RegionDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="subregionDao" class="cs.bms.dao.SubregionDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="districtDao" class="cs.bms.dao.DistrictDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    
+    <bean id="userDao" class="cs.bms.dao.UserDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="specialPermissionDao" class="cs.bms.dao.SpecialPermissionDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="rolDao" class="cs.bms.dao.RolDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="permissionDao" class="cs.bms.dao.PermissionDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="permissionCategoryDao" class="cs.bms.dao.PermissionCategoryDao">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <bean id="dataSource"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+<!--        <property name="url" value="jdbc:postgresql://195.154.56.237:5432/bms" /> 
+        <property name="driverClassName" value="org.postgresql.Driver"/> 
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin1986"/>-->
+                <property name="url" value="jdbc:postgresql://localhost:5432/bms_test" /> 
+        <property name="driverClassName" value="org.postgresql.Driver"/> 
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin"/>
+    </bean>
+      
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="annotatedClasses">
+            <list>
+                <value>cs.bms.model.DataCompany</value>
+                <!--CORE -->
+                <value>cs.bms.model.Actor</value>
+                <value>cs.bms.model.IdentityDocument</value>
+                <value>cs.bms.model.WorkShift</value>
+                <value>cs.bms.model.Company</value>
+                <value>cs.bms.model.CompanyGroup</value>
+                <value>cs.bms.model.FinancialEntity</value>
+                <!--WMS-->
+                <value>cs.bms.model.Product</value>
+                <value>cs.bms.model.ProductLine</value>
+                <value>cs.bms.model.ProductSalePrice</value>
+                <value>cs.bms.model.ProductCostPrice</value>
+                <value>cs.bms.model.Stock</value>
+                <value>cs.bms.model.StockType</value>
+                <value>cs.bms.model.UoM</value>
+                <value>cs.bms.model.InternalStockMovement</value>
+                <value>cs.bms.model.InternalStockMovementDetail</value>
+                <value>cs.bms.model.OperationType</value>
+                <value>cs.bms.model.StockReturnSupplier</value>
+                <value>cs.bms.model.StockReturnSupplierDetail</value>
+                <value>cs.bms.model.StockReturnCustomer</value>
+                <value>cs.bms.model.StockReturnCustomerDetail</value>
+                <value>cs.bms.model.StockReduction</value>
+                <value>cs.bms.model.StockReductionDetail</value>
+                <value>cs.bms.model.Kardex</value>
+                <value>cs.bms.model.OpeningBalance</value>
+                <!--ACCOUNTING -->
+                <value>cs.bms.model.AccountingEntry</value>
+                <value>cs.bms.model.AccountingRecord</value>
+                <value>cs.bms.model.AccountingRecordDetail</value>
+                <value>cs.bms.model.ElectronicBook</value>
+                <value>cs.bms.model.ElectronicBookCategory</value>
+                <value>cs.bms.model.PaymentProof</value>
+                <value>cs.bms.model.DocumentNumbering</value>
+                <value>cs.bms.model.CashRegister</value>
+                <value>cs.bms.model.CashRegisterDetail</value>
+                <value>cs.bms.model.PaymentVoucher</value>
+                <!-- SALE -->
+                <value>cs.bms.model.Sale</value>
+                <value>cs.bms.model.SalePayment</value>
+                <value>cs.bms.model.SaleDetail</value>
+                <!-- PURCHASE -->
+                <value>cs.bms.model.Purchase</value>
+                <value>cs.bms.model.PurchasePayment</value>
+                <value>cs.bms.model.PurchaseDetail</value>
+                <value>cs.bms.model.Seller</value>
+                <!--LOCATION -->
+                <value>cs.bms.model.Country</value>
+                <value>cs.bms.model.Region</value>
+                <value>cs.bms.model.Subregion</value>
+                <value>cs.bms.model.District</value>     
+                <value>cs.bms.model.Ubigeo</value>             
+                <!--SEGURIDAD -->
+                <value>cs.bms.model.User</value>
+                <value>cs.bms.model.Rol</value>
+                <value>cs.bms.model.Permission</value>
+                <value>cs.bms.model.SpecialPermission</value>
+                <value>cs.bms.model.PermissionCategory</value>
+            </list>
+        </property> 
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+   
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <context:annotation-config />
+    
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+ 
+</beans>

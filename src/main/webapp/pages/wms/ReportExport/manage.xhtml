@@ -1,0 +1,264 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript" src="#{request.contextPath}/js/customer-return_man.js" />
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">#{managedStockReductionBean.selected.id eq null ? 'REGISTRAR' : 'EDITAR'} DEVOLUCIONES DE CLIENTE</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form"  style="padding-top: 50px">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" process="@this" update=":content-wrapper" action="#{customerReturnBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/wms/customer_return/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{customerReturnBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedCustomerReturnBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedCustomerReturnBean.doSave('/pages/wms/customer_return/list.xhtml', customerReturnBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SRC.back()" class="metro-tile bg-danger light">
+                                <span class="fa fa-arrow-left text-muted"></span>
+                                <span class="metro-title">Volver a lista</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SRC.refresh()" class="metro-tile bg-warning light">
+                                <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                <span class="metro-title">Reestablecer</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="javascript:SRC.save()" class="metro-tile bg-primary light">
+                                <span class="fa fa-save text-muted"></span>
+                                <span class="metro-title">Guardar</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel mb10">
+                            <div class="panel-heading">
+                                <span class="panel-icon">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <span class="panel-title">BUSCAR VENTA</span>
+                            </div>
+                            <div class="panel-body pb10">
+                                <div class="form-horizontal">
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-3">Documento</label>
+                                        <div class="col-md-9">
+                                            <script>
+                                                $(function () {
+                                                    $("#form\\:document-number").on("input", function () {
+                                                        if ($("#form\\:sale").val() != "") {
+                                                            nullify();
+                                                        }
+                                                    }).pressEnter(function () {
+                                                        search();
+                                                    });
+                                                });
+                                            </script>
+                                            <p:remoteCommand 
+                                                name="search" 
+                                                onstart="begin_load()"
+                                                oncomplete="end_load()"
+                                                update="form:sale-wrapper,form:sale"
+                                                action="#{managedCustomerReturnBean.saleSearcher.search()}"
+                                                process="@this,document-number"/>
+                                            <p:remoteCommand 
+                                                name="nullify" 
+                                                onstart="begin_load()"
+                                                oncomplete="end_load()"
+                                                update="form:sale-wrapper,form:sale"
+                                                action="#{managedCustomerReturnBean.saleSearcher.search()}"
+                                                process="@this">
+                                                <f:setPropertyActionListener value="#{''}" target="#{managedCustomerReturnBean.documentNumber}" />
+                                            </p:remoteCommand>
+                                            <p:inputText id="document-number" value="#{managedCustomerReturnBean.saleSearcher.documentNumber}" styleClass="form-control input-sm" />
+                                            <h:inputHidden id="sale" value="#{managedCustomerReturnBean.saleId}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel mb10">
+                            <div class="panel-heading">
+                                <span class="panel-icon">
+                                    <i class="fa fa-files-o"></i>
+                                </span>
+                                <span class="panel-title">DOCUMENTO</span>
+                            </div>
+                            <div class="panel-body pb10">
+                                <div class="form-horizontal">
+                                    <div class="form-group form-group-sm">
+                                        <div class="col-md-12">
+                                            <h:selectOneMenu value="#{managedCustomerReturnBean.paymentProofId}"  id="payment-proof" styleClass="form-control input-sm">
+                                                <f:selectItem/>
+                                                <f:selectItems 
+                                                    value="#{managedCustomerReturnBean.paymentProofSearcher.data}"
+                                                    var="item" 
+                                                    itemLabel="#{item[2]}"
+                                                    itemValue="#{item[0]}"/>
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-3">Fec. Emisión</label>
+                                        <div class="col-md-9">
+                                            <p:inputText  value="#{managedCustomerReturnBean.dateIssue}" id="date-issue" styleClass="form-control input-sm" >
+                                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                                            </p:inputText>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-3">Devolución</label>
+                                        <div class="col-md-9">
+                                            <p:inputText converter="javax.faces.BigDecimal" value="#{managedCustomerReturnBean.repayment}" id="repayment" styleClass="form-control input-sm" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="panel mb10">
+                            <div class="panel-heading">
+                                <span class="panel-icon">
+                                    <i class="fa fa-tasks"></i>
+                                </span>
+                                <span class="panel-title">VENTA DE DEVOLUCIÓN</span>
+                            </div>
+                            <h:panelGroup id="sale-wrapper" layout="block" styleClass="panel-body pb10">
+                                <ui:fragment rendered="#{managedCustomerReturnBean.saleSearcher.data ne null}">
+                                    <ui:param name="sale" value="#{managedCustomerReturnBean.saleSearcher.data}" />
+                                    <div class="form-horizontal">
+                                        <div class="row">
+                                            <div class="col-md-6">                                            
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-3">Cliente</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static input-sm">#{sale[5] eq null ? '---' : sale[5]}</p>
+                                                    </div>
+                                                </div>                                         
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-3">Ptos</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static input-sm">#{sale[9]}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">      
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-3">Fec. emisión</label>
+                                                    <div class="col-md-9">
+                                                        <p class="form-control-static input-sm">
+                                                            <h:outputText value="#{sale[4]}">
+                                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p>
+                                                    </div>
+                                                </div>   
+                                                <div class="form-group form-group-sm mbn">
+                                                    <label class="control-label col-md-3">Subtotal</label>
+                                                    <div class="col-md-3">
+                                                        <p class="form-control-static input-sm text-right">S/. #{sale[6]}</p>
+                                                    </div>
+                                                </div>   
+                                                <div class="form-group form-group-sm mbn">
+                                                    <label class="control-label col-md-3">IGV</label>
+                                                    <div class="col-md-3">
+                                                        <p class="form-control-static input-sm text-right">S/. #{sale[7]}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm mbn">
+                                                    <label class="control-label col-md-3">Descuento</label>
+                                                    <div class="col-md-3">
+                                                        <p class="form-control-static input-sm text-right">S/. #{sale[8]}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-sm">
+                                                    <label class="control-label col-md-3">Total</label>
+                                                    <div class="col-md-3">
+                                                        <p class="form-control-static input-sm text-right">S/. #{sale[6] + sale[7] - sale[8 ]}</p>
+                                                    </div>
+                                                </div>   
+                                            </div>     
+                                        </div>                                   
+                                        <div class="form-group form-group-sm">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-md-2">Devoluc.</th>
+                                                        <th class="col-md-2">Cant.</th>
+                                                        <th class="col-md-4">Descripción</th>
+                                                        <th class="col-md-2 text-center">Prec. Unit</th>
+                                                        <th class="col-md-2 text-center">Subtotal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedCustomerReturnBean.detailSearcher.data}" var="item"> 
+                                                        <tr>
+                                                            <td class="ptn pbn">
+                                                                <p:inputText converter="javax.faces.BigDecimal" value="#{item[1]}" styleClass="form-control input-sm quantity table-input">
+                                                                    <f:passThroughAttribute name="max" value="#{item[3] - item[2]}" />                                                                     
+                                                                    <f:passThroughAttribute name="data-msg-max" value="Maximo #{item[3] - item[2]}" />  
+<!--                                                                    <f:passThroughAttribute name="require_from_group" value="[1, '.quantity']" />
+                                                                    <f:passThroughAttribute name="data-msg-require_from_group" value="Minimo rellenar un campo" />                                                                        -->
+                                                                </p:inputText>
+                                                            </td>
+                                                            <td>#{item[3] - item[2]} #{item[5]}</td>
+                                                            <td>#{item[6]}</td>
+                                                            <td class="text-right">S/. #{item[7]}</td>
+                                                            <td class="text-right">S/. #{item[8]}</td>
+                                                        </tr>
+
+                                                    </ui:repeat>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{managedCustomerReturnBean.saleSearcher.data eq null}">
+                                    <div class="well well-lg text-center pt40 pb40 mbn text-muted">
+                                        <i class="imoon imoon-file2 fa-5x"/>
+                                        <h2>INGRESE EL NUMERO DE DOCUMENTO PARA VISUALIZAR</h2>
+                                    </div>
+                                </ui:fragment>
+
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+</ui:composition>
+
+

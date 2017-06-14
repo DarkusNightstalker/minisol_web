@@ -1,0 +1,158 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_create_customer() {
+            $('#modal-customer').modal();
+        }
+        $(function () {
+            $('#modal-customer').on('shown.bs.modal', function () {
+                $('#form-customer\\:identity-number').focus();
+            }).on('hidden.bs.modal', function () {
+                $('#form\\:identity-number').focus();
+            });
+        });
+    </script>
+
+    <div id="modal-customer" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <h:panelGroup layout="block" id="m-customer-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        $('#form-customer\\:address').pressEnter(function () {
+                            SaleM.customer.before_save();
+                        });
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="glyphicons glyphicons-user_add mr5"></i><b>REGISTRAR CLIENTE</b> 
+                </div>
+                <h:form id="form-customer">
+                    <script>
+                        $(function () {
+                            SaleM.customer.init();
+                        });
+                    </script>
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <div class="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-customer\\:identity-document").select2({
+                                                        placeholder: "Tipo de Documento",
+                                                        width: "100%",
+                                                        allowClear: true,
+                                                        containerCssClass: ":all:"
+                                                    });
+                                                });
+                                            </script>
+                                            <h:selectOneMenu value="#{managedSaleBean.managedSupplierBean.identityDocumentId}"  id="identity-document" styleClass="select2-single form-control input-sm">
+                                                <f:selectItem/>
+                                                <f:selectItems 
+                                                    value="#{managedSaleBean.managedSupplierBean.identityDocumentSearcher.data}"
+                                                    var="item"
+                                                    itemLabel="#{item[3]}"
+                                                    itemValue="#{item[0]}"/> 
+                                                <p:ajax event="change" listener="#{managedSaleBean.managedSupplierBean.identityDocumentSearcher.changeLength()}" update="form-customer:info-wrapper,form-customer:identity_number-wrapper" process="@this" />
+                                            </h:selectOneMenu>   
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group form-group-sm mbn">
+                                        <h:panelGroup id="identity_number-wrapper" layout="block" styleClass="col-md-12">
+                                            <script>
+                                                $(function () {
+                                                    $("#form-customer\\:identity-number").numeric({scale: 0, negative: false});
+                                                    $('#form-customer\\:identity-number').pressEnter(function () {
+                                                        if($('#form-customer\\:other').length == 0){
+                                                            $('#form-customer\\:name').focus();
+                                                        }else
+                                                        $('#form-customer\\:other').focus();
+                                                    });
+                                                });
+                                            </script>
+                                            <p:inputText id="identity-number" value="#{managedSaleBean.managedSupplierBean.identityNumber}" styleClass="form-control input-sm">
+                                                <f:passThroughAttribute name="minlength" value="#{managedSaleBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-minlength" value="Tamaño minimo #{managedSaleBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="maxlength" value="#{managedSaleBean.managedSupplierBean.length}"/>
+                                                <f:passThroughAttribute name="data-msg-maxlength" value="Tamaño maximo #{managedSaleBean.managedSupplierBean.length}"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="short mb5 mt5"/>
+                            <h:panelGroup layout="block" id="info-wrapper">
+                                <script>
+                                    $(function () {
+                                        $('#form-customer\\:other').pressEnter(function () {
+                                            $('#form-customer\\:name').focus();
+                                        });
+                                        $('#form-customer\\:name').pressEnter(function () {
+                                            $('#form-customer\\:address').focus();
+                                        });
+                                    });
+                                </script>
+                                <ui:fragment rendered="#{managedSaleBean.managedSupplierBean.length eq 11}">
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-sm-4">
+                                            Nombre comerc.
+                                        </label>
+                                        <div class="col-md-8">
+                                            <p:inputText id="other" value="#{managedSaleBean.managedSupplierBean.other}" styleClass="form-control input-sm name" />
+                                        </div>
+                                    </div>
+                                </ui:fragment>
+                                <div class="form-group form-group-sm mbn">
+                                    <label class="control-label col-sm-4">
+                                        Nombre #{managedSaleBean.managedSupplierBean.length eq 11 ? 'RUC' : ''}
+                                    </label>
+                                    <div class="col-md-8">
+                                        <p:inputText id="name" value="#{managedSaleBean.managedSupplierBean.name}" styleClass="form-control input-sm name" />
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <div class="form-group form-group-sm mbn">
+                                <label class="control-label col-sm-4">
+                                    Direccion
+                                </label>
+                                <div class="col-md-8">
+                                    <p:inputText id="address" value="#{managedSaleBean.managedSupplierBean.address}" styleClass="form-control input-sm " />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedSaleBean.managedSupplierBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-customer .close').trigger('click')"
+                        name="update_customer" update="formc:customer-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedSaleBean.customerSearcher.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();SaleM.customer.after_save()"
+                        name="save_customer" update="form-customer:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="SaleM.customer.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

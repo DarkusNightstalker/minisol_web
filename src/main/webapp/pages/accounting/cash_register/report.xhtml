@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        function open_report() {
+            $('#modal-report').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report').on('shown.bs.modal', function () {
+                $('#formc\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+    <div id="modal-report" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="report-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE ARQUEOS DE CAJA</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-6 prn">
+                            <li class="active">
+                                <a href="#tab14_1" onclick="Report.clean('form-r-cr-total')" data-toggle="tab">  
+                                    <span class="fs20 pl5 pr5 bg-system mr15">
+                                        <i class="icon-cash-register2"/></span> Arqueos de caja totalizados
+                                </a>
+                            </li>
+<!--                            <li>
+                                <a href="#tab14_2" onclick="Report.clean('form-r-work-shift')" data-toggle="tab">
+                                    <span class="fs20 pl5 pr5 bg-alert mr15">
+                                        <i class="icon-cash-register2"/></span> Arqueos de caja por turno
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_3" onclick="Report.clean('form-r-user')" data-toggle="tab">
+                                    <span class="fs20 pl5 pr5 bg-alert mr15">
+                                        <i class="icon-cash-register2"/></span> Arqueos de caja por cajero
+                                </a>
+                            </li>-->
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab14_1" class="tab-pane active">
+                                <h:form id="form-r-cr-total">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-cr-total");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportCashRegisterBean.cashRegisterTotal.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportCashRegisterBean.cashRegisterTotal.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportCashRegisterBean.cashRegisterTotal.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportCashRegisterBean.cashRegisterTotal.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pr5 bg-system mr10">
+                                            <i class="icon-cash-register2"/></span><b>ARQUEOS DE CAJA TOTALIZADOS</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Fec. inicio</label>
+                                            <div class="col-md-6">
+                                                <p:inputText value="#{reportCashRegisterBean.cashRegisterTotal.params['date_init']}" class="form-control d">
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Fec. Fin</label>
+                                            <div class="col-md-6">
+                                                <p:inputText value="#{reportCashRegisterBean.cashRegisterTotal.params['date_end']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-cr-total:many-company-value')" id="company" styleClass="chk-company">
+                                                        </h:selectBooleanCheckbox>
+                                                        <label class="fs11" for="form-r-cr-total:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportCashRegisterBean.cashRegisterTotal.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div id="tab14_2" class="tab-pane">   
+                                <h:form id="form-r-work-shift">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-work-shift");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportCashRegisterBean.cashRegisterByWorkShift.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportCashRegisterBean.cashRegisterByWorkShift.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportCashRegisterBean.cashRegisterByWorkShift.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportCashRegisterBean.cashRegisterByWorkShift.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p><span class="pl5 pr5 bg-alert mr10">
+                                            <i class="icon-cash-register2"/></span><b>ARQUEOS DE CAJA POR TURNO</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Turno</label>
+                                            <div class="col-md-9">
+                                                <h:selectOneMenu id="work-shift" converter="javax.faces.Integer" value="#{reportCashRegisterBean.cashRegisterByWorkShift.params['id_work_shift']}" class="form-control input-sm">
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:selectItem itemLabel="Seleccione un turno" itemValue=""/>
+                                                    <f:selectItems 
+                                                        value="#{reportCashRegisterBean.workShiftSearcher.data}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}"/>
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Fecha</label>
+                                            <div class="col-md-6">
+                                                <p:inputText value="#{reportCashRegisterBean.cashRegisterByWorkShift.params['date_arcing']}" class="form-control d">
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

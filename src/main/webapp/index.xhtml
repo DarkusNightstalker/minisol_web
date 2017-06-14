@@ -1,0 +1,350 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta charset="utf-8"/>
+        <title>Sistema de Gestion de Negocio</title>
+
+        <!-- Font CSS (Via CDN) -->
+        <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700'/>-->
+        <!-- FullCalendar Plugin CSS -->
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/vendor/plugins/fullcalendar/fullcalendar.min.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/fonts/glyphicons-pro/glyphicons-pro.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/fonts/icomoon/icomoon.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/fonts/iconsweets/iconsweets.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/fonts/octicons/octicons.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/vendor/plugins/magnific/magnific-popup.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/vendor/plugins/select2/css/core.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/vendor/plugins/datepicker/css/bootstrap-datetimepicker.css"/>
+        <!-- Theme CSS -->
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/skin/default_skin/css/theme.css"/>
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/skin/default_skin/css/HoldOn.css"/>
+
+        <!-- Admin Forms CSS -->
+        <link rel="stylesheet" type="text/css" href="#{request.contextPath}/assets/admin-tools/admin-forms/css/admin-forms.min.css"/>
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="#{request.contextPath}/assets/img/favicon.ico"/>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+      <![endif]-->
+        <script src="#{request.contextPath}/vendor/jquery/jquery-1.11.1.min.js"></script>
+        <script src="#{request.contextPath}/vendor/jquery/jquery_ui/jquery-ui.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/plus_as_tab/emulatetab.joelpurra.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/plus_as_tab/plusastab.joelpurra.js"></script>
+        <script src="#{request.contextPath}/assets/js/custom.js"></script>
+
+    </h:head>
+
+    <h:body styleClass="sb-top sb-top-lg onload-check">
+        <f:event type="preRenderView" listener="#{sessionBean.onLoad()}"/>
+
+        <div id="main">
+
+            <!-- Start: Header -->
+            <header class="navbar navbar-fixed-top navbar-shadow bg-info">
+                <div class="navbar-branding">      
+                    <a class="navbar-brand" href="/">            
+                        <img src="#{request.contextPath}/assets/img/minisol.png" class="img-responsive mt15"/>
+                        <!--
+                                                <b>Mini</b>Sol <b><span class="glyphicons glyphicons-sun"></span></b>-->
+                    </a>
+                    <span id="toggle_sidemenu_l" class="ad ad-lines"></span>
+                </div>
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="hidden-xs">
+                        <a class="request-fullscreen toggle-active" href="#">
+                            <span class="ad ad-screen-full fs18"></span>
+                        </a>
+                    </li>
+                    <li class="dropdown menu-merge hidden-xs">
+                        <a href="javascript:change_company()"  class="dropdown-toggle">
+                            <span class="fa fa-pencil"></span>
+                            <ui:fragment rendered="#{sessionBean.currentCompany eq null}">
+                                <em>Ninguna Sede seleccionada</em>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.currentCompany ne null}">
+                                #{sessionBean.currentCompany.name} #{sessionBean.currentCompany.city} (#{sessionBean.currentCompany.address})
+                            </ui:fragment>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown menu-merge">
+                        <a href="#" class="dropdown-toggle fw600 p15" data-toggle="dropdown">
+                            <img src="assets/img/avatars/5.jpg" alt="avatar" class="mw30 br64"/>
+                            <span class="hidden-xs pl15"> #{sessionBean.currentUser.username} </span>
+                            <span class="caret caret-tp hidden-xs"></span>
+                        </a>
+                        <ul class="dropdown-menu list-group dropdown-persist w250" role="menu">
+                            <li class="dropdown-footer">
+                                <a href="javascript:$('#form-option\\:logout').trigger('click')">
+                                    <span class="fa fa-power-off pr5"></span> Salir 
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li id="toggle_sidemenu_t">  
+                        <span class="fa fa-caret-up"></span>
+                    </li>
+                </ul>
+            </header>
+            <!-- End: Header -->
+
+            <!-- Start: Sidebar -->
+            <aside id="sidebar_left" class="affix sidebar-light has-scrollbar">
+
+                <!-- Start: Sidebar Left Content -->
+                <div class="sidebar-left-content nano-content">
+                    <ui:include  src="/layout/menu/top_menu.xhtml" />
+                </div>
+                <!-- End: Sidebar Left Content -->
+
+            </aside>
+            <!-- End: Sidebar Left -->
+
+            <!-- Start: Content-Wrapper -->
+            <section id="content_wrapper">
+
+                <!-- Start: Topbar-Dropdown -->
+                <div id="topbar-dropmenu" class="alt">
+                    <div class="topbar-menu row">
+
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-primary light">
+                                <span class="glyphicon glyphicon-inbox text-muted"></span>
+                                <span class="metro-title">Messages</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-info light">
+                                <span class="glyphicon glyphicon-user text-muted"></span>
+                                <span class="metro-title">Users</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-success light">
+                                <span class="glyphicon glyphicon-headphones text-muted"></span>
+                                <span class="metro-title">Support</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-system light">
+                                <span class="glyphicon glyphicon-facetime-video text-muted"></span>
+                                <span class="metro-title">Videos</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-warning light">
+                                <span class="fa fa-gears text-muted"></span>
+                                <span class="metro-title">Settings</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <a href="#" class="metro-tile bg-alert light">
+                                <span class="glyphicon glyphicon-picture text-muted"></span>
+                                <span class="metro-title">Pictures</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <h:panelGroup id="content-wrapper" layout="block">
+                    <ui:include src="#{navigationBean.content}" />
+                </h:panelGroup>
+
+                <footer id="content-footer" class="affix mln">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span class="footer-legal">© 2015 C&amp;S Bienes y servicios</span>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <span class="footer-meta">60GB of <b>350GB</b> Free</span>
+                            <a href="#content" class="footer-return-top">
+                                <span class="fa fa-arrow-up"></span>
+                            </a>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End: Page Footer -->
+
+            </section>
+            <!-- End: Content-Wrapper -->
+
+            <!-- End: Right Sidebar -->
+
+        </div>
+        <!-- End: Main -->
+
+        <!-- BEGIN: PAGE SCRIPTS -->
+
+        <!-- HighCharts Plugin -->
+        <script src="#{request.contextPath}/vendor/plugins/fileupload/fileupload.js"></script>
+        <script src="#{request.contextPath}/assets/js/HoldOn.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/tagsinput/tagsinput.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/magnific/jquery.magnific-popup.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/select2/select2.full.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/pnotify/pnotify.js"></script>
+
+        <!-- JvectorMap Plugin + US Map (more maps in plugin/assets folder) -->
+        <script src="#{request.contextPath}/vendor/plugins/jvectormap/jquery.jvectormap.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/jvectormap/assets/jquery-jvectormap-us-lcc-en.js"></script> 
+
+        <!-- FullCalendar Plugin + moment Dependency -->
+        <script src="#{request.contextPath}/vendor/plugins/fullcalendar/lib/moment.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/fullcalendar/fullcalendar.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/datepicker/js/bootstrap-datetimepicker.min.js"></script>
+        <!-- Theme Javascript -->
+        <script src="#{request.contextPath}/assets/js/utility/utility.js"></script>
+        <script src="#{request.contextPath}/assets/js/main.js"></script>
+
+        <ui:include src="/layout/load.xhtml" />
+        <script src="#{request.contextPath}/assets/admin-tools/admin-forms/js/jquery.validate.min.js"></script>
+        <script src="#{request.contextPath}/assets/admin-tools/admin-forms/js/additional-methods.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/x-editable/jquery.mockjax.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/x-editable/x-editable.min.js"></script>
+        <script src="#{request.contextPath}/vendor/plugins/hotKeys/hotKeys.js"></script>
+
+        <!-- Widget Javascript -->
+        <script src="#{request.contextPath}/assets/js/demo/demo.js"></script>
+        <h:form id="form-option">
+            <p:remoteCommand process="@this" name="permanent_conect" />
+            <p:commandLink id="logout" ajax="false" action="#{sessionBean.authentication.logout()}" styleClass="hidden"/>
+        </h:form>
+        <script type="text/javascript">
+            $(function(){
+                #{sessionBean.messagesToJS()};
+            });
+            var Stacks = {
+                stack_top_right: {
+                    "dir1": "down",
+                    "dir2": "left",
+                    "push": "top",
+                    "spacing1": 10,
+                    "spacing2": 10
+                },
+                stack_top_left: {
+                    "dir1": "down",
+                    "dir2": "right",
+                    "push": "top",
+                    "spacing1": 10,
+                    "spacing2": 10
+                },
+                stack_bottom_left: {
+                    "dir1": "right",
+                    "dir2": "up",
+                    "push": "top",
+                    "spacing1": 10,
+                    "spacing2": 10
+                },
+                stack_bottom_right: {
+                    "dir1": "left",
+                    "dir2": "up",
+                    "push": "top",
+                    "spacing1": 10,
+                    "spacing2": 10
+                },
+                stack_bar_top: {
+                    "dir1": "down",
+                    "dir2": "right",
+                    "push": "top",
+                    "spacing1": 0,
+                    "spacing2": 0
+                },
+                stack_bar_bottom: {
+                    "dir1": "up",
+                    "dir2": "right",
+                    "spacing1": 0,
+                    "spacing2": 0
+                },
+                stack_context: {
+                    "dir1": "down",
+                    "dir2": "left",
+                    "context": $("#stack-context")
+                }
+            };
+
+            jQuery(document).ready(function () {
+
+                "use strict";
+
+                Core.init();
+
+
+            });
+            function  change_company() {
+                $.magnificPopup.open({
+                    removalDelay: 500, //delay removal by X to allow out-animation,
+                    items: {
+                        src: "#modal-current-company"
+                    },
+                    callbacks: {
+                        beforeOpen: function (e) {
+                            this.st.mainClass = "mfp-zoomIn";
+                        }
+                    },
+                    midClick: false,
+                    closeOnBgClick: false
+            #{sessionBean.currentCompany eq null? ',showCloseBtn: false' : ''}
+                });
+            }
+        </script>
+        <ui:fragment rendered="#{sessionBean.currentCompany eq null}">
+            <script>
+                $(function () {
+                    change_company();                    
+                });
+            </script>
+        </ui:fragment>
+        
+        <script>
+            $(function(){
+               setTimeout(function(){
+                   permanent_conect();
+               },60000) ;
+            });
+        </script>
+        
+        <div id="modal-current-company" class="popup-basic popup-full bg-none mfp-with-anim mfp-hide">
+            <h:panelGroup id="current-company-content" layout="block" styleClass="panel">
+                <h:form id="form-current-company">
+                    <div class="panel-heading clearfix">
+                        <span class="panel-icon pull-left">
+                            <i class="fa fa-university"></i>
+                        </span>
+                        <span class="panel-title">Seleccionar sede para operaciones</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <ui:repeat value="#{sessionBean.companySearcher.data}" var="item">
+                                <div class="col-md-3 mb15">
+                                    <p:commandLink action="#{sessionBean.setCurrentCompanyById(item[0])}" styleClass="btn btn-block btn-#{item[0] eq sessionBean.currentCompany.id ? 'system' : 'default'} "  ajax="false">
+                                        <i class="fa fa-university fa-3x"/>
+                                        <br/>
+                                        <span class="pt15">#{item[1]} #{item[2]}<br/> (#{item[3]})</span>   
+                                        <ui:fragment rendered="#{item[0] eq sessionBean.currentCompany.id}">
+                                            <i class="fa fs13 fa-check" style="position: absolute;left: 25px;top:10px"/>
+                                        </ui:fragment>
+                                    </p:commandLink>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+        <ui:include src="/layout/import.xhtml"> 
+            <ui:param name="width_window" value="popup-xl"/>
+            <ui:param name="import_" value="#{sessionBean.import_}"/>
+            <ui:param name="suffix" value="main"/>
+        </ui:include>
+    </h:body>
+
+</html>

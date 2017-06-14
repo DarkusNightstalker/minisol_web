@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function show_#{modal_name}(content) {
+            $("#modal-#{modal_name} .panel-body").html(content);
+            $.magnificPopup.open({
+                removalDelay: 500,
+                items: {
+                    src: '#modal-#{modal_name}'
+                },
+                callbacks: {
+                    beforeOpen: function (e) {
+                        this.st.mainClass = 'mfp-zoomIn';
+                    }
+                },
+                modal: true,
+                midClick: false
+            });
+        }
+    </script>
+    <div id="modal-#{modal_name}" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="#{modal_name}-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="#{modal_icon}"></i>
+                </span>
+                <span class="panel-title">#{modal_title}</span>
+            </div>
+            <div class="panel-body">
+            </div>
+            <div class="panel-footer text-right">
+                <button type="button" onclick="#{accept_option};$.magnificPopup.close();" class="btn btn-success w100">
+                    #{accept_text}
+                </button>
+                <button type="button" onclick="$.magnificPopup.close()" class="btn btn-danger w100">
+                    #{cancel_text}
+                </button>
+            </div>
+        </h:panelGroup>
+    </div>
+</ui:composition>

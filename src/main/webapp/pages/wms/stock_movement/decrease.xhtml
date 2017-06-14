@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:form id="form">
+        <header id="topbar" class="ph10">
+            <div class="topbar-left">
+                <ol class="breadcrumb">
+                    <li class="crumb-active">
+                        <a href="javascript:void(0)">Registrar Merma</a>
+                    </li>
+                    <li class="crumb-icon">
+                        <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                            <span class="glyphicon glyphicon-home"></span>
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                        </p:commandLink>
+                    </li>
+                </ol>
+            </div>
+            <div class="topbar-right hidden-xs hidden-sm">
+            </div>
+        </header>
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel mb10">
+                            <div class="panel-body pb10">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">Pto partida</label>
+                                        <div class="col-md-5">
+                                            <h:selectOneMenu id="source" value="#{managedStockMovementBean.sourceCompanyId}" class="form-control">
+                                                <f:selectItem/>
+                                                <f:selectItems
+                                                    value="#{managedStockMovementBean.companySearcher.sourceData}"
+                                                    var="item"
+                                                    itemLabel="#{item[1]} #{item[2]} (#{item[3]})"
+                                                    itemValue="#{item[0]}"/>
+                                                <p:ajax event="change" listener="#{managedStockMovementBean.stockSearcher.update()}" process="@this" update="form:product-table-wrapper" />
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel">
+                            <div class="panel-body pn">
+                                <div id="datatable2_wrapper" class="dataTables_wrapper form-horizontal dt-bootstrap no-footer">
+                                    <div class="dt-panelmenu clearfix">
+                                        <div class="form-group mbn">
+                                            <label class="control-label col-md-2 text-left">Buscar Producto</label>
+                                            <div class="col-md-7">
+                                                <script>
+                                                    $(function () {
+                                                        $("#form\\:terms-product").keyup(function () {
+                                                            if ($("#form\\:input-enter").is(":checked")) {
+                                                                var code = e.keyCode ? e.keyCode : e.which;
+                                                                if (code == 13) {
+                                                                    search_product();
+                                                                    e.preventDefault();
+                                                                    return false;
+                                                                }
+                                                            } else {
+                                                                search_product();
+                                                            }
+                                                        });
+                                                    });
+                                                </script>
+                                                <p:inputText id="terms-product" value="#{generateSaleBean.productSearcher.terms}" styleClass="form-control" placeholder="Por código de barras o por nombre"/>
+                                                <p:remoteCommand name="search_product" 
+                                                                 onstart="begin_load()"  
+                                                                 onsuccess="end_load()"  
+                                                                 update="product-table-wrapper"
+                                                                 process="@this,terms-product" 
+                                                                 action="#{generateSaleBean.productSearcher.search()}" />
+                                            </div>
+                                            <label class="control-label col-md-3">                                                
+                                                <div class="checkbox-custom checkbox-primary mb5">
+                                                    <input type="checkbox" id="form:input-enter"/>
+                                                    <label for="form:input-enter">Presionar enter para buscar</label>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <p:remoteCommand 
+                                            name="add_item"
+                                            onstart="begin_load()"
+                                            oncomplete="end_load(); $('#form\\:detail-wrapper .quantity').last().focus()"
+                                            process="@this,detail-wrapper"
+                                            action="#{managedStockMovementBean.stockMovementDetailSearcher.addItem()}"
+                                            update="form:detail-wrapper,form:product-table-wrapper"/>
+                                    </div>
+                                    <h:panelGroup id="product-table-wrapper" layout="block">
+                                        <table class="table table-striped table-hover table-condensed dataTable no-footer" id="datatable2" cellspacing="0" width="100%" role="grid" aria-describedby="datatable2_info" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-10" >Producto</th>
+                                                    <th class="col-md-1 text-center">Unid.</th>
+                                                    <th class="col-md-1 text-center">Stock</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{managedStockMovementBean.stockSearcher.pagination.data}" var="item" varStatus="st">                                                    
+                                                    <tr style="cursor: pointer" onclick="add_item([{name: 'selected', value:#{st.index}}])">
+                                                        <td>#{item[1]}</td>
+                                                        <td class="text-center">#{item[2]}</td>
+                                                        <td class="text-center">#{item[3]}</td>
+                                                    </tr>
+                                                </ui:repeat>
+                                            </tbody>
+                                            <ui:fragment rendered="#{empty managedStockMovementBean.stockSearcher.pagination.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <td class="text-center" colspan="4">
+                                                            <h3 class="text-muted">No se ha encontrado productos habilitados</h3>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </table>
+
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel">
+                                    <h:panelGroup id="detail-wrapper" layout="block" styleClass="panel-body pn">
+                                        <script>
+                                            $(function () {
+                                                $("#form\\:detail-wrapper .numeric").numeric({decimal: '.', scale: 2});
+                                            })
+                                        </script>
+                                        <table class="table form-horizontal table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-3 text-center">Cantidad</th>
+                                                    <th  class="col-md-5">Descripcion</th>
+                                                    <th class="col-md-2 text-center">Peso</th>
+                                                    <th  class="col-md-2 text-center">Unid. Peso</th>
+                                                    <th  class="min-width:80px"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{managedStockMovementBean.stockMovementDetailSearcher.data}" var="item" varStatus="st">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="input-group input-group-sm">
+                                                                <p:inputText converter="javax.faces.BigDecimal" value="#{item[0]}" styleClass="form-control input-sm numeric quantity"/>  
+                                                                <span  style="min-width:55px"  class="input-group-addon">#{item[2]}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td>#{item[1]}</td>
+                                                        <td class="text-right">
+                                                            <p:inputText converter="javax.faces.BigDecimal" value="#{item[3]}" styleClass="form-control input-sm numeric weigth"/>  
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <h:selectOneMenu converter="javax.faces.Integer" value="#{item[4]}" class="form-control input-sm">
+                                                                <f:selectItem/>
+                                                                <f:selectItems 
+                                                                    value="#{managedStockMovementBean.uomSearcher.data}" 
+                                                                    var="item"
+                                                                    itemLabel="#{item[2]}"
+                                                                    itemValue="#{item[0]}"/>
+                                                            </h:selectOneMenu>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <p:commandLink process="@this,form:detail-wrapper" update="form:detail-wrapper,form:product-table-wrapper" action="#{managedStockMovementBean.stockMovementDetailSearcher.removeItem(st.index)}" styleClass="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"/>
+                                                            </p:commandLink>
+                                                        </td>
+                                                    </tr> 
+                                                </ui:repeat>          
+                                                <ui:fragment rendered="#{empty managedStockMovementBean.stockMovementDetailSearcher.data}">
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td class="text-center" colspan="5">
+                                                                <h4 class="text-muted">No se ha agregado productos</h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>                                    
+                                            </tbody>
+                                        </table>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <span class="panel-title hidden-xs"><i class="fa fa-car"/>Documento Tecnico</span>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4 text-left">Serie</label>
+                                        <div class="col-md-8">
+                                            <p:inputText styleClass="form-control input-sm"  />
+                                        </div>
+                                    </div>
+                                    <div class="form-group mbn">
+                                        <label class="control-label col-md-4 text-left">Nro documento</label>
+                                        <div class="col-md-8">
+                                            <p:inputText styleClass="form-control input-sm"  />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer text-right">
+                                <button type="button" class="btn btn-danger">
+                                    Cancelar
+                                </button>
+                                <p:commandLink  action="#{managedStockMovementBean.doSave('/pages/accounting/payment_proof/view.xhtml', purchaseBean)}"
+                                                styleClass="btn btn-primary">
+                                    Guardar
+                                </p:commandLink>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+</ui:composition>
+
+

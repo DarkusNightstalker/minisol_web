@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_synchro() {
+            $('#modal-synchro-actor').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-synchro-actor').on('shown.bs.modal', function () {
+                $('#form-synchro\\:captcha').focus();
+            }).on('hidden.bs.modal', function () {
+            });
+        });
+    </script>
+
+    <div id="modal-synchro-actor" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <h:panelGroup layout="block" id="synchro-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        Actor.synchro.init();
+                    });
+                </script>
+                <div class="modal-header">
+                    <p:commandLink process="@this" action="#{actorBean.synchroDataWithWeb.stop()}" styleClass="close">
+                        <i class="fa fa-times"/>
+                        <f:passThroughAttribute name="data-dismiss" value="modal" />
+                    </p:commandLink>
+                    <i class="fa fa-globe"></i><b>SINCRONIZAR DATOS CON RENIEC</b> 
+                </div>
+                <h:form id="form-synchro">
+                    <div class="modal-body">
+                        <h:panelGroup id="content" layout="block" class="form-horizontal">
+                            <div id="form-synchro:cc-wrapper">
+                                <h:panelGroup id="captcha-wrapper" layout="block">
+                                    <div class="form-group form-group-sm">
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12 text-center">
+                                                <img alt="Embedded Image" src="data:image/jpg;base64,#{actorBean.synchroDataWithWeb.image64}" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12">
+                                                <script>
+                                                    $(function () {
+                                                        Actor.synchro.configure_captcha();
+                                                    });
+                                                </script>
+                                                <p:inputText id="captcha" value="#{actorBean.synchroDataWithWeb.captcha}" styleClass="form-control input-sm text-uppercase"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                            <div id="form-synchro:pg-wrapper" class="hidden" >
+                                <h:panelGroup id="progress-wrapper" layout="block">
+                                    <h:inputHidden id="finalize" value="#{actorBean.synchroDataWithWeb.finalize}" />
+                                    <h:inputHidden id="valid" value="#{actorBean.synchroDataWithWeb.valid}" />
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-3">Progreso Actual : </label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static text-success input-sm"> #{actorBean.synchroDataWithWeb.currentCount} / #{actorBean.synchroDataWithWeb.totalCount}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-3">Errores : </label>
+                                        <div class="col-md-9">
+                                            <p class="form-control-static text-danger input-sm"> #{actorBean.synchroDataWithWeb.errors.size()} </p>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </h:panelGroup>
+                        <p:remoteCommand 
+                            process="@this" 
+                            oncomplete="Actor.synchro.update_progress()"
+                            name="synchro_progress" update="form-synchro:progress-wrapper"  />
+                        <p:remoteCommand 
+                            process="@this" 
+                            oncomplete="Actor.synchro.reload_captcha()"
+                            name="reload_captcha" update="form-synchro:captcha-wrapper"  />
+                        <p:remoteCommand 
+                            action="#{actorBean.synchroDataWithWeb.begin()}"
+                            process="@form" 
+                            oncomplete="Actor.synchro.after_synchro();"
+                            name="begin_synchro" />
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

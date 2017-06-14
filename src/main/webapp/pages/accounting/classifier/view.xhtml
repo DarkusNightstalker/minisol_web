@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:form id="form">
+        <header id="topbar" class="ph10">
+            <div class="topbar-left">
+                <ol class="breadcrumb">
+                    <li class="crumb-active">
+                        <a href="dashboard.html">Clasificadores</a>
+                    </li>
+                    <li class="crumb-icon">
+                        <a href="dashboard.html">
+                            <span class="glyphicon glyphicon-home"></span>
+                        </a>
+                    </li>
+                    <li class="crumb-link">
+                        <a href="index.html">Inicio</a>
+                    </li>
+                    <li class="crumb-trail">Clasificadores</li>
+                </ol>
+            </div>
+            <div class="topbar-right hidden-xs hidden-sm">
+                <p:commandLink action="#{classifierBean.import_.refresh()}" update=":import-content" process="@this" styleClass="btn btn-default btn-sm fw600 ml10" oncomplete="App.open_modal('#modal-import','mfp-zoomIn',false)">
+                    <span class="fa fa-upload pr5"></span> Importar datos
+                </p:commandLink>
+                <a href="ecommerce_products.html" class="btn btn-default btn-sm fw600 ml10">
+                    <span class="fa fa-plus pr5"></span> Agregar clasificador
+                </a>
+            </div>
+        </header>
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" class="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/table_toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{classifierBean.pagination}"/>
+                                </ui:include>
+                                <table class="table table-condensed admin-form theme-primary fs13 table-hover table-striped">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:repeat value="#{classifierBean.types}" var="ct">
+                                                <th style="width: 35px"></th>
+                                            </ui:repeat>
+                                            <th class="">Descripción</th>
+                                            <th class="text-center" style="width: 100px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{classifierBean.pagination.data}" varStatus="st_data" var="item">
+                                            <tr>
+                                                <ui:repeat value="#{classifierBean.types}" var="ct" varStatus="st_ct">
+                                                    <td class="">#{classifierBean.localCode(st_data.index, st_ct.index)}</td>
+                                                </ui:repeat>
+                                                <td class="">#{item[2]}</td>
+                                                <td class="text-right">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-xs btn-gradient btn-info">
+                                                            <i class="glyphicons glyphicons-vcard"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-xs btn-gradient btn-system">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-xs btn-gradient btn-danger">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty classifierBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="#{classifierBean.types.size() + 2}">
+                                                    <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+                                <ui:include src="/layout/table_footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{classifierBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match" style="height: 603px;">
+
+
+
+                <!-- menu quick links -->
+                <div class="admin-form">
+
+                    <h4> Buscar Asiento</h4>
+
+                    <hr class="short"/>
+
+                    <div class="section mb10">
+                        <label for="customer-email" class="field prepend-icon">
+                            <input type="text" name="customer-email" id="customer-email" class="gui-input" placeholder="DNI/RUC del cliente"/>
+                            <label for="customer-email" class="field-icon">
+                                <i class="icon-documents"></i>
+                            </label>
+                        </label>
+                    </div>
+
+                    <div class="section mb25">
+                        <label for="customer-name" class="field prepend-icon">
+                            <input type="text" name="customer-name" id="customer-name" class="gui-input" placeholder="Nombre del cliente"/>
+                            <label for="customer-name" class="field-icon">
+                                <i class="fa fa-user"></i>
+                            </label>
+                        </label>
+                    </div>
+
+
+                    <hr class="short"/>
+
+                    <div class="section">
+                        <button class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                    </div>
+
+                </div>
+            </aside>
+
+        </section>
+    </h:form>
+    <ui:include src="/layout/import.xhtml"> 
+        <ui:param name="width_window" value="popup-xl"/>
+        <ui:param name="import_" value="#{classifierBean.import_}"/>
+        <ui:param name="tableWidth" value="Código:150px,Nombre:40%,Descripcion:60%"/>
+    </ui:include>
+
+</ui:composition>
+
+

@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script src="#{request.contextPath}/js/product-line_man.js" />
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedProductLineBean.selected.id eq null ? 'AGREGAR' : 'EDITAR'} LINEAS DE PRODUCTOS</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>                    
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" styleClass="pt20">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" process="@this" update=":content-wrapper" action="#{productLineBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/wms/product_line/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{financialEntityBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedProductLineBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedProductLineBean.doSave('/pages/wms/product_line/list.xhtml', productLineBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open" style="display: block;">
+                        <div class="topbar-menu row">
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ProductLine.back()" class="metro-tile bg-danger light">
+                                    <span class="fa fa-arrow-left text-muted"></span>
+                                    <span class="metro-title">Volver a lista</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ProductLine.refresh()" class="metro-tile bg-warning light">
+                                    <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                    <span class="metro-title">Reestablecer</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ProductLine.save()" class="metro-tile bg-primary light">
+                                    <span class="fa fa-save text-muted"></span>
+                                    <span class="metro-title">Guardar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group form-group-sm">
+                                    <label class="col-md-2 control-label">Nombre</label>
+                                    <div class="col-lg-10" >
+                                        <p:inputText id="name" value="#{managedProductLineBean.name}"  class="form-control input-sm" maxlength="380" />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2" >
+
+                                    </div>
+                                    <ui:fragment rendered="#{managedProductLineBean.selected.id eq null}">
+                                        <div class="col-md-4" >
+                                            <div class="checkbox-custom checkbox-primary mb5">
+                                                <h:selectBooleanCheckbox value="#{managedProductLineBean.createAgain}" id="create-again" />
+                                                <label for="form:create-again">Crear nuevo al terminar</label>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+</ui:composition>
+
+

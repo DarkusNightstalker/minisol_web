@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javasciprt:void(0)">Tipos de existencias</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn" style="display: block;">
+                    <div class="topbar-menu row">
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  action="#{managedStockTypeBean.create()}" 
+                                            update=":content-wrapper" 
+                                            process="@this" 
+                                            onstart="begin_load()"
+                                            oncomplete="end_load()" styleClass="metro-tile bg-success light">
+                                <span class="glyphicons glyphicons-inbox_in text-muted"></span>
+                                <span class="metro-title">Registrar</span>
+                                <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_type/manage.xhtml"/>
+                                <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{managedStockTypeBean}"/>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-xs-4 col-sm-2">
+                            <p:commandLink  
+                                action="#{stockTypeBean.import_.refresh()}" 
+                                update=":import-content-main" process="@this" 
+                                oncomplete="open_import_main('IMPORTAR TIPOS DE EXISTENCIA DE LA SUNAT',true,function(){$('#btn-refresh').trigger('click')})"  
+                                styleClass="metro-tile bg-system light">
+                                <span class="glyphicons glyphicons-file_import text-muted"></span>
+                                <span class="metro-title">Importar</span>
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{stockTypeBean.import_}"/>
+                            </p:commandLink>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/datatable/toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{stockTypeBean.pagination}"/>
+                                    <ui:param name="order_factory" value="#{stockTypeBean.orderFactory}"/>
+                                    <ui:param name="update_script" value="search()"/>
+                                </ui:include>
+                                <table class="table table-condensed admin-form theme-primary fs13 table-hover table-striped">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{stockTypeBean.orderFactory}" />
+                                                <ui:param name="label" value="Codigo" />
+                                                <ui:param name="field" value="code" />
+                                                <ui:param name="class" value="col-md-1 text-center" />
+                                            </ui:include>
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{stockTypeBean.orderFactory}" />
+                                                <ui:param name="label" value="Nombre" />
+                                                <ui:param name="field" value="name" />
+                                                <ui:param name="class" value="col-md-11" />
+                                            </ui:include>
+                                            <th class="text-center" style="min-width: 100px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{stockTypeBean.pagination.data}"  var="item">
+                                            <tr>
+                                                <td class="text-center">#{item[1]}</td>
+                                                <td class="">#{item[2]}</td>                                                
+                                                <td class="text-center">
+                                                    <div class="btn-group">
+                                                        <p:commandLink 
+                                                            update=":info-content" 
+                                                            process="@this" 
+                                                            onstart="begin_load()"
+                                                            action="#{stockTypeBean.load()}"
+                                                            oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                            styleClass="btn btn-xs btn-gradient btn-info">
+                                                            <i class="glyphicons glyphicons-vcard"></i>
+                                                            <f:setPropertyActionListener target="#{stockTypeBean.id}" value="#{item[0]}"/>
+                                                        </p:commandLink>
+                                                        <p:commandLink 
+                                                            update=":content-wrapper" 
+                                                            process="@this" 
+                                                            onstart="begin_load()"
+                                                            oncomplete="end_load()" 
+                                                            styleClass="btn btn-xs btn-gradient btn-system">
+                                                            <i class="fa fa-pencil"></i>
+                                                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_type/manage.xhtml"/>
+                                                            <f:setPropertyActionListener target="#{managedStockTypeBean.idSelected}" value="#{item[0]}"/>
+                                                        </p:commandLink>
+                                                        <p:commandLink 
+                                                            update=":delete-content" 
+                                                            process="@this" 
+                                                            onstart="begin_load()"
+                                                            oncomplete="end_load();StockType.delete('#{item[4]}');" 
+                                                            styleClass="btn btn-xs btn-gradient btn-danger">
+                                                            <i class="fa fa-trash"></i>
+                                                            <f:setPropertyActionListener target="#{stockTypeBean.id}" value="#{item[0]}"/>
+                                                        </p:commandLink>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty stockTypeBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3">
+                                                    <h3 class="text-muted">No se ha encontrado ningun registro</h3>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+
+                                <ui:include src="/layout/datatable/footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{stockTypeBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match" style="height: 603px;">
+
+
+
+                <!-- menu quick links -->
+                <div class="admin-form">
+
+                    <h4> Buscar Tipo de Existencia</h4>
+
+                    <hr class="short"/>
+
+                    <div class="section mb10">
+                        <label for="form:code" class="field prepend-icon">
+                            <p:inputText id="code" value="#{stockTypeBean.code}" styleClass="gui-input" placeholder="Código" autocomplete="false" />
+                            <label for="form:code" class="field-icon">
+                                <i class="fa fa-barcode"></i>
+                            </label>
+                        </label>
+                    </div>
+                    <div class="section mb25">
+                        <label for="form:name" class="field prepend-icon">
+                            <p:inputText id="name" value="#{stockTypeBean.name}" styleClass="gui-input" placeholder="Descripción" autocomplete="false" />
+                            <label for="form:name " class="field-icon">
+                                <i class="fa fa-files-o"></i>
+                            </label>
+                        </label>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{stockTypeBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load();clean();" oncomplete="end_load()" action="#{stockTypeBean.refresh()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="del" action="#{managedStockTypeBean.delete(stockTypeBean.id)}"  onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" update="form:table-wrapper" />
+                        <p:remoteCommand name="recovery" action="#{managedStockTypeBean.recovery(stockTypeBean.id)}"  oncomplete="search()" update="form:table-wrapper" />
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </h:form>
+    <script src="#{request.contextPath}/js/stock-type_view.js"/>
+    <ui:include src="/layout/delete.xhtml"/> 
+    <div id="modal-info" class="popup-basic popup-lg bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="info-content" layout="block" styleClass="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-info"></i>
+                </span>
+                <span class="panel-title">Tipo de existencia</span>
+            </div>
+            <h:form enctype="multipart/form-data" id="form-info">
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group form-group-sm">
+                            <label class="col-lg-2 control-label">Codigo SUNAT</label>
+                            <div class="col-lg-3">
+                                <p class="form-control-static input-sm">#{stockTypeBean.selected.code}</p>
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class="col-lg-2 control-label">Nombre</label>
+                            <div class="col-lg-10">
+                                <p class="form-control-static input-sm">#{stockTypeBean.selected.name}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer text-right">
+                    <p:commandLink 
+                        update=":content-wrapper" 
+                        process="@this" 
+                        onstart="begin_load();$.magnificPopup.close()"
+                        oncomplete="end_load()"
+                        styleClass="btn btn-warning">
+                        <i class="fa fa-edit"/> Editar
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/stock_type/manage.xhtml"/>
+                        <f:setPropertyActionListener target="#{managedStockTypeBean.idSelected}" value="#{stockTypeBean.selected.id}"/>
+                    </p:commandLink>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>
+
+

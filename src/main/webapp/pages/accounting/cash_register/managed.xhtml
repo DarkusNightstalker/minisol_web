@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_managed() {
+            $("#modal-managed").modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-managed').on('shown.bs.modal', function () {
+                $('#form-manage\\:initial-cash').focus();
+            });
+        });
+    </script>
+    <script  type="text/javascript" src="#{request.contextPath}/js/cash-register_man.js"/>
+    <div id="modal-managed" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 80%;">
+            <h:panelGroup layout="block" id="managed-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="fa fa-plus"></i> <b> REGISTRAR ARQUEO DE CAJA</b> 
+                </div>
+                <h:form id="form-manage">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+
+                                <div class="col-md-10">
+                                    <div class="form-group form-group-sm mb5">
+                                        <label class="control-label col-md-2">Turno</label>
+                                        <div class="col-md-4">
+                                            <h:selectOneMenu id="work-shift" value="#{managedCashRegisterBean.workShiftId}" styleClass="form-control input-sm">
+                                                <f:selectItems 
+                                                    value="#{managedCashRegisterBean.workShiftSearcher.data}"
+                                                    var="item" itemLabel="#{item[1]}" itemValue="#{item[0]}"/>
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+                                <!--    <div class="form-group form-group-sm mb5">
+                                        <label class="control-label col-md-2">Saldo inicial</label>
+                                        <div class="col-md-4">
+                                            <p:inputText id="initial-cash" value="#{managedCashRegisterBean.initialCash}" styleClass="form-control input-sm"/>
+                                        </div>
+                                    </div> -->
+                                    <hr class="short mt10 mb10"/>     
+
+                                    <script>
+                                        $(function () {
+                                            CashRegisterManaged.init();
+                                        });
+                                    </script>
+                                    <div class="form-group form-group-sm">
+                                        <label class="control-label col-md-2"></label>
+                                        <div class="col-md-10">
+                                            <h3 class="mtn mbn">Cantidad de billetes y monedas
+                                                <small><a href="javascript:$('#form-manage .cash-type').val('').first().trigger('input').focus()" class="btn btn-xs btn-primary"><i class="fa fa-refresh"/></a></small>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-8 col-md-offset-2">
+                                            <div class="row">
+                                                <ui:repeat value="#{managedCashRegisterBean.detailSearcher.types}" varStatus="st" var="type">
+                                                    <div class="col-md-4">                                                    
+                                                        <div class="form-group form-group-sm mbn">
+                                                            <label class="control-label col-md-6">S/. #{type.value}</label>
+                                                            <div class="col-md-6">
+                                                                <p:inputText converter="javax.faces.Integer"  value="#{managedCashRegisterBean.detailSearcher.data[type]}" styleClass="form-control input-sm cash-type">
+                                                                    <f:passThroughAttribute name="data-cash" value="#{st.index}" />
+                                                                    <f:passThroughAttribute name="data-cash-value" value="#{type.value}" />
+                                                                </p:inputText>
+                                                            </div>
+                                                        </div>   
+                                                    </div>                                   
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                    </div>                          
+                                </div> 
+
+                                <div class="col-md-2">
+                                    <div class="form-group form-group-sm">
+                                        <div class="col-md-12 text-center" style="margin-top: 100px">
+                                            <h1 class="">SALDO CAJA<br/> 
+                                                <small><span id="form-manage:display-real-cash" class="mt5">S/ #{managedCashRegisterBean.realCash}</span></small>
+                                                <h:inputHidden id="real-cash" value="#{managedCashRegisterBean.realCash}" />
+                                            </h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedCashRegisterBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-managed').modal('hide');search();"
+                        name="update_payment" update=":form:table-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedCashRegisterBean.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();CashRegisterManaged.after_save()"
+                        name="save_payment" update="form-manage:valid"  />
+                    <div class="modal-footer">
+                        <button id="btn-save-manage" onclick="CashRegisterManaged.before_save()" type="button" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

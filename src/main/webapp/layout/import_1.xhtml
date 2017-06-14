@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        var update_list_#{suffix};
+        var update_fn_#{suffix};
+
+        function open_import_#{suffix}(title, availableUpdate, fn) {
+            $.magnificPopup.open({
+                removalDelay: 500,
+                items: {
+                    src: '#modal-import-#{suffix}'
+                },
+                callbacks: {
+                    beforeOpen: function (e) {
+                        this.st.mainClass = 'mfp-zoomIn';
+                    }
+                },
+                modal: true,
+                midClick: false,
+                closeOnBgClick: false
+            });
+            update_list_#{suffix} = availableUpdate;
+            update_fn_#{suffix} = fn;
+            $("#import-title-#{suffix}").html(title);
+        }
+    </script>
+    <script>
+        var scroll = -25;
+        function updateFormProgress_#{suffix}() {
+            $("#import-state-#{suffix}").html($("#form-progress-#{suffix}\\:state").val());
+            $("#import-percent-#{suffix}").html($("#form-progress-#{suffix}\\:percent").val());
+            $("#form-import-#{suffix} .progress-bar").css("width", $("#form-progress-#{suffix}\\:percent").val() + "%");
+
+            console.log("Current : " + $("#form-progress-#{suffix}\\:current_plots").val() + "  ; Total :" + $("#form-progress-#{suffix}\\:total_plots").val())
+            if ($("#form-progress-#{suffix}\\:current_plots").val() != $("#form-progress-#{suffix}\\:total_plots").val()) {
+                updateProgress_#{suffix}();
+            } else {
+                $("#form-import-#{suffix} .progress-bar").css("width", "100%");
+                $("#import-percent-#{suffix}").html("100");
+                updateSummary_#{suffix}();
+                $(document.getElementById("form-import-#{suffix}:success")).html($("#form-progress-#{suffix}\\:success").val())
+                $(document.getElementById("form-import-#{suffix}:error")).html($("#form-progress-#{suffix}\\:error").val())
+                $("#import-state-#{suffix}").html("Finalizado");
+                $("#final-message-#{suffix}").removeClass("hidden");
+                $("#message-content-#{suffix}").html($("#form-progress-#{suffix}\\:message").val())
+                if ($("#form-progress-#{suffix}\\:state-name").val() == 'ERROR') {
+                    $("#final-message-#{suffix}").find(".alert").addClass("alert-danger")
+                    $("#final-message-#{suffix}").find("i").addClass("fa-exclamation-triangle")
+                } else {
+                    $("#final-message-#{suffix}").find(".alert").addClass("alert-success")
+                    $("#final-message-#{suffix}").find("i").addClass("fa-check")
+                }
+                //cleanSearchFields();
+                if (update_list_#{suffix}) {
+                    update_fn_#{suffix}();
+                }
+            }
+        }
+    </script>
+    <div id="modal-import-#{suffix}" class="popup-basic popup-lg bg-none mfp-with-anim mfp-hide">
+        <h:panelGroup id="import-content-#{suffix}" layout="block" styleClass="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-upload"></i>
+                </span>
+                <span id="import-title-#{suffix}" class="panel-title">Importar datos</span>
+            </div>
+            <h:form enctype="multipart/form-data" id="form-import-#{suffix}">
+                <div class="panel-body">
+                    <div class="admin-form theme-primary">
+                        <h:panelGroup layout="block" style="display: none" styleClass="animated fadeInDown" id="load-wrapper">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        <span id="import-state-#{suffix}">&nbsp;#{import_.state.description}</span> <span class="txt-color-purple pull-right"><span id="import-percent-#{suffix}">0</span>% Completado </span>
+                                    </p>
+                                    <div class="progress mt10 mbn">
+                                        <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                                            <span class="sr-only">45% Complete</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="final-message-#{suffix}" class="hidden">
+                                <div  class="row mt10 hidden"  >
+                                    <div class="col-md-12">
+                                        <div class="alert alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <i class="fa pr10"></i>
+                                            <span id="message-content-#{suffix}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h:panelGroup id="summary" layout="block" >
+                                    <div  class="row mt10"  >
+                                        <div class="col-md-12">
+                                            <div class="well">
+                                                <span class="text-success"><b>Filas guardadas :</b><h:panelGroup id="success">#{import_.log.keySet().size()}</h:panelGroup>  </span>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <span class="text-danger"><b>Filas erroneas :</b><h:panelGroup id='error'>#{import_.logError.keySet().size()}</h:panelGroup> </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div  class="row mt10"  >
+                                        <div class="col-md-12">
+                                            <p:commandLink process="@this" styleClass="btn btn-warning btn-sm text-muted" ajax="false">
+                                                <i class="fa fa-warning"/> Registro de errores
+                                                <p:fileDownload value="#{import_.downloadLog(true)}"/>
+                                            </p:commandLink>
+                                            <button type="button" class="pull-right btn btn-danger" onclick="$.magnificPopup.close()">
+                                                Cerrar <i class="fa fa-arrow-right"/>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+
+                            </div>
+
+                        </h:panelGroup>   
+                        <div id="import-file-wrapper-#{suffix}" class="row">
+                            <div class="col-md-12">
+                                <div class="section">
+                                    <label class="field prepend-icon append-button file">
+                                        <span class="button btn-primary">Buscar Archivo</span>                                    
+                                        <h:inputFile value="#{import_.file}"  class="gui-file" onchange="document.getElementById('form-import-#{suffix}:uploader').value = this.value;"  >
+                                            <f:passThroughAttribute name="accept" value=".xls,.xlsx"/>
+                                        </h:inputFile>
+                                        <input type="text" class="gui-input" id="form-import-#{suffix}:uploader" placeholder="Seleccione un archivo xls,xslx"/>
+                                        <label class="field-icon">
+                                            <i class="fa fa-upload"></i>
+                                        </label>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <h:commandLink id="button-submit" onclick="$('#import-file-wrapper-#{suffix}').css('display', 'none');
+                            $(this).parent().css('display', 'none');
+                            $(document.getElementById('form-import-#{suffix}:load-wrapper')).css('display', 'block');
+                            updateProgress_#{suffix}()" styleClass="btn btn-primary" action="#{import_.begin()}">
+                        Comenzar <i class="fa fa-upload"></i>
+                        <f:ajax execute="@form" render="@none" />
+                    </h:commandLink>
+                    <button type="button" class="pull-right btn btn-danger" onclick="$.magnificPopup.close()">
+                        Cerrar <i class="fa fa-arrow-right"/>
+                    </button>
+                </div>
+            </h:form>
+
+            <h:form id="form-progress-#{suffix}">
+                <h:inputHidden id="percent" value="#{import_.percentLoad}" />
+                <h:inputHidden id="finalize" value="#{import_.state.terminate}" />
+                <h:inputHidden id="state" value="#{import_.state.description}" />
+                <h:inputHidden id="success" value="#{import_.log.size()}" />
+                <h:inputHidden id="error" value="#{import_.logError.size()}" />
+                <h:inputHidden id="current_plots" value="#{import_.log.size() + import_.logError.size()}" />
+                <h:inputHidden id="total_plots" value="#{import_.totalRecords}" />
+                <h:inputHidden id="state-name" value="#{import_.state.name()}" />
+                <p:remoteCommand  name="updateSummary_#{suffix}"  process="@this" update=":form-import-#{suffix}:summary"/>
+
+                <p:remoteCommand  name="updateProgress_#{suffix}" oncomplete="updateFormProgress_#{suffix}()" process="@this" update=":form-progress-#{suffix}"/>
+            </h:form>
+        </h:panelGroup>
+    </div>
+    ﻿</ui:composition>

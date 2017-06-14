@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <div class="dt-toolbar">
+        <div class="col-xs-12 col-sm-6">
+            <div class="dataTables_info">
+                Página <b>#{pagination.page}</b> de  <b>#{pagination.lastPage}</b>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12 hidden-xs">
+            <div class="dataTables_length pull-right" id="result-table_length">
+                <label>
+                    <h:selectOneMenu value="#{pagination.rows}" class="form-control">
+                        <f:selectItems value="#{pagination.rowsData}" var="r" itemValue="#{r[0]}" itemLabel="#{r[1]}"/>
+                        <p:ajax event="change" 
+                                onstart="begin_load()"
+                                oncomplete="end_load()" process="@this" listener="#{pagination.changeRows()}" update="#{wrapperId}" />
+                    </h:selectOneMenu>
+                </label>
+            </div>
+        </div>
+    </div>
+    ﻿</ui:composition>

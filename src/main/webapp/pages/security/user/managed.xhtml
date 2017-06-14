@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">    
+    <script type="text/javascript" src="#{request.contextPath}/js/user_man.js"/>
+    <script>
+        function  open_managed() {
+            $("#modal-managed").modal({backdrop: 'static', keyboard: false});
+        }
+    </script>
+    <div id="modal-managed" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 80%">
+            <h:panelGroup layout="block" id="m-user-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        UserManaged.init();
+                        UserManaged.configure_employee('#{request.contextPath}',#{managedUserBean.idEmployee eq null ? 0 : managedUserBean.idEmployee});
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">    <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;<b>#{managedUserBean.selected.id eq null ? 'CREAR' : 'EDITAR'} USUARIO</b> 
+                    </h4>
+                </div>
+                <h:form id="form-managed">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group form-group-sm">
+                                    <label for="form-managed:username">Nombre de usuario</label>
+                                    <script>
+                                        $(function () {
+                                            $("#form-managed\\:username").pressEnter(function () {
+                                                $("#form-managed\\:password").focus();
+                                            });
+                                        });
+                                    </script>
+                                    <p:inputText id="username" value="#{managedUserBean.username}" styleClass="form-control input-sm" />
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <label for="form-managed:password">Contraseña</label>
+                                    <script>
+                                        $(function () {
+                                            $("#form-managed\\:password").pressEnter(function () {
+                                                $("#form-managed\\:repeat-password").focus();
+                                            });
+                                        })
+                                    </script>
+                                    <p:inputText type="password" id="password" value="#{managedUserBean.password}" styleClass="form-control input-sm" />
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <label for="form-managed:repeat-password">Repetir Contraseña</label>
+                                    <script>
+                                        $(function () {
+                                            $("#form-managed\\:repeat-password").pressEnter(function () {
+                                                $("#form-managed\\:identity-number").focus();
+                                            });
+                                        })
+                                    </script>
+                                    <p:inputText type="password" id="repeat-password"  styleClass="form-control input-sm" />
+                                </div>
+                                <p:remoteCommand 
+                                    name="search_employee"
+                                    onstart="begin_load()"  
+                                    onsuccess="end_load()"   
+                                    process="@this,identity-number" 
+                                    action="#{managedUserBean.employeeSearcher.search()}"
+                                    update="form-managed:employee-info,:s-actor-content,form-managed:exist-employee"/>
+                                <p:remoteCommand 
+                                    name="null_employee"
+                                    onstart="begin_load()"  
+                                    onsuccess="end_load()"   
+                                    process="@this" 
+                                    update="form-managed:employee-info,form-managed:exist-employee">
+                                    <f:setPropertyActionListener target="#{managedUserBean.employeeSearcher.actor}" value="#{null}" />
+                                </p:remoteCommand>
+                                <h:panelGroup  id="employee-wrapper" layout="block" >
+                                    <div class="form-group form-group-sm mb5">
+                                        <label for="form-managed:identity-number">DNI Empleado</label>
+                                        <script>
+                                            $(function () {
+                                                UserManaged.configure_employee();
+                                            });
+                                        </script>
+                                        <p:inputText id="identity-number" styleClass="form-control input-sm" value="#{managedUserBean.employeeSearcher.identityNumber}" />                                                        
+                                        <h:inputHidden id="exist-employee" value="#{managedUserBean.employeeSearcher.exist}" />
+                                    </div>
+                                    <h:panelGroup id="employee-info" layout="block">
+                                        <ui:fragment rendered="#{managedUserBean.employeeSearcher.actor ne null}">
+                                            <div class="form-group form-group-sm mbn">
+                                                <label for="form-managed:employee-name">Nombre</label>
+                                                <p id="form-managed:employee-name" class="form-control-static input-sm">#{managedUserBean.employeeSearcher.actor.identityNumber.length() == 11 ? (managedUserBean.employeeSearcher.actor.other eq null ? managedUserBean.employeeSearcher.actor.name : managedUserBean.employeeSearcher.actor.other) : managedUserBean.employeeSearcher.actor.name} </p>
+                                            </div>
+                                        </ui:fragment>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group form-group-sm">
+                                            <table id="message-table"  class="table admin-form  table-condensed theme-warning ">
+                                                <thead>
+                                                    <tr class="system">                                                
+                                                        <th colspan="2" class="text-center">Permisos de sede</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedUserBean.specialPermissionSearcher.companies}" var="item">
+                                                        <tr class="">
+                                                            <td class="text-center w50 pt5 pb5">
+                                                                <label class="option block mn">
+                                                                    <h:selectBooleanCheckbox id="selected" value="#{managedUserBean.specialPermissionSearcher.selecteds[item[0]]}" />
+                                                                    <span class="checkbox mn"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="pt5 pb5 fs12">#{item[1]} - #{item[2]} <br/><small>(#{item[3]})</small></td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group form-group-sm">
+                                            <table id="message-table" class="table admin-form  table-condensed theme-warning ">
+                                                <thead>
+                                                    <tr class="system">                                                
+                                                        <th colspan="2" class="text-center">Roles</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody> 
+                                                    <ui:repeat id="rol-list" value="#{managedUserBean.rolSearcher.rols}" var="item">
+                                                        <tr class="">
+                                                            <td class="text-center w50 pt5 pb5">
+                                                                <label class="option block mn">
+                                                                    <h:selectBooleanCheckbox id="selected" value="#{managedUserBean.rolSearcher.selecteds[item[0]]}" />
+                                                                    <span class="checkbox mn"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td class="pt5 pb5">#{item[1]}</td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="#{managedUserBean.documentNumberingSearcher.rucs.size() == 1 ? 'col-md-8 col-md-offset-4' : 'col-md-6'}">
+                                <ui:repeat value="#{managedUserBean.documentNumberingSearcher.rucs}" var="ruc" varStatus="st">
+                                    <ui:fragment rendered="#{st.index % 2 ==0 }">
+                                        <div class="form-group form-group-sm">
+                                            <table  class="table admin-form table-condensed theme-warning">
+                                                <thead>
+                                                    <tr class="primary">                                                
+                                                        <th colspan="2" class="text-center">SERIES PERMITIDAS RUC: #{ruc}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                    
+                                                    <tr class="">
+                                                        <td class="col-md-12 pn ">
+                                                            <div class="row">
+                                                                <ui:repeat value="#{managedUserBean.documentNumberingSearcher.data[ruc]}" var="item" varStatus="stdata">
+                                                                    <div class="col-md-6">
+                                                                        <table frame="box" class="table admin-form table-condensed theme-warning mb10">
+                                                                            <thead>
+                                                                                <tr class="dark">                                                
+                                                                                    <th colspan="2" class="text-center">#{item[1]}</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <ui:repeat value="#{item[2]}" var="serie" varStatus="stdata">
+                                                                                    <tr class="">
+                                                                                        <td class="text-center w50 pt5 pb5">
+                                                                                            <label class="option block mn">
+                                                                                                <h:selectBooleanCheckbox value="#{managedUserBean.documentNumberingSearcher.selecteds[serie[0]]}"  />
+                                                                                                <span class="checkbox mn"></span>
+                                                                                            </label>
+                                                                                        </td>
+                                                                                        <td class="pt5 pb5 fs12">#{serie[1]}</td>
+                                                                                    </tr>
+                                                                                </ui:repeat>
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>  
+                                                                </ui:repeat>
+                                                            </div>
+                                                        </td>                     
+                                                    </tr>        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </ui:fragment>
+                                </ui:repeat>
+                            </div>                  
+                            <div class="#{managedUserBean.documentNumberingSearcher.rucs.size() == 1 ? '' : 'col-md-6'}">
+                                <ui:repeat value="#{managedUserBean.documentNumberingSearcher.rucs}" var="ruc" varStatus="st">
+                                    <ui:fragment rendered="#{st.index % 2 !=0 }">
+                                        <div class="form-group form-group-sm">
+                                            <table 
+                                                class="table admin-form table-condensed theme-warning">
+                                                <thead>
+                                                    <tr class="primary">                                                
+                                                        <th colspan="2" class="text-center">SERIES PERMITIDAS RUC: #{ruc}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                    
+                                                    <tr class="">
+                                                        <td class="col-md-12 pn ">
+                                                            <div class="row">
+                                                                <ui:repeat value="#{managedUserBean.documentNumberingSearcher.data[ruc]}" var="item" varStatus="stdata">
+                                                                    <div class="col-md-6">
+                                                                        <table frame="box" class="table admin-form table-condensed theme-warning mb10">
+                                                                            <thead>
+                                                                                <tr class="dark">                                                
+                                                                                    <th colspan="2" class="text-center">#{item[1]}</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <ui:repeat value="#{item[2]}" var="serie" varStatus="stdata">
+                                                                                    <tr class="">
+                                                                                        <td class="text-center w50 pt5 pb5">
+                                                                                            <label class="option block mn">
+                                                                                                <h:selectBooleanCheckbox value="#{managedUserBean.documentNumberingSearcher.selecteds[serie[0]]}"  />
+                                                                                                <span class="checkbox mn"></span>
+                                                                                            </label>
+                                                                                        </td>
+                                                                                        <td class="pt5 pb5 fs12">#{serie[1]}</td>
+                                                                                    </tr>
+                                                                                </ui:repeat>
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>  
+                                                                </ui:repeat>
+                                                            </div>
+                                                        </td>                     
+                                                    </tr>        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </ui:fragment>
+                                </ui:repeat>
+                            </div>                               
+                        </div>
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedUserBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-managed').modal('hide');search();"
+                        name="update_users" update=":form:table-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedUserBean.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();UserManaged.after_save()"
+                        name="save_user" update="form-managed:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="UserManaged.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+
+    <ui:include src="/layout/search_actor.xhtml" >
+        <ui:param name="actorSearcher" value="#{managedUserBean.employeeSearcher}" />
+        <ui:param name="updated" value=":form-managed:employee-info,:form-managed:exist-employee" />
+    </ui:include>
+</ui:composition>
+
+

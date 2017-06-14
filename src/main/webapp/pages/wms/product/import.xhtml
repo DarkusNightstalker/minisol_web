@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        function open_import() {
+            $('#modal-import').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-import').on('shown.bs.modal', function () {
+            });
+        });
+    </script>
+    <div id="modal-import" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Escoja que desea importar</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb10">
+                            <p:commandLink  
+                                action="#{productBean.import_.refresh()}" 
+                                update=":import-content-main" 
+                                process="@this" 
+                                onstart="begin_load()"
+                                oncomplete="end_load();open_import_main('IMPORTAR PRODUCTOS',true,function(){$('#btn-refresh').trigger('click')},'product','Plantilla de productos')"  
+                                styleClass="fs11 btn btn-block btn-info">
+                                <span class="glyphicons glyphicons-database_plus  fs30  mt20 mb20"></span> 
+                                <br/><br/>
+                                Datos generales
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{productBean.import_}"/>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-md-4 text-center mb10 ">
+                            <p:commandLink  
+                                action="#{productBean.priceImport.refresh()}" 
+                                update=":import-content-main" 
+                                process="@this" 
+                                onstart="begin_load()"
+                                oncomplete="end_load();open_import_main('IMPORTAR PRECIOS DE PRODUCTOS',true,function(){$('#btn-refresh').trigger('click')},'product_price','Plantilla de productos')"  
+                                styleClass="fs11 btn btn-block btn-system">
+                                <span class="glyphicons glyphicons-shopping_cart  fs30  mt20 mb20"></span> 
+                                <br/><br/>
+                                Precios
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{productBean.priceImport}"/>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-md-4 text-center mb10">
+                            <p:commandLink  
+                                action="#{productBean.disabledImport.refresh()}" 
+                                update=":import-content-main"
+                                onstart="begin_load()"
+                                process="@this" 
+                                oncomplete="end_load();open_import_main('IMPORTAR PRODUCTOS HA DESHABILITAR',true,function(){$('#btn-refresh').trigger('click')},'product_inactive','Plantilla de productos desactivados')"  
+                                styleClass="fs11 btn btn-block btn-danger">
+                                <span class="glyphicons glyphicons-database_minus  fs30  mt20 mb20"></span> 
+                                <br/><br/>
+                                Desactivar
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{productBean.disabledImport}"/>
+                            </p:commandLink>
+                        </div>
+                        <div class="col-md-4 text-center mb10 ">
+                            <p:commandLink  
+                                action="#{productBean.supplierAssigmentImport.refresh()}" 
+                                update=":import-content-main"
+                                onstart="begin_load()"
+                                process="@this" 
+                                oncomplete="end_load();open_import_main('IMPORTAR VENDEDORES Y/O PROVEEDORES ASIGNADOS',true,function(){$('#btn-refresh').trigger('click')},'product_seller','Plantilla de productos con vendedores')"  
+                                styleClass="fs11 btn btn-block btn-alert">
+                                <span class="glyphicons glyphicons-user_add fs30  mt20 mb20"></span> 
+                                <br/>
+                                Asignar Vendedores <br/>y/o Proveedores
+                                <f:setPropertyActionListener target="#{sessionBean.import_}" value="#{productBean.supplierAssigmentImport}"/>
+                            </p:commandLink>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>
+    </div>
+</ui:composition>

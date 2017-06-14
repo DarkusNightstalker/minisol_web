@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javasciprt:void(0)">VALES DE CONSUMO</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+
+    <h:form id="form" style="padding-top: 50px">
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="tray tray-center">
+                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn prn pln" style="display: block;">
+                    <div class="topbar-menu row">
+                        <ui:fragment rendered="#{sessionBean.authorize('M_PVR')}">
+                            <div class="col-xs-4 col-sm-2">
+                                <p:commandLink  
+                                    action="#{managedPaymentVoucherBean.create()}" 
+                                    update=":managed-content" 
+                                    process="@this" 
+                                    onstart="begin_load()"
+                                    oncomplete="end_load();open_managed()" styleClass="metro-tile bg-success light">
+                                    <span class="glyphicons glyphicons-cogwheels text-muted"></span>
+                                    <span class="metro-title">Generar</span>
+                                </p:commandLink>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body pn">
+                        <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
+                            <div class="dataTables_wrapper form-inline no-footer">
+                                <ui:include src="/layout/datatable/toolbar.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{paymentVoucherBean.pagination}"/>
+                                    <ui:param name="order_factory" value="#{paymentVoucherBean.orderFactory}"/>
+                                    <ui:param name="update_script" value="search()"/>
+                                </ui:include>
+                                <table class="table table-condensed admin-form theme-primary fs13 table-hover table-striped">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{paymentVoucherBean.orderFactory}" />
+                                                <ui:param name="label" value="Numeración" />
+                                                <ui:param name="field" value="numeration" />
+                                                <ui:param name="class" value="" />
+                                            </ui:include>
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{paymentVoucherBean.orderFactory}" />
+                                                <ui:param name="label" value="Valor" />
+                                                <ui:param name="field" value="value" />
+                                                <ui:param name="class" value="" />
+                                            </ui:include>
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{paymentVoucherBean.orderFactory}" />
+                                                <ui:param name="label" value="Fec. expiración" />
+                                                <ui:param name="field" value="dateExpiry" />
+                                                <ui:param name="class" value="text-center" />
+                                            </ui:include>
+                                            <th class="text-center">
+                                                Estado 
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <ui:repeat value="#{paymentVoucherBean.pagination.data}"  var="item">
+                                            <tr>
+                                                <td class="text-center">#{item[1]}</td>
+                                                <td class="">#{item[2]}</td>
+                                                <td class="">#{item[3]}</td>
+                                                <td class="text-center">
+                                                    <ui:fragment rendered="#{item[4] ne null}">
+                                                        <span class="label label-success">COBRADO</span>
+                                                    </ui:fragment>  
+                                                    <ui:fragment rendered="#{item[4] eq null and item[3].time lt currentDate.time}">
+                                                        <span class="label label-danger">EXPIRADO</span>
+                                                    </ui:fragment>  
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                    <ui:fragment rendered="#{empty paymentVoucherBean.pagination.data}">
+                                        <tfoot>
+                                            <tr>
+                                                <td class="text-center" colspan="3">
+                                                    <h4 class="text-muted">No se ha encontrado ningun registro</h4>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </ui:fragment>
+                                </table>
+
+                                <ui:include src="/layout/datatable/footer.xhtml">
+                                    <ui:param name="wrapperId"  value="form:table-wrapper"/>
+                                    <ui:param name="pagination"  value="#{paymentVoucherBean.pagination}"/>
+                                </ui:include>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+
+            </div>
+            <aside class="tray tray-right tray290 " data-tray-height="match" style="height: 603px;">
+
+
+
+                <!-- menu quick links -->
+                <div class="admin-form form-horizontal">
+
+                    <h4> Filtrar vales de consumo</h4>
+
+                    <hr class="short"/>
+
+                    <div class="section mb5">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="glyphicons glyphicons-barcode"></i>
+                                    </span>
+                                    <p:inputText value="#{paymentVoucherBean.numeration}"  tabindex="1" id="numeration" styleClass="form-control" placeholder="Numeracion" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section mb10">
+                        <div class="form-group form-group-sm mbn">
+                            <div class="col-md-12">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-dollar"></i>
+                                    </span>
+                                    <p:inputText value="#{paymentVoucherBean.value}"  tabindex="2" id="value" styleClass="form-control" placeholder="Valor" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="short"/>
+                    <div class="section">
+                        <button onclick="refresh()" class="btn btn-system btn-sm ph15" type="button">
+                            <span class="fa fa-refresh"></span>
+                        </button>
+                        <button onclick="search()" class="btn btn-default btn-sm ph25" type="button">
+                            <span class="fa fa-search"></span> Comenzar Busqueda
+                        </button>
+                        <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{paymentVoucherBean.search()}" process="@form" update="form:table-wrapper" />
+                        <p:remoteCommand name="refresh" onstart="begin_load();clean();" oncomplete="end_load()" action="#{paymentVoucherBean.refresh()}" process="@form" update="form:table-wrapper" />
+
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </h:form>
+    <ui:include src="managed.xhtml"/> 
+</ui:composition>
+
+

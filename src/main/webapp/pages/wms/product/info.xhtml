@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script>
+        function open_info() {
+            $('#modal-info').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-info').on('shown.bs.modal', function () {
+            });
+        });
+    </script>
+    <div id="modal-info" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <h:panelGroup layout="block" id="info-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><i class="fa fa-info-circle"/>  INFORMACIÓN DE PRODUCTO</h4>
+                </div>
+                <h:form id="form-info">
+                    <div class="modal-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <img style="border: 1px solid #ddd" src="#{productBean.selected.image eq null ? 'https://www.roller.riedellskates.com/UserFiles/Images/Products/LG_NotFound.jpg' :productBean.selected.image}" width="100%" />
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group form-group-sm">
+                                        <div class="col-md-12">
+                                            <h3 class="form-control-static mtn">#{productBean.selected.name}<br/><small>COD: #{productBean.selected.barcode eq null ? '---' :productBean.selected.barcode}</small></h3>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-3 text-left">Linea de prod.<span class="pull-right">:</span></label>
+                                        <div class="col-md-9">
+                                            <ui:fragment rendered="#{productBean.selected.productLine eq null}">
+                                                <p class="form-control-static input-sm text-muted"><i>Ninguno</i></p>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{productBean.selected.productLine ne null}">
+                                                <p class="form-control-static  input-sm">#{productBean.selected.productLine.path}</p>
+                                            </ui:fragment>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-3 text-left">Tipo de exist.<span class="pull-right">:</span></label>
+                                        <div class="col-md-9">
+                                            <ui:fragment rendered="#{productBean.selected.stockType eq null}">
+                                                <p class="form-control-static  input-sm text-muted"><i>Ninguno</i></p>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{productBean.selected.stockType ne null}">
+                                                <p class="form-control-static  input-sm">#{productBean.selected.stockType.code} #{productBean.selected.stockType.name}</p>
+                                            </ui:fragment>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm mbn">
+                                        <label class="control-label col-md-3 text-left">Unid medida<span class="pull-right">:</span></label>
+                                        <div class="col-md-9">
+                                            <ui:fragment rendered="#{productBean.selected.uom eq null}">
+                                                <p class="form-control-static input-sm text-muted"><i>Ninguno</i></p>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{productBean.selected.uom ne null}">
+                                                <p class="form-control-static  input-sm">#{productBean.selected.uom.code} #{productBean.selected.uom.name}</p>
+                                            </ui:fragment>
+                                        </div>
+                                    </div>
+                                    <div class="form-group form-group-sm ">
+                                        <div class="col-md-12">
+
+                                            <table class="table table-hover table-bordered table-condensed fs13">
+                                                <thead>
+                                                    <tr >
+                                                        <th class="text-center" valign="middle" colspan="6">UTILIDAD</th> 
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-center" valign="middle" colspan="2">Precios de venta</th> 
+                                                        <th class="text-center" valign="middle" colspan="2">Costo promedio</th> 
+                                                        <th class="text-center" valign="middle" colspan="2">Ultima compra</th> 
+                                                    </tr>
+                                                    <tr>
+                                                        <th  class="text-center" valign="middle">Cantidad</th> 
+                                                        <th class="text-center" valign="middle">Precio</th>
+                                                        <th  class="text-center" valign="middle">Costo</th> 
+                                                        <th class="text-center" valign="middle">%Util</th>
+                                                        <th  class="text-center" valign="middle">Costo</th> 
+                                                        <th class="text-center" valign="middle">%Util</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{productBean.otherData['salePrices']}" var="item">
+                                                        <tr>
+                                                            <td class="text-center">#{item[0]}</td>
+                                                            <td class="text-right">S/. #{item[1]}</td>
+                                                            <td class="text-right">S/. #{productBean.otherData['basicCost']}</td>
+                                                            <td class="text-center">
+                                                                <ui:fragment rendered="#{productBean.otherData['basicCost'].doubleValue() eq 0}">
+                                                                    -
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{productBean.otherData['basicCost'].doubleValue() ne 0}">
+                                                                    <h:outputText value="#{((item[1].doubleValue()*100) / productBean.otherData['basicCost'].doubleValue())-100}">
+                                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                    </h:outputText>
+                                                                </ui:fragment>
+                                                            </td>
+                                                            <td class="text-right">S/. #{productBean.otherData['lastCost']}</td>
+                                                            <td class="text-center">
+                                                                <ui:fragment rendered="#{productBean.otherData['lastCost'].doubleValue() eq 0}">
+                                                                    -
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{productBean.otherData['lastCost'].doubleValue() ne 0}">
+                                                                    <h:outputText value="#{((item[1].doubleValue()*100) / productBean.otherData['lastCost'].doubleValue())-100}">
+                                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                                                                    </h:outputText>
+                                                                </ui:fragment>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                    <ui:fragment rendered="#{empty productBean.otherData['salePrices']}">
+                                                        <tr>
+                                                            <td class="text-center">-</td>
+                                                            <td class="text-right">-</td>
+                                                            <td class="text-right">S/. #{productBean.otherData['basicCost']}</td>
+                                                            <td class="text-center">-</td>
+                                                            <td class="text-right">S/. #{productBean.otherData['lastCost']}</td>
+                                                            <td class="text-center">-</td>
+
+                                                        </tr>
+                                                    </ui:fragment>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group form-group-sm mbn">
+                                        <div class="col-md-12">
+                                            <table class="table table-hover table-bordered table-condensed fs13">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center" valign="middle" colspan="2">Proveedores</th> 
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{productBean.otherData['suppliers']}" var="item" varStatus="st">
+                                                        <tr>
+                                                            <td class="w50"><i class="fs40 icon-admin2"/></td>
+                                                            <td>#{item[3]}<br/><small class="fs9"><b>#{item[1]}</b> : #{item[2]}</small></td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>                                                
+                                                <ui:fragment rendered="#{empty productBean.otherData['suppliers']}">
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="2" class="text-center">
+                                                                <h4 class="text-muted">No se ha registrado proveedores</h4>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </ui:fragment>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>   
+                    <div class="modal-footer">
+                        <p:commandLink 
+                            update=":content-wrapper" 
+                            process="@this" 
+                            onstart=" begin_load()"
+                            oncomplete="end_load()"  
+                            rendered="#{sessionBean.authorize('M_PRD')}" styleClass="btn btn-system">
+                            <i class="fa fa-edit"/> Editar
+                            <f:passThroughAttribute name="data-dismiss" value="modal" />
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/product/manage.xhtml"/>
+                            <f:setPropertyActionListener target="#{managedProductBean.idSelected}" value="#{productBean.selected.id}"/>
+                        </p:commandLink>
+                    </div>   
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

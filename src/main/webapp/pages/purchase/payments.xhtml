@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">    
+
+    <div id="modal-payment" class="white-popup-block popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="payment-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-coins"></i>
+                </span>
+                <span class="panel-title ">PAGOS #{purchaseBean.selected.serie}-#{purchaseBean.selected.documentNumber}</span>
+            </div>
+            <h:form id="form-payment">
+                <script>
+                    $(function () {
+                        Purchase.payment.init();
+                    });
+                </script>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-md-2 pt5">Prov.</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static input-sm">#{purchaseBean.selected.supplier.name}</p>
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-md-2 pt5">Total</label>
+                            <div class="col-md-10">
+                                <p class="form-control-static input-sm">S/. 
+                                    <h:outputText value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount}">
+                                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                    </h:outputText>
+                                    <h:panelGroup id="remaining">
+                                        <small class="text-danger pl15">(Falta pagar S/.<h:outputText value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.purchasePaymentSearcher.currentPay}">
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                            </h:outputText>) 
+                                        </small>
+                                    </h:panelGroup>
+                                </p>
+                            </div>
+                        </div>
+                        <h:panelGroup id="payments" layout="block">  
+                            <ui:repeat value="#{purchaseBean.purchasePaymentSearcher.data}" var="item" varStatus="st">
+                                <div class="form-group form-group-sm mbn">
+                                    <div class="col-md-1">
+                                        <p class="text-muted form-control-static input-sm text-left">
+                                            <sup>##{st.index+1}</sup>
+                                        </p>                                        
+                                    </div>
+                                    <div class="col-md-5">
+                                        <p class="form-control-static input-sm">
+                                            <h:outputText value="#{item.datePayment}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm aa" />
+                                            </h:outputText>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <p class="form-control-static input-sm text-right">
+                                            S/. 
+                                            <h:outputText value="#{item.quantity}">
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
+                                            </h:outputText>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-1  text-center">
+                                        <p:commandLink  
+                                            action="#{purchaseBean.purchasePaymentSearcher.remove(st.index)}"
+                                            process="@this" 
+                                            update="form-payment:payments,form-payment:remaining" 
+                                            styleClass="btn btn-danger btn-xs">
+                                            <i class="fa fa-trash"/>
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                            <ui:fragment rendered="#{(purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount) gt purchaseBean.purchasePaymentSearcher.currentPay}">
+                                <div class="form-group form-group-sm mbn">
+                                    <div class="col-md-1">
+                                        <p class="text-muted form-control-static input-sm text-left">                                        
+                                            <i class="fa fa-arrow-right"/>
+                                        </p>                                        
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12">
+                                                <p:inputText id="date-payment" value="#{purchaseBean.purchasePaymentSearcher.datePayment}" placeholder="Fecha y Hora de pago" styleClass="form-control input-sm" >
+                                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12">
+                                                <p:inputText id="quantity"  value="#{purchaseBean.purchasePaymentSearcher.quantity}" placeholder="Cantidad" styleClass="form-control input-sm text-rigth">
+                                                    <f:passThroughAttribute name="max" value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.purchasePaymentSearcher.currentPay}" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 text-center">
+                                        <p:remoteCommand 
+                                            name="save_payments"
+                                            action="#{purchaseBean.purchasePaymentSearcher.add()}"
+                                            process="@form" 
+                                            update="form-payment:payments,form-payment:remaining" 
+                                            />
+                                        <button onclick="Purchase.payment.save()" type="button" class="btn btn-success btn-xs">
+                                            <i class="fa fa-check"/>                                            
+                                        </button>
+                                    </div>
+                                </div>
+                            </ui:fragment>
+                        </h:panelGroup>
+                    </div>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+
+</ui:composition>
+
+

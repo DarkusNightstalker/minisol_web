@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <script type="text/javascript" src="#{request.contextPath}/js/rol_man.js"/>
+    <script>
+        function open_managed() {
+            $('#modal-managed').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-managed').on('shown.bs.modal', function () {
+                $('#form-managed\\:name').focus();
+            });
+        });
+    </script>
+    <div id="modal-managed" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg" style="width: 90%">
+            <h:panelGroup layout="block" id="m-rol-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        RolManaged.init();
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;<b>#{managedRolBean.selected.id eq null ? 'CREAR' : 'EDITAR'} ROL</b> 
+                </div>
+                <h:form id="form-managed">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-horizontal">
+                                <div class="form-group form-group-sm">
+                                    <label class="control-label col-md-1">Nombre</label>
+                                    <div class="col-md-6">
+                                        <p:inputText id="name" value="#{managedRolBean.name}" styleClass="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="max-height: 350px ; overflow-y: scroll" class="form-group form-group-sm">
+                                <script>
+                                    $(function () {
+                                        RolManaged.configure_permissions();
+                                    });
+                                </script>
+                                <div class="col-md-3 pl5 pr5  mb5">
+                                    <ui:repeat value="#{managedRolBean.permissionSearcher.categories}" var="category" varStatus="st">
+                                        <ui:fragment rendered="#{st.index % 4 == 1}">
+                                            <table frame="box" width="100%" class="mb5 table table-condensed table-hover table-striped table-forum">
+                                                <thead>
+                                                    <tr class="">
+                                                        <td class="text-center" style="width: 40px;"><i class="#{category.icon} text-muted"></i></td>
+                                                        <td colspan="2">
+                                                            <h4>
+                                                                <a href="javascript:void(0)" class="fs12">
+                                                                    #{category.name}
+                                                                </a>
+                                                                <small>#{category.summary}</small>
+                                                                <button type="button" onclick="RolManaged.all_disselected(this)" class=" btn btn-xs fs10 btn-warning pull-right">
+                                                                    <i class="fa fa-times"/>
+                                                                </button>
+                                                                <button type="button" onclick="RolManaged.all_selected(this)" class=" btn btn-xs fs10 btn-alert pull-right">
+                                                                    <i class="fa fa-check"/>
+                                                                </button>
+                                                            </h4>
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedRolBean.permissionSearcher.permissions[category.id]}" var="item">
+                                                        <tr>
+                                                            <td class="text-center" style="width: 40px;"></td>
+                                                            <td class="fs11" >#{item.name}</td>
+                                                            <td style="width: 40px;">
+                                                                <label class="checkbox  hidden">
+                                                                    <h:selectBooleanCheckbox  value="#{managedRolBean.permissionSearcher.selecteds[item]}"  styleClass="checkbox permission-ck" />
+                                                                    <span>&nbsp;</span>
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+                                        </ui:fragment>
+                                    </ui:repeat>
+                                </div>
+                                <div class="col-md-3 pl5 pr5  mb5">
+                                    <ui:repeat value="#{managedRolBean.permissionSearcher.categories}" var="category" varStatus="st">
+                                        <ui:fragment rendered="#{st.index % 4 == 2}">
+                                            <table frame="box" width="100%" class="mb5 table table-condensed table-hover table-striped table-forum">
+                                                <thead>
+                                                    <tr class="">
+                                                        <td class="text-center" style="width: 40px;"><i class="#{category.icon} text-muted"></i></td>
+                                                        <td colspan="2">
+                                                            <h4>
+                                                                <a href="javascript:void(0)" class="fs12">
+                                                                    #{category.name}
+                                                                </a>
+                                                                <small>#{category.summary}</small>
+                                                                
+                                                                <button type="button" onclick="RolManaged.all_disselected(this)" class=" btn btn-xs fs10 btn-warning pull-right">
+                                                                    <i class="fa fa-times"/>
+                                                                </button>
+                                                                <button type="button" onclick="RolManaged.all_selected(this)" class=" btn btn-xs fs10 btn-alert pull-right">
+                                                                    <i class="fa fa-check"/>
+                                                                </button>
+                                                            </h4>
+                                                            
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedRolBean.permissionSearcher.permissions[category.id]}" var="item">
+                                                        <tr>
+                                                            <td class="text-center" style="width: 40px;"></td>
+                                                            <td class="fs11" >#{item.name}</td>
+                                                            <td style="width: 40px;">
+                                                                <label class="checkbox hidden">
+                                                                    <h:selectBooleanCheckbox  value="#{managedRolBean.permissionSearcher.selecteds[item]}"  styleClass="checkbox permission-ck" />
+                                                                    <span>&nbsp;</span>
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+
+                                        </ui:fragment>
+                                    </ui:repeat>
+
+                                </div>
+                                <div class="col-md-3 pl5 pr5  mb5">
+                                    <ui:repeat value="#{managedRolBean.permissionSearcher.categories}" var="category" varStatus="st">
+                                        <ui:fragment rendered="#{st.index % 4 == 3}">
+                                            <table frame="box" width="100%" class="mb5 table table-condensed table-hover table-striped table-forum">
+                                                <thead>
+                                                    <tr class="">
+                                                        <td class="text-center" style="width: 40px;"><i class="#{category.icon} text-muted"></i></td>
+                                                        <td colspan="2">
+                                                            <h4>
+                                                                <a href="javascript:void(0)" class="fs12">
+                                                                    #{category.name}
+                                                                </a>
+                                                                <small>#{category.summary}</small>
+                                                                <button type="button" onclick="RolManaged.all_disselected(this)" class=" btn btn-xs fs10 btn-warning pull-right">
+                                                                    <i class="fa fa-times"/>
+                                                                </button>
+                                                                <button type="button" onclick="RolManaged.all_selected(this)" class=" btn btn-xs fs10 btn-alert pull-right">
+                                                                    <i class="fa fa-check"/>
+                                                                </button>
+                                                            </h4>
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedRolBean.permissionSearcher.permissions[category.id]}" var="item">
+                                                        <tr>
+                                                            <td class="text-center" style="width: 40px;"></td>
+                                                            <td class="fs11" >#{item.name}</td>
+                                                            <td style="width: 40px;">
+                                                                <label class="checkbox hidden">
+                                                                    <h:selectBooleanCheckbox  value="#{managedRolBean.permissionSearcher.selecteds[item]}"  styleClass="checkbox permission-ck" />
+                                                                    <span>&nbsp;</span>
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+
+                                        </ui:fragment>
+                                    </ui:repeat>
+
+                                </div>
+                                <div class="col-md-3 pl5 pr5  mb5">
+                                    <ui:repeat value="#{managedRolBean.permissionSearcher.categories}" var="category" varStatus="st">
+                                        <ui:fragment rendered="#{st.index % 4 == 0}">
+                                            <table frame="box" width="100%" class="mb5 table table-condensed table-hover table-striped table-forum">
+                                                <thead>
+                                                    <tr class="">
+                                                        <td class="text-center" style="width: 40px;"><i class="#{category.icon} text-muted"></i></td>
+                                                        <td colspan="2">
+                                                            <h4>
+                                                                <a href="javascript:void(0)" class="fs12">
+                                                                    #{category.name}
+                                                                </a>
+                                                                <small>#{category.summary}</small>
+                                                                <button type="button" onclick="RolManaged.all_disselected(this)" class=" btn btn-xs fs10 btn-warning pull-right">
+                                                                    <i class="fa fa-times"/>
+                                                                </button>
+                                                                <button type="button" onclick="RolManaged.all_selected(this)" class=" btn btn-xs fs10 btn-alert pull-right">
+                                                                    <i class="fa fa-check"/>
+                                                                </button>
+                                                            </h4>
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <ui:repeat value="#{managedRolBean.permissionSearcher.permissions[category.id]}" var="item">
+                                                        <tr>
+                                                            <td class="text-center" style="width: 40px;"></td>
+                                                            <td class="fs11" >#{item.name}</td>
+                                                            <td style="width: 40px;">
+                                                                <label class="checkbox hidden">
+                                                                    <h:selectBooleanCheckbox  value="#{managedRolBean.permissionSearcher.selecteds[item]}"  styleClass="checkbox permission-ck" />
+                                                                    <span>&nbsp;</span>
+                                                                </label>
+                                                            </td>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                </tbody>
+                                            </table>
+
+                                        </ui:fragment>
+                                    </ui:repeat>
+
+                                </div>
+
+                                <ui:fragment rendered="#{not empty managedRolBean.permissionSearcher.permissionNoCategory }">
+                                    <div class="col-md-3  mb5 ">
+                                        <table frame="box" class="table table-condensed  table-hover table-striped table-forum">
+                                            <thead>
+                                                <tr>
+                                                    <td class="text-center" style="width: 40px;"><i class="#{category.icon} text-muted"></i></td>
+                                                    <td colspan="2">
+                                                        <h4>
+                                                            <a href="javascript:void(0)">
+                                                                Otros
+                                                            </a>
+                                                            <small>Otras funcionalidades a realizar</small>
+                                                        </h4>
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat value="#{managedRolBean.permissionSearcher.permissionNoCategory}" var="item">
+                                                    <tr>
+                                                        <td class="text-center" style="width: 40px;"></td>
+                                                        <td >#{item.name}</td>
+                                                        <td style="width: 40px;">
+                                                            <label class="checkbox hidden">
+                                                                <h:selectBooleanCheckbox  value="#{managedRolBean.permissionSearcher.selecteds[item]}"  styleClass="checkbox permission-ck" />
+                                                                <span>&nbsp;</span>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </ui:repeat>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </ui:fragment>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <h:inputHidden id="valid" value="#{managedRolBean.saved}" />
+                    <p:remoteCommand 
+                        process="@this" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();$('#modal-managed').modal('hide');search();"
+                        name="update_users" update=":form:table-wrapper"  />
+                    <p:remoteCommand 
+                        action="#{managedRolBean.save()}"
+                        process="@form" 
+                        onstart="begin_load()"
+                        oncomplete="end_load();RolManaged.after_save()"
+                        name="save_user" update="form-managed:valid"  />
+                    <div class="modal-footer">
+                        <button type="button" onclick="RolManaged.before_save()" class="btn btn-success">
+                            Guardar
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger ">
+                            Cancelar
+                        </button>
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_search_actor() {
+            $('#modal-search-actor').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-search-actor').on('shown.bs.modal', function () {
+                $('#form-s-actor\\:captcha').focus();
+            }).on('hidden.bs.modal', function () {
+                $('#form\\:identity-number').focus();
+            });
+        });
+        var ActorSearch = function () {
+            return {
+                before_search: function () {
+                    if ($("#form-s-actor").valid()) {
+                        search_actor();
+                    }
+                },
+                after_search: function () {
+                    if ($("#form-s-actor\\:valid").val() == "true") {
+                        update_actor();
+                    } else {
+                        reload_s_actor();
+                    }
+                },
+                init: function () {
+                    $(document).on("keypress", "#form-s-actor", function (event) {
+                        return event.keyCode != 13;
+                    });
+                    $("#form-s-actor").validate({
+                        errorClass: "has-error text-danger",
+                        validClass: "has-success",
+                        errorElement: "em",
+                        rules: {
+                            "form-s-actor:captcha": {
+                                required: true
+                            }
+                        },
+                        messages: {
+                            "form-s-actor:captcha": {
+                                required: "Este campo es requerido"
+                            }
+                        },
+                        highlight: function (element, errorClass, validClass) {
+                            $(element).closest('.form-group').addClass(errorClass).removeClass(validClass);
+                        },
+                        unhighlight: function (element, errorClass, validClass) {
+                            $(element).closest('.form-group').removeClass(errorClass).addClass(validClass);
+                        },
+                        errorPlacement: function (error, element) {
+                            error.insertAfter(element);
+                        }
+                    });
+                }
+            };
+        }();
+    </script>
+
+    <div id="modal-search-actor" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <h:panelGroup layout="block" id="s-actor-content" styleClass="modal-content">
+                <script>
+                    $(function () {
+                        ActorSearch.init();
+                    });
+                </script>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times"/></button>
+                    <i class="fa fa-search"></i><b> BUSCAR EN RENIEC/SUNAT</b> 
+                </div>
+                <h:form id="form-s-actor">
+                    <div class="modal-body">
+                        <h:panelGroup id="content" layout="block" class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <div class="form-group form-group-sm">
+                                    <div class="col-md-12 text-center">
+                                        <img alt="Embedded Image" src="data:image/jpg;base64,#{actorSearcher.image64}" />
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <div class="col-md-12">
+                                        <script>
+                                            $(function () {
+                                                $('#form-s-actor\\:captcha').pressEnter(function () {
+                                                    ActorSearch.before_search();
+                                                });
+                                            });
+                                        </script>
+                                        <p:inputText id="captcha" value="#{actorSearcher.captcha}" styleClass="form-control input-sm "/>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                        <h:inputHidden id="valid" value="#{actorSearcher.webSearchValid}" />
+                        <p:remoteCommand 
+                            process="@this" 
+                            onstart="begin_load()"
+                            oncomplete="end_load();$('#modal-search-actor .close').trigger('click');"
+                            name="update_actor" update="#{updated}"  />
+                        <p:remoteCommand 
+                            action="#{actorSearcher.searchByWeb()}"
+                            process="@form" 
+                            onstart="begin_load()"
+                            oncomplete="end_load();ActorSearch.after_search()"
+                            name="search_actor" update="form-s-actor:valid"  />
+                        <p:remoteCommand 
+                            process="@form" 
+                            onstart="begin_load();"
+                            oncomplete="end_load();$('#form-s-actor\\:captcha').focus();"
+                            name="reload_s_actor" update=":form-s-actor:content"  />
+                    </div>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>
+

@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script src="#{request.contextPath}/js/electronic-book_man.js" />
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedElectronicBookBean.selected.id eq null ? 'AGREGAR' : 'EDITAR'} LIBRO ELECTRÓNICO</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>                    
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" styleClass="pt20">
+        <p:remoteCommand name="back" onstart="begin_load()" oncomplete="end_load();Core.trays();" process="@this" update=":content-wrapper" action="#{electronicBookBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/accounting/electronic_book/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{electronicBookBean}" target="#{sessionBean.loadable}" />
+        </p:remoteCommand>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedElectronicBookBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" action="#{managedElectronicBookBean.doSave('/pages/accounting/electronic_book/list.xhtml', electronicBookBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open pln prn" style="display: block;">
+                        <div class="topbar-menu row">
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ElectronicBook.back()" class="metro-tile bg-danger light">
+                                    <span class="fa fa-arrow-left text-muted"></span>
+                                    <span class="metro-title">Volver a lista</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ElectronicBook.refresh()" class="metro-tile bg-warning light">
+                                    <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                    <span class="metro-title">Reestablecer</span>
+                                </a>
+                            </div>
+                            <div class="col-xs-4 col-sm-2">
+                                <a href="javascript:ElectronicBook.save()" class="metro-tile bg-primary light">
+                                    <span class="fa fa-save text-muted"></span>
+                                    <span class="metro-title">Guardar</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div class="form-horizontal">
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="col-md-2 control-label">Categoría</label>
+                                    <div class="col-lg-10" >
+                                        <h:panelGroup layout="block" id="category-wrapper" styleClass="input-group input-group-sm">
+                                            <script>
+                                                $(function () {
+                                                    ElectronicBook.configure_category();
+                                                });
+                                            </script>
+                                            <h:selectOneMenu id="category" value="#{managedElectronicBookBean.elecronicBookCategoryId}" styleClass="select2-single form-control input-sm">
+                                                <f:selectItem/>
+                                                <f:selectItems 
+                                                    value="#{managedElectronicBookBean.categorySearcher.data}"
+                                                    var="item"
+                                                    itemLabel="#{item[1]}||#{item[2]}"
+                                                    itemValue="#{item[0]}"/>
+                                            </h:selectOneMenu> 
+                                            <span class="input-group-btn">
+                                                <p:commandLink 
+                                                    action="#{managedElectronicBookBean.categorySearcher.initManaged()}"
+                                                    update=":m-category-content"
+                                                    oncomplete="App.open_modal('#modal-category','mfp-zoomIn',false)"
+                                                    styleClass="btn btn-system">
+                                                    <i class="fa fa-plus"/>
+                                                </p:commandLink>
+                                            </span>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="col-md-2 control-label">Código</label>
+                                    <div class="col-lg-10" >
+                                        <p:inputText id="code" tabindex="1" value="#{managedElectronicBookBean.code}"  class="form-control input-sm" maxlength="8" />
+                                    </div>
+                                </div>
+                                <div class="form-group form-group-sm mb5">
+                                    <label class="col-md-2 control-label">Nombre</label>
+                                    <div class="col-lg-10" >
+                                        <p:inputText id="name" tabindex="2" value="#{managedElectronicBookBean.name}"  class="form-control input-sm" maxlength="255" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2" >
+
+                                    </div>
+                                    <ui:fragment rendered="#{managedElectronicBookBean.selected.id eq null}">
+                                        <div class="col-md-4" >
+                                            <div class="checkbox-custom checkbox-primary mb5">
+                                                <h:selectBooleanCheckbox value="#{managedElectronicBookBean.createAgain}" id="create-again" />
+                                                <label for="form:create-again">Crear nuevo al terminar</label>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+
+    <div id="modal-category" class="white-popup-block popup-full popup-basic mfp-with-anim mfp-hide">
+        <h:panelGroup id="m-category-content" layout="block" class="panel">
+            <div class="panel-heading">
+                <span class="panel-icon">
+                    <i class="fa fa-trash"></i>
+                </span>
+                <span class="panel-title">REGISTRAR CATEGORIA DE LIBROS ELECTRÓNICOS</span>
+            </div>
+            <h:form id="form-category">
+                <script>
+                    $(function () {
+                        ElectronicBook.electronicBookCategory.init();
+                    });
+                </script>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-sm-2">
+                                Categoria sup.
+                            </label>
+                            <div class="col-sm-10">
+                                <script>
+                                    $(function () {
+                                        ElectronicBook.electronicBookCategory.configure_parents();
+                                    });
+                                </script>
+                                <h:selectOneMenu id="parent" value="#{managedElectronicBookBean.managedElectronicBookCategoryBean.parentId}" styleClass="select2-single form-control input-sm">
+                                    <f:selectItem/>
+                                    <f:selectItems 
+                                        value="#{managedElectronicBookBean.managedElectronicBookCategoryBean.parentSearcher.data}"
+                                        var="item"
+                                        itemLabel="#{item[1]}||#{item[2]}"
+                                        itemValue="#{item[0]}"/>
+                                </h:selectOneMenu> 
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-sm-2">
+                                Codigo
+                            </label>
+                            <div class="col-md-5">
+                                <p:inputText id="code" value="#{managedElectronicBookBean.managedElectronicBookCategoryBean.code}" styleClass="form-control input-sm text-uppercase" />
+                            </div>
+                        </div>
+                        <div class="form-group form-group-sm">
+                            <label class="control-label col-sm-2">
+                                Nombre
+                            </label>
+                            <div class="col-md-10">
+                                <p:inputText id="name" value="#{managedElectronicBookBean.managedElectronicBookCategoryBean.name}" styleClass="form-control input-sm" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h:inputHidden id="valid" value="#{managedElectronicBookBean.managedElectronicBookCategoryBean.saved}" />
+
+                <p:remoteCommand 
+                    process="@this" 
+                    onstart="begin_load()"
+                    oncomplete="end_load();$.magnificPopup.close();"
+                    name="update_category" update="form:category-wrapper"  />
+                <p:remoteCommand 
+                    action="#{managedElectronicBookBean.categorySearcher.save()}"
+                    process="@form" 
+                    onstart="begin_load()"
+                    oncomplete="end_load();ElectronicBook.electronicBookCategory.after_save()"
+                    name="save_category" update="form-category:valid"  />
+                <div class="panel-footer text-right">
+                    <button type="button" onclick="ElectronicBook.electronicBookCategory.before_save()" class="btn btn-success">
+                        Guardar
+                    </button>
+                    <button type="button" onclick="$.magnificPopup.close()" class="btn btn-danger ">
+                        Cancelar
+                    </button>
+                </div>
+            </h:form>
+        </h:panelGroup>
+    </div>
+</ui:composition>
+
+
