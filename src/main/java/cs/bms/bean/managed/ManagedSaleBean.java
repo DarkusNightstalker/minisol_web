@@ -194,9 +194,6 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
                     actorService.addPoints(selected.getCustomer().getId(), currentPoints, sessionBean.getCurrentUser());
                 }
             }
-            if (selected.getCustomer() != null) {
-                actorService.saveOrUpdate(selected.getCustomer());
-            }
             for (Object[] item : detailSearcher.removed) {
                 SaleDetail saleDetail = new SaleDetail();
                 saleDetail.setId((Long) item[0]);

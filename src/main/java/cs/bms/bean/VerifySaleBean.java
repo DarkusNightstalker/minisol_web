@@ -7,13 +7,17 @@ package cs.bms.bean;
 
 import cs.bms.bean.managed.ManagedSaleBean;
 import cs.bms.bean.util.PNotifyMessage;
+import cs.bms.model.Product;
 import cs.bms.model.Sale;
 import cs.bms.model.SalePayment;
+import cs.bms.service.interfac.IActorService;
 import cs.bms.service.interfac.IPaymentVoucherService;
 import cs.bms.service.interfac.ISaleDetailService;
 import cs.bms.service.interfac.ISalePaymentService;
 import cs.bms.service.interfac.ISaleService;
+import cs.bms.service.interfac.IStockService;
 import cs.bms.util.DownloadUtil;
+import gkfire.auditory.Auditory;
 import gkfire.web.util.BeanUtil;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.Asynchronous;
 import javax.faces.bean.ManagedBean;
@@ -40,8 +42,10 @@ public class VerifySaleBean implements java.io.Serializable {
 
     @ManagedProperty(value = "#{saleService}")
     protected ISaleService saleService;
-    @ManagedProperty(value = "#{managedSaleBean}")
-    protected ManagedSaleBean managedSaleBean;
+    @ManagedProperty(value = "#{actorService}")
+    protected IActorService actorService;
+    @ManagedProperty(value = "#{stockService}")
+    protected IStockService stockService;
     @ManagedProperty(value = "#{paymentVoucherService}")
     protected IPaymentVoucherService paymentVoucherService;
     @ManagedProperty(value = "#{saleDetailService}")
@@ -84,7 +88,20 @@ public class VerifySaleBean implements java.io.Serializable {
 
     public void delete() {
         Long id = Long.parseLong(BeanUtil.getParameter("id"));
-        managedSaleBean.delete(id);
+        Sale sale = saleService.getById( id);
+        if (sale.getCustomer() != null) {
+            Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
+            if (currentPoints > 0) {
+                actorService.subtractPoints(sale.getCustomer().getId(), sale.getPoints(),sessionBean.getCurrentUser());
+            }
+        }
+        saleDetailService.getProductDataBySale(sale).forEach(item -> {
+            stockService.addQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
+        });
+
+        Auditory.make(sale, sessionBean.getCurrentUser());
+        sale.setSent(false);
+        saleService.delete(sale);
         BeanUtil.exceuteJS("SaleVerification.after_delete(" + id + ");");
     }
 
@@ -434,16 +451,31 @@ public class VerifySaleBean implements java.io.Serializable {
     }
 
     /**
-     * @return the managedSaleBean
+     * @return the actorService
      */
-    public ManagedSaleBean getManagedSaleBean() {
-        return managedSaleBean;
+    public IActorService getActorService() {
+        return actorService;
     }
 
     /**
-     * @param managedSaleBean the managedSaleBean to set
+     * @param actorService the actorService to set
      */
-    public void setManagedSaleBean(ManagedSaleBean managedSaleBean) {
-        this.managedSaleBean = managedSaleBean;
+    public void setActorService(IActorService actorService) {
+        this.actorService = actorService;
     }
+
+    /**
+     * @return the stockService
+     */
+    public IStockService getStockService() {
+        return stockService;
+    }
+
+    /**
+     * @param stockService the stockService to set
+     */
+    public void setStockService(IStockService stockService) {
+        this.stockService = stockService;
+    }
+
 }
