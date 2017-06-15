@@ -137,38 +137,46 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
 
     @Override
     public void delete(Serializable id) {
-        Sale sale = mainService.getById((Long) id);
-        if (sale.getCustomer() != null) {
-            Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
-            if (currentPoints > 0) {
-                actorService.subtractPoints(sale.getCustomer().getId(), sale.getPoints(),sessionBean.getCurrentUser());
+        if (mainService.isActive((Long) id)) {
+            Sale sale = mainService.getById((Long) id);
+            if (sale.getCustomer() != null) {
+                Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
+                if (currentPoints > 0) {
+                    actorService.subtractPoints(sale.getCustomer().getId(), sale.getPoints(), sessionBean.getCurrentUser());
+                }
             }
-        }
-        saleDetailService.getProductDataBySale(sale).forEach(item -> {
-            stockService.addQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
-        });
+            saleDetailService.getProductDataBySale(sale).forEach(item -> {
+                stockService.addQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
+            });
 
-        Auditory.make(sale, sessionBean.getCurrentUser());
-        sale.setSent(false);
-        getMainService().delete(sale);
+            Auditory.make(sale, sessionBean.getCurrentUser());
+            sale.setSent(false);
+            getMainService().delete(sale);
+        } else {
+            PNotifyMessage.errorMessage("Esta venta ya fue anulada!!");
+        }
     }
 
     @Override
     public void recovery(Serializable id) {
-        Sale sale = mainService.getById((Long) id); 
-        if (sale.getCustomer() != null) {
-            Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
-            if (currentPoints > 0) {
-                actorService.addPoints(sale.getCustomer().getId(), sale.getPoints(),sessionBean.getCurrentUser());
+        if (!mainService.isActive((Long) id)) {
+            Sale sale = mainService.getById((Long) id);
+            if (sale.getCustomer() != null) {
+                Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
+                if (currentPoints > 0) {
+                    actorService.addPoints(sale.getCustomer().getId(), sale.getPoints(), sessionBean.getCurrentUser());
+                }
             }
+            saleDetailService.getProductDataBySale(sale).forEach(item -> {
+                stockService.substractQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
+            });
+            Auditory.make(sale, sessionBean.getCurrentUser());
+            sale.setSent(false);
+            sale.setActive(true);
+            getMainService().saveOrUpdate(sale);
+        }else{
+            PNotifyMessage.errorMessage("Esta venta ya fue recuperada!!");
         }
-        saleDetailService.getProductDataBySale(sale).forEach(item -> {
-            stockService.substractQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
-        });
-        Auditory.make(sale, sessionBean.getCurrentUser());
-        sale.setSent(false);
-        sale.setActive(true);
-        getMainService().saveOrUpdate(sale);
     }
 
     @Override
@@ -188,10 +196,12 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
             return saved;
         }
         if (saved) {
-            if (selected.getCustomer() != null) {
+            if (selected.getCustomer() != null) {         
                 Long currentPoints = points - new Double(subtotalDiscount.doubleValue() * 100).longValue();
                 if (currentPoints > 0) {
                     actorService.addPoints(selected.getCustomer().getId(), currentPoints, sessionBean.getCurrentUser());
+                }else if (currentPoints < 0){
+                    actorService.subtractPoints(selected.getCustomer().getId(), currentPoints*-1, sessionBean.getCurrentUser());
                 }
             }
             for (Object[] item : detailSearcher.removed) {
@@ -314,7 +324,7 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
 
         selected.setElectronic(true);
         selected.setCustomer(customerSearcher.getActor());
-        selected.setCustomerName(selected.getCustomer() == null ? customerName : selected.getCustomer().getName());
+        selected.setCustomerName(selected.getCustomer() == null ? customerName : (selected.getCustomer().getOther() != null ? selected.getCustomer().getOther() : selected.getCustomer().getName()));
         selected.setPoints(points);
         selected.setSubtotal(subtotal);
         selected.setIgv(igv);
@@ -1081,11 +1091,13 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
 
         @Override
         protected void caseRUC() {
-            initManaged();
-            managedSupplierBean.setIdentityNumber(identityNumber);
-            managedSupplierBean.setIdentityDocumentId((Short) identityDocumentService.getByHQL("SELECT idd.id FROM IdentityDocument idd WHERE idd.abbr LIKE ?", "RUC"));
-            managedSupplierBean.getIdentityDocumentSearcher().changeLength();
-            BeanUtil.exceuteJS("open_create_customer();");
+            if (actor == null || (actor.getOther() == null || actor.getOther().length() == 0)) {
+                initManaged();
+                managedSupplierBean.setIdentityNumber(identityNumber);
+                managedSupplierBean.setIdentityDocumentId((Short) identityDocumentService.getByHQL("SELECT idd.id FROM IdentityDocument idd WHERE idd.abbr LIKE ?", "RUC"));
+                managedSupplierBean.getIdentityDocumentSearcher().changeLength();
+                BeanUtil.exceuteJS("open_create_customer();");
+            }
         }
 
         @Override

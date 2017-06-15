@@ -171,6 +171,7 @@
                                                                             process="@this" 
                                                                             onstart="begin_load()"
                                                                             action="#{saleBean.load()}"
+                                                                            update=":info-content"
                                                                             oncomplete="end_load();open_info();" 
                                                                             styleClass="btn btn-xs btn-gradient btn-info">
                                                                             Información
@@ -182,7 +183,7 @@
                                                                             process="@this" 
                                                                             onstart="begin_load()"
                                                                             action="#{saleBean.copyPrint()}"
-                                                                            oncomplete="end_load();open_info();" 
+                                                                            oncomplete="end_load();" 
                                                                             styleClass="btn btn-xs btn-gradient btn-warning">
                                                                             Imprimir copia
                                                                             <f:setPropertyActionListener target="#{saleBean.id}" value="#{item[0]}"/>
@@ -424,6 +425,7 @@
         <ui:param name="accept_text" value="SI"/>
         <ui:param name="cancel_text" value="NO"/>
     </ui:include>
+    <ui:include  src="info.xhtml" />
     <ui:include  rendered="#{sessionBean.authorize('M_SAL')}"  src="managed.xhtml" />
     <ui:include  rendered="#{sessionBean.authorize('VE_SAL')}" src="verify.xhtml" />
     <ui:include  rendered="#{sessionBean.authorize('R_SAL,RP_SAL')}" src="reports.xhtml" />

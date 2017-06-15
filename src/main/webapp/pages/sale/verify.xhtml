@@ -87,13 +87,11 @@
                             <p:remoteCommand
                                 update=':verify-info-content'
                                 process="@this"
-                                oncomplete="open_verify_info()"
                                 name="send_verify_visa" 
                                 action="#{verifySaleBean.info.load(false,true,false)}" />
                             <p:remoteCommand
                                 update=':verify-info-content'
                                 process="@this"
-                                oncomplete="open_verify_info()"
                                 name="send_consumption_voucher" 
                                 action="#{verifySaleBean.info.load(true,false,true)}" />
                             <p:remoteCommand

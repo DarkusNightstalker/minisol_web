@@ -215,7 +215,7 @@
         <!-- Widget Javascript -->
         <script src="#{request.contextPath}/assets/js/demo/demo.js"></script>
         <h:form id="form-option">
-            <p:remoteCommand process="@this" name="permanent_conect" />
+            <p:remoteCommand process="@this" update="@this" name="permanent_conect" />
             <p:commandLink id="logout" ajax="false" action="#{sessionBean.authentication.logout()}" styleClass="hidden"/>
         </h:form>
         <script type="text/javascript">

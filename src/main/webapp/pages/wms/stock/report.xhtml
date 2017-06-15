@@ -47,13 +47,25 @@
                             <li>
                                 <a href="#tab14_3" onclick="Report.clean('form-r-kardex-valuate');anulateValuateProduct();" data-toggle="tab">
                                     <span class="fs16 pl5 pt5 pr5 bg-warning mr15">
-                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unidades Valorizadas total
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Valorizadas por producto
                                 </a>
                             </li>
                             <li>
                                 <a href="#tab14_4" onclick="Report.clean('form-r-kardex-physical');anulatePhysicalProduct();" data-toggle="tab">
                                     <span class="fs16 pl5 pt5 pr5 bg-primary mr15">
-                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unidades Físicas total
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Físicas por producto
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_5" onclick="Report.clean('form-r-kardex-valuate-total')" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-dark mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Valorizadas Total
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_6" onclick="Report.clean('form-r-kardex-physical-total')" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-danger mr15">
+                                        <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Físicas Total
                                 </a>
                             </li>
                         </ul>
@@ -82,6 +94,12 @@
                                                 <p class="form-control-static"><i>Ningun filtro necesario</i></p>
                                             </div>
                                         </div>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
                                     </div>
                                     <br/>
                                     <br/>
@@ -188,7 +206,7 @@
                                         <span class="pl5 pt5 pr5 bg-warning mr10">
                                             <i class="glyphicons glyphicons-cargo"/>
                                         </span>
-                                        <b>INVENTARIO UNIDADES VALORIZADAS</b>
+                                        <b>INVENTARIO UNID. VALORIZADAS POR PRODUCTO</b>
                                     </p>
                                     <div class="form-horizontal">
                                         <div class="form-group form-group-sm mb5">
@@ -196,8 +214,10 @@
                                             <div class="col-md-7">
                                                 <div class="input-group input-group-sm">
                                                     <p:inputText id="barcode" value="#{reportStockBean.kardexValuate.params['barcode_product']}" class="form-control none-pass">
-                                                       <f:passThroughAttribute name="maxlength" value="13"/>
+                                                        <f:passThroughAttribute name="maxlength" value="13"/>
                                                         <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
+                                                        <f:passThroughAttribute name="required" value=""/>
+                                                        <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
                                                     </p:inputText>
                                                     <span class="input-group-btn">
                                                         <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
@@ -305,7 +325,7 @@
                                         <span class="pl5 pt5 pr5 bg-primary mr10">
                                             <i class="glyphicons glyphicons-cargo"/>
                                         </span>
-                                        <b>INVENTARIO UNIDADES FISICAS </b>
+                                        <b>INVENTARIO UNID. FISICAS POR PRODUCTO</b>
                                     </p>
                                     <div class="form-horizontal">
                                         <div class="form-group form-group-sm mb5">
@@ -315,6 +335,8 @@
                                                     <p:inputText id="barcode" value="#{reportStockBean.kardexPhysical.params['barcode_product']}" class="form-control none-pass" >
                                                         <f:passThroughAttribute name="maxlength" value="13"/>
                                                         <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
+                                                        <f:passThroughAttribute name="required" value=""/>
+                                                        <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
                                                     </p:inputText>
                                                     <span class="input-group-btn">                                                        
                                                         <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
@@ -384,6 +406,146 @@
                                     </div>
                                 </h:form>           
                             </div>
+                            <div id="tab14_5" class="tab-pane">   
+                                <h:form id="form-r-kardex-valuate-total">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-kardex-valuate-total");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportStockBean.kardexValuateTotal.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.kardexValuateTotal.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.kardexValuateTotal.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.kardexValuateTotal.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-warning mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>INVENTARIO UNID. VALORIZADAS TOTALIZADAS</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Inicio.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText id="date-init" value="#{reportStockBean.kardexValuateTotal.params['date_init']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Fin.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText value="#{reportStockBean.kardexValuateTotal.params['date_end']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-kardex-valuate-total:many-company-value')" id="company" styleClass="chk-company">
+                                                        </h:selectBooleanCheckbox>
+                                                        <label class="fs11" for="form-r-kardex-valuate-total:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportStockBean.kardexValuateTotal.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
+                            <div id="tab14_6" class="tab-pane">   
+                                <h:form id="form-r-kardex-physical-total">
+                                  
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-kardex-physical-total");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf" action="#{reportStockBean.kardexPhysicalTotal.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportStockBean.kardexPhysicalTotal.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportStockBean.kardexPhysicalTotal.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportStockBean.kardexPhysicalTotal.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-primary mr10">
+                                            <i class="glyphicons glyphicons-cargo"/>
+                                        </span>
+                                        <b>INVENTARIO UNID. FISICAS TOTAL</b>
+                                    </p>
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Inicio.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText id="date-init" value="#{reportStockBean.kardexPhysicalTotal.params['date_init']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Fec. Fin.</label>
+                                            <div class="col-md-7">
+                                                <p:inputText value="#{reportStockBean.kardexPhysicalTotal.params['date_end']}" class="form-control d" >
+                                                    <f:passThroughAttribute name="required" value=""/>
+                                                    <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-3 control-label">Sedes</label>
+                                            <div class="col-md-9">
+                                                <ui:repeat id="options" value="#{sessionBean.companySearcher.data}" varStatus="st" var="c">
+                                                    <div class="checkbox-custom mb5 mt5">
+                                                        <h:selectBooleanCheckbox  onchange="Report.manyToOneField(this, '#{c[0]}', 'form-r-kardex-physical-total:many-company-value')" id="company"  />
+                                                        <label class="fs11" for="form-r-kardex-physical-total:options:#{st.index}:company">#{c[1]} #{c[2]} (#{c[3]})</label>
+                                                    </div>
+                                                </ui:repeat>
+                                                <h:inputHidden value="#{reportStockBean.kardexPhysicalTotal.params['id_companies']}" converter="gkfire.converter.ListInteger" id='many-company-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="short mt10 mb10"/> 
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>           
+                            </div>
                         </div>
                     </div>
                 </div>   
@@ -419,8 +581,8 @@
                                 <label class="col-md-2 control-label">Buscar</label>
                                 <div class="col-md-7">
                                     <script>
-                                        $(function(){
-                                            $("#form-search-product\\:terms").pressEnter(function(){
+                                        $(function () {
+                                            $("#form-search-product\\:terms").pressEnter(function () {
                                                 searchProducts();
                                             });
                                         });

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex_report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f4ff809e-964b-4faa-a1e6-fd0a25dcc29f">
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
-	<property name="ireport.zoom" value="1.4641000000000053"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.1000000000000048"/>
+	<property name="ireport.x" value="110"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
@@ -66,8 +66,8 @@ k.quantity_out,
 k.cost_out,
 k.total_out
 from kardex k
-join payment_proof pp on k.id_payment_proof = pp.id
-join operation_type ot on k.id_operation_type = ot.id
+left join payment_proof pp on k.id_payment_proof = pp.id
+left join operation_type ot on k.id_operation_type = ot.id
 join product p on p.id = k.id_product
 join company c on c.id = k.id_company
 WHERE (k.date between $P{date_init} AND $P{date_end}) AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product}
@@ -260,7 +260,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="89e30763-e54a-45aa-a766-324e93119ad7" style="Column header" x="537" y="10" width="12" height="20" forecolor="#000000"/>
+				<reportElement uuid="89e30763-e54a-45aa-a766-324e93119ad7" style="Column header" x="539" y="41" width="12" height="20" forecolor="#000000"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
@@ -334,7 +334,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 	<summary>
 		<band height="155" splitType="Stretch">
 			<componentElement>
-				<reportElement uuid="1b66659b-b677-4cd8-a52a-b09d666c4338" key="table 1" x="-1" y="18" width="360" height="50"/>
+				<reportElement uuid="1b66659b-b677-4cd8-a52a-b09d666c4338" key="table 1" x="-1" y="18" width="803" height="50"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="kardex" uuid="c49bd651-70d5-467b-b03a-94d9b53fdc01">
 						<datasetParameter name="id_companies">
@@ -370,9 +370,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter height="0" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
+						<jr:detailCell height="20" rowSpan="1">
 							<textField pattern="dd/MM/yyyy">
-								<reportElement uuid="d57737a3-082a-4443-818a-601b5204a4ff" x="0" y="0" width="61" height="30"/>
+								<reportElement uuid="d57737a3-082a-4443-818a-601b5204a4ff" x="0" y="0" width="61" height="20"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -387,7 +387,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:columnGroup width="218" uuid="c01e5244-1fb1-49cf-8fc5-f621ebffc345">
+					<jr:columnGroup width="224" uuid="c01e5244-1fb1-49cf-8fc5-f621ebffc345">
 						<jr:tableHeader height="31" rowSpan="1">
 							<staticText>
 								<reportElement uuid="c8b1aaa3-d666-43f8-9b61-1a93bd144b93" mode="Opaque" x="0" y="0" width="218" height="30" backcolor="#E6E6E6"/>
@@ -404,10 +404,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								<text><![CDATA[DOCUMENTO DE TRASLADO, COMPROBANTE DE PAGO, DOCUMENTO INTERNO O SIMILAR]]></text>
 							</staticText>
 						</jr:tableHeader>
-						<jr:column width="48" uuid="c55f4ec9-21b8-4025-86a8-3a35d4c7d189">
+						<jr:column width="54" uuid="c55f4ec9-21b8-4025-86a8-3a35d4c7d189">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="cab100ef-581f-4bd5-ab6f-7b53fdb44034" mode="Opaque" x="0" y="0" width="48" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="cab100ef-581f-4bd5-ab6f-7b53fdb44034" mode="Opaque" x="0" y="0" width="54" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -421,9 +421,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[FECHA]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
+							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="dd/MM/yyyy">
-									<reportElement uuid="fda05979-a216-4423-8d8b-ba6f4d2dc547" x="0" y="0" width="48" height="30"/>
+									<reportElement uuid="fda05979-a216-4423-8d8b-ba6f4d2dc547" x="0" y="0" width="54" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -455,9 +455,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[TIPO]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
-								<textField>
-									<reportElement uuid="7761d580-e28d-480d-9a48-0e4d15db9d40" x="0" y="0" width="60" height="30"/>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="7761d580-e28d-480d-9a48-0e4d15db9d40" x="0" y="0" width="60" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -489,9 +489,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[SERIE]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
-								<textField>
-									<reportElement uuid="ff1494a9-0639-466a-bffd-e6b3c9eaa013" x="0" y="0" width="52" height="30"/>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="ff1494a9-0639-466a-bffd-e6b3c9eaa013" x="0" y="0" width="52" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -523,9 +523,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[NÚMERO]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
-								<textField>
-									<reportElement uuid="81de4a0f-5c09-4763-ad18-e5f1e9483a52" x="0" y="0" width="58" height="30"/>
+							<jr:detailCell height="20" rowSpan="1">
+								<textField isBlankWhenNull="true">
+									<reportElement uuid="81de4a0f-5c09-4763-ad18-e5f1e9483a52" x="0" y="0" width="58" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -558,9 +558,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								<text><![CDATA[OPERACION]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell height="30" rowSpan="1">
+						<jr:detailCell height="20" rowSpan="1">
 							<textField>
-								<reportElement uuid="9a5c5d7e-1420-40b2-ae14-d338ac6dd7a3" x="0" y="0" width="58" height="30"/>
+								<reportElement uuid="9a5c5d7e-1420-40b2-ae14-d338ac6dd7a3" x="0" y="0" width="58" height="20"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -593,9 +593,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[ENTRADAS]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
+							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="###0" isBlankWhenNull="true">
-									<reportElement uuid="f26184cf-60a3-40cd-80ab-98afef3f7cb6" x="0" y="0" width="107" height="30"/>
+									<reportElement uuid="f26184cf-60a3-40cd-80ab-98afef3f7cb6" x="0" y="0" width="107" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -629,9 +629,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 									<text><![CDATA[SALIDAS]]></text>
 								</staticText>
 							</jr:columnHeader>
-							<jr:detailCell height="30" rowSpan="1">
+							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="###0" isBlankWhenNull="true">
-									<reportElement uuid="73c6c73e-deb9-4c5d-8e39-e22caab8d311" x="0" y="0" width="107" height="30"/>
+									<reportElement uuid="73c6c73e-deb9-4c5d-8e39-e22caab8d311" x="0" y="0" width="107" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -666,9 +666,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter height="0" rowSpan="1"/>
-						<jr:detailCell height="30" rowSpan="1">
+						<jr:detailCell height="20" rowSpan="1">
 							<textField pattern="###0" isBlankWhenNull="true">
-								<reportElement uuid="ad59ff78-2e46-4a6c-a64b-642ec9b9650c" x="0" y="0" width="108" height="30"/>
+								<reportElement uuid="ad59ff78-2e46-4a6c-a64b-642ec9b9650c" x="0" y="0" width="108" height="20"/>
 								<box rightPadding="5">
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>

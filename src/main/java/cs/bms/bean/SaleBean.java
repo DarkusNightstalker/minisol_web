@@ -70,7 +70,7 @@ public class SaleBean extends ABasicBean<Long> {
 
     public void load() {
         selected = saleService.getById(id);
-        List detail = saleDetailService.listHQL("FROM SaleDetail sd WHERE sd.sale = ?", selected);
+        List detail = saleDetailService.getBasicDataBySale(selected);
         otherData = new HashMap<>();
         otherData.put("detail", detail);
     }

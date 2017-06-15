@@ -18,13 +18,13 @@
     
     <dependencies>
         <dependency>
-            <groupId>local</groupId>
-            <artifactId>com.gkfire</artifactId>
+            <groupId>darkus-nightmare</groupId>
+            <artifactId>dn.core</artifactId>
             <version>1.3</version>
         </dependency>
         <dependency>
-            <groupId>javax.dkq</groupId>
-            <artifactId>cs.bms</artifactId>
+            <groupId>darkus-nightmare</groupId>
+            <artifactId>dn.bms</artifactId>
             <version>1.0</version>
         </dependency>
         <!-- PRIMEFACES DEPENDENCI -->

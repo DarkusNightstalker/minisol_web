@@ -53,8 +53,10 @@ public class ReportStockBean implements java.io.Serializable {
     @ManagedProperty(value = "#{productService}")
     protected IProductService productService;
 
-    protected ReportExportList kardexValuate;
-    protected ReportExportList kardexPhysical;
+    protected ReportExport kardexValuateTotal;
+    protected ReportExport kardexPhysicalTotal;
+    protected ReportExport kardexValuate;
+    protected ReportExport kardexPhysical;
     protected ReportExport currentStock;
     protected ReportExport totalStock;
 
@@ -70,25 +72,16 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
-        map.put("date_end", null);
-        kardexValuate = new ReportExportList("/1258488425132154132154214536/kardex_valuate.jasper", "Inventario en unidades valorizadas", sessionBean, map, (Map<String, Object> params) -> {
-            try {
-                List<JasperPrint> jasperPrints = new ArrayList();
-                if (params.get("barcode_product") == null || params.get("barcode_product").toString().equalsIgnoreCase("")) {
-                    List<String> barcodes = productService.getAllBarcodes();
-                    for (String barcode : barcodes) {
-                        params.put("barcode_product", barcode);
-                        jasperPrints.add(JasperFillManager.fillReport(kardexValuate.makeInputStream(), params, PGSqlUtil.getJdbcPostGresSQL().getConnection()));
-                    }
-                } else {
-                    jasperPrints.add(JasperFillManager.fillReport(kardexValuate.makeInputStream(), params, PGSqlUtil.getJdbcPostGresSQL().getConnection()));
-                }
-                return jasperPrints;
-            } catch (SQLException | JRException ex) {
-                Logger.getLogger(ReportStockBean.class.getName()).log(Level.SEVERE, null, ex);
-                return Collections.EMPTY_LIST;
-            }
-        });
+        map.put("date_end", null);                
+        kardexValuate = new ReportExport("/1258488425132154132154214536/kardex_valuate.jasper", "Inventario en unidades valorizadas", sessionBean, map);
+        /**/
+        map = new HashMap();
+        map.put("id_companies", Collections.EMPTY_LIST);
+        map.put("ruc", sessionBean.getCurrentCompany().getRuc());
+        map.put("name_company", sessionBean.getCurrentCompany().getName());
+        map.put("date_init", null);
+        map.put("date_end", null);                
+        kardexValuateTotal = new ReportExport("/1258488425132154132154214536/kardex_valuate_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
         /**/
         map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
@@ -97,24 +90,15 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
         map.put("date_end", null);
-        kardexPhysical = new ReportExportList("/1258488425132154132154214536/kardex_physical.jasper", "Inventario en unidades fisicas", sessionBean, map, (Map<String,Object> params) -> {
-            try {
-                List<JasperPrint> jasperPrints = new ArrayList();
-                if (params.get("barcode_product") == null || params.get("barcode_product").toString().equalsIgnoreCase("")) {
-                    List<String> barcodes = productService.getAllBarcodes();
-                    for (String barcode : barcodes) {
-                        params.put("barcode_product", barcode);
-                        jasperPrints.add(JasperFillManager.fillReport(kardexPhysical.makeInputStream(), params, PGSqlUtil.getJdbcPostGresSQL().getConnection()));
-                    }
-                } else {
-                    jasperPrints.add(JasperFillManager.fillReport(kardexPhysical.makeInputStream(), params, PGSqlUtil.getJdbcPostGresSQL().getConnection()));
-                }
-                return jasperPrints;
-            } catch (SQLException | JRException ex) {
-                Logger.getLogger(ReportStockBean.class.getName()).log(Level.SEVERE, null, ex);
-                return Collections.EMPTY_LIST;
-            }
-        });
+        kardexPhysical = new ReportExport("/1258488425132154132154214536/kardex_physical.jasper", "Inventario en unidades fisicas", sessionBean, map);
+        /**/ 
+        map = new HashMap();
+        map.put("id_companies", Collections.EMPTY_LIST);
+        map.put("ruc", sessionBean.getCurrentCompany().getRuc());
+        map.put("name_company", sessionBean.getCurrentCompany().getName());
+        map.put("date_init", null);
+        map.put("date_end", null);                
+        kardexValuateTotal = new ReportExport("/1258488425132154132154214536/kardex_physical_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
         /**/
         map = new HashMap();
         map.put("company", sessionBean.getCurrentCompany().getName() + " " + sessionBean.getCurrentCompany().getCity() + " (" + sessionBean.getCurrentCompany().getAddress() + ")");
@@ -143,7 +127,15 @@ public class ReportStockBean implements java.io.Serializable {
         kardexPhysical.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
         kardexPhysical.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
         kardexPhysical.getParams().put("barcode_product", null);
-        kardexValuate.getParams().put("name_product", null);
+        kardexPhysical.getParams().put("name_product", null);
+        /**/
+        kardexValuateTotal.getParams().put("id_companies", Collections.EMPTY_LIST);
+        kardexValuateTotal.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
+        kardexValuateTotal.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
+        /**/
+        kardexPhysicalTotal.getParams().put("id_companies", Collections.EMPTY_LIST);
+        kardexPhysicalTotal.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
+        kardexPhysicalTotal.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
     }
 
     public void refreshValuate(Long idProduct) {
@@ -200,26 +192,6 @@ public class ReportStockBean implements java.io.Serializable {
         this.productService = productService;
     }
 
-    /**
-     * @return the kardexValuate
-     */
-    public ReportExportList getKardexValuate() {
-        return kardexValuate;
-    }
-
-    /**
-     * @param kardexValuate the kardexValuate to set
-     */
-    public void setKardexValuate(ReportExportList kardexValuate) {
-        this.kardexValuate = kardexValuate;
-    }
-
-    /**
-     * @return the kardexPhysical
-     */
-    public ReportExportList getKardexPhysical() {
-        return kardexPhysical;
-    }
 
     /**
      * @param kardexPhysical the kardexPhysical to set
@@ -381,6 +353,62 @@ public class ReportStockBean implements java.io.Serializable {
     }
 
     /**
+     * @return the kardexValuateTotal
+     */
+    public ReportExport getKardexValuateTotal() {
+        return kardexValuateTotal;
+    }
+
+    /**
+     * @param kardexValuateTotal the kardexValuateTotal to set
+     */
+    public void setKardexValuateTotal(ReportExport kardexValuateTotal) {
+        this.kardexValuateTotal = kardexValuateTotal;
+    }
+
+    /**
+     * @return the kardexPhysicalTotal
+     */
+    public ReportExport getKardexPhysicalTotal() {
+        return kardexPhysicalTotal;
+    }
+
+    /**
+     * @param kardexPhysicalTotal the kardexPhysicalTotal to set
+     */
+    public void setKardexPhysicalTotal(ReportExport kardexPhysicalTotal) {
+        this.kardexPhysicalTotal = kardexPhysicalTotal;
+    }
+
+    /**
+     * @return the kardexValuate
+     */
+    public ReportExport getKardexValuate() {
+        return kardexValuate;
+    }
+
+    /**
+     * @param kardexValuate the kardexValuate to set
+     */
+    public void setKardexValuate(ReportExport kardexValuate) {
+        this.kardexValuate = kardexValuate;
+    }
+
+    /**
+     * @return the kardexPhysical
+     */
+    public ReportExport getKardexPhysical() {
+        return kardexPhysical;
+    }
+
+    /**
+     * @param kardexPhysical the kardexPhysical to set
+     */
+    public void setKardexPhysical(ReportExport kardexPhysical) {
+        this.kardexPhysical = kardexPhysical;
+    }
+
+    /**
      * @return the productSearcher
      */
     public ProductSearcher getProductSearcher() {
@@ -393,4 +421,5 @@ public class ReportStockBean implements java.io.Serializable {
     public void setProductSearcher(ProductSearcher productSearcher) {
         this.productSearcher = productSearcher;
     }
+
 }

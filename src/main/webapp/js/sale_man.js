@@ -131,8 +131,11 @@ var SaleM = function () {
                         $("#formc\\:detail\\:" + index + "\\:display_total").html(total_price.toFixed(2));
                         $("#formc\\:detail\\:" + index + "\\:subtotal").val(total_price.toFixed(2));
                         $("#formc\\:detail\\:" + index + "\\:subtotal").trigger("change");
+						
+						
                         $("#formc\\:detail\\:" + index + "\\:points").val(partial_price.toFixed(2));
                         $("#formc\\:detail\\:" + index + "\\:points").trigger("change");
+						
 
                     }).pressEnter(function () {
 						$("#formc\\:terms-product").focus()
@@ -144,7 +147,7 @@ var SaleM = function () {
 						//		$("#formc\\:discount-points").focus();
 						//	}
 						//}
-            });
+            }).trigger("input");
             $("#formc\\:detail-wrapper .td-other input").on("change", function () {
                 SaleM.update_points();
             });
@@ -179,6 +182,15 @@ var SaleM = function () {
             $("#formc\\:detail-wrapper .td-other input").each(function () {
                 points += parseFloat(this.value);
             });
+			var sub_points = 0.0;
+			if($("#formc\\:discount-points").length){					
+				var totalUnpointable = parseFloat($("#formc\\:subtotal").val())+parseFloat($("#formc\\:igv").val()) - points;
+				var discount = parseFloat($("#formc\\:discount").val());
+				if(totalUnpointable - discount < 0){
+					sub_points =  (totalUnpointable - discount);
+				}
+			}			
+			points +=sub_points;
             $("#formc\\:points").val(parseInt(points));
             $("#formc\\:display_points").html(parseInt(points));
         },

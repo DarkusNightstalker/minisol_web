@@ -94,7 +94,7 @@
                                             <div class="form-group form-group-sm fs11">
                                                 <label class="control-label col-md-4 text-left" style="">Nombre</label>
                                                 <div class="col-md-6">
-                                                    <p class="form-control-static input-sm text-muted pbn">#{managedSaleBean.customerSearcher.actor.name}</p>
+                                                    <p class="form-control-static input-sm text-muted pbn">#{managedSaleBean.customerSearcher.actor.other eq null ? managedSaleBean.customerSearcher.actor.name : managedSaleBean.customerSearcher.actor.other }</p>
                                                 </div>
                                             </div>
                                             <div class="form-group form-group-sm fs11">
@@ -337,6 +337,7 @@
                                                             var discount = parseInt(v / 100);
                                                             if (discount > subtotal) {
                                                                 v = parseInt(subtotal) * 100;
+                                                                this.value = "" +v;
                                                                 discount = parseInt(subtotal);
                                                             }
                                                             if (v > #{managedSaleBean.customerSearcher.actor.points}) {
@@ -344,9 +345,9 @@
                                                                 v = #{managedSaleBean.customerSearcher.actor.points};
                                                                 discount = parseInt(v / 100);
                                                             }
-
                                                             $("#formc\\:discount_display").html(discount.toFixed(2));
                                                             $("#formc\\:discount").val(discount.toFixed(2));
+                                                            SaleM.update_points();
                                                             $("#formc\\:discount").trigger("change");
                                                         }).numeric({scale: 0, negative: false}).val("0").defaultSelect();
                                                     });

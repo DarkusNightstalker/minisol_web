@@ -88,20 +88,25 @@ public class VerifySaleBean implements java.io.Serializable {
 
     public void delete() {
         Long id = Long.parseLong(BeanUtil.getParameter("id"));
-        Sale sale = saleService.getById( id);
-        if (sale.getCustomer() != null) {
-            Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
-            if (currentPoints > 0) {
-                actorService.subtractPoints(sale.getCustomer().getId(), sale.getPoints(),sessionBean.getCurrentUser());
+        if (saleService.isActive(id)) {
+            Sale sale = saleService.getById(id);
+            if (sale.getCustomer() != null) {
+                Long currentPoints = sale.getPoints() - new Double(sale.getSubtotalDiscount().doubleValue() * 100).longValue();
+                if (currentPoints > 0) {
+                    actorService.subtractPoints(sale.getCustomer().getId(), sale.getPoints(), sessionBean.getCurrentUser());
+                }
             }
-        }
-        saleDetailService.getProductDataBySale(sale).forEach(item -> {
-            stockService.addQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
-        });
+            saleDetailService.getProductDataBySale(sale).forEach(item -> {
+                stockService.addQuantity((BigDecimal) item[1], new Product((Long) item[0]), sale.getCompany(), sessionBean.getCurrentUser());
+            });
 
-        Auditory.make(sale, sessionBean.getCurrentUser());
-        sale.setSent(false);
-        saleService.delete(sale);
+            Auditory.make(sale, sessionBean.getCurrentUser());
+            sale.setSent(false);
+            saleService.delete(sale);
+            PNotifyMessage.infoMessage("Se ha anulado una venta!!");
+        } else {
+            PNotifyMessage.errorMessage("Esta venta ya fue anulada!!");
+        }
         BeanUtil.exceuteJS("SaleVerification.after_delete(" + id + ");");
     }
 
@@ -192,33 +197,45 @@ public class VerifySaleBean implements java.io.Serializable {
         protected boolean vouchers;
 
         public Info() {
-            vourcherCodes = Arrays.asList(null,null,null);
-         
+            vourcherCodes = Arrays.asList(null, null, null);
+
         }
 
-        
-        
         public void load(boolean contado, boolean visa, boolean vouchers) {
-            this.contado = contado;
-            this.visa = visa;
-            this.vouchers = vouchers;
-
-            vourcherCodes.set(0, null);
-            vourcherCodes.set(1, null);
-            vourcherCodes.set(2, null);
             Long id = Long.parseLong(BeanUtil.getParameter("id"));
-            data = (Object[]) saleService.getByHQL("SELECT "
-                    + "s.id,"
-                    + "s.paymentProof.abbr||' '||s.fullDocument,"
-                    + "s.dateIssue,"
-                    + "s.customerName,"
-                    + "s.subtotal,"
-                    + "s.igv,"
-                    + "s.subtotalDiscount,"
-                    + "s.points FROM Sale s WHERE s.id = ?", id);
-            detail = saleDetailService.getBasicDataBySale(new Sale(id));
-            vouchersVerified = false;
-            vouchersTotal = 0;
+            if (saleService.isActive(id)) {
+                this.contado = contado;
+                this.visa = visa;
+                this.vouchers = vouchers;
+
+                vourcherCodes.set(0, null);
+                vourcherCodes.set(1, null);
+                vourcherCodes.set(2, null);
+                data = (Object[]) saleService.getByHQL("SELECT "
+                        + "s.id,"
+                        + "s.paymentProof.abbr||' '||s.fullDocument,"
+                        + "s.dateIssue,"
+                        + "s.customerName,"
+                        + "s.subtotal,"
+                        + "s.igv,"
+                        + "s.subtotalDiscount,"
+                        + "s.points,"
+                        + "s.verified FROM Sale s WHERE s.id = ?", id);
+                if ((Boolean) data[8]) {
+                    PNotifyMessage.errorMessage("Esta venta ya fue verificada!!");
+                    BeanUtil.exceuteJS("SaleVerification.after_delete(" + id + ");");
+                } else {
+                    detail = saleDetailService.getBasicDataBySale(new Sale(id));
+                    vouchersVerified = false;
+                    vouchersTotal = 0;
+                    BeanUtil.exceuteJS("open_verify_info();");
+                }
+
+            } else {
+                PNotifyMessage.errorMessage("Esta venta fue anulada!!");
+                BeanUtil.exceuteJS("SaleVerification.after_delete(" + id + ");");
+            }
+
         }
 
         public void verifyVouchers() {
@@ -239,7 +256,7 @@ public class VerifySaleBean implements java.io.Serializable {
                 }
                 vouchersTotal += paymentVoucherService.getValueByCode(code);
             }
-            if(vouchersTotal == 0){
+            if (vouchersTotal == 0) {
                 vouchersVerified = false;
                 PNotifyMessage.errorMessage("No se ha ingresado ningun vale de consumo");
                 return;
