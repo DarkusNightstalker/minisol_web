@@ -148,13 +148,10 @@
                                                         <ui:fragment rendered="#{not item[10]}">
                                                             <span class="label label-danger fs8" title="Esta venta fue anulada">Anulado</span>
                                                         </ui:fragment>
-                                                        <ui:fragment rendered="#{item[11]}">
-                                                            <span class="label label-info fs8" title="Esta venta fue anulada">VISA</span>
-                                                        </ui:fragment>
-                                                        <ui:fragment rendered="#{not item[11] and item[12] and (item[5]+item[6]-item[7]) eq item[13]}">
+                                                        <ui:fragment rendered="#{item[11] and not item[12]}">
                                                             <span class="label label-info fs8" title="Esta venta fue anulada">CONTADO</span>
                                                         </ui:fragment>
-                                                        <ui:fragment rendered="#{not item[11] and item[12] and (item[5]+item[6]-item[7]) ne item[13]}">
+                                                        <ui:fragment rendered="#{item[11] and item[12]}">
                                                             <span class="label label-info fs8" title="Esta venta fue anulada">CREDITO</span>
                                                         </ui:fragment>
                                                     </td>

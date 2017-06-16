@@ -22,6 +22,7 @@ import gkfire.auditory.Auditory;
 import gkfire.web.bean.AManagedBean;
 import gkfire.web.bean.ILoadable;
 import gkfire.web.util.BeanUtil;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
     protected BigDecimal initialCash;
     protected BigDecimal expectedCash;
     protected BigDecimal realCash;
+    protected BigDecimal outs;
     protected BigDecimal credit;
     protected BigDecimal visa;
 
@@ -86,6 +88,14 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
         }
         workShiftSearcher.update();
     }
+
+    @Override
+    public void delete(Serializable id) {
+        CashRegister cr = mainService.getById((Long)id);
+        cashRegisterDetailService.deleteBy(cr);
+        mainService.delete(cr);
+    }
+    
 
     @Override
     public boolean save() {
@@ -140,6 +150,7 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
         if (dateArcing == null) {
             dateArcing = new Date();
         }
+        outs = selected.getOuts();
         visa = selected.getVisa();
         initialCash = selected.getInitialCash();
         expectedCash = selected.getExpectedCash();
@@ -166,15 +177,15 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
         if (selected.getId() == null) {
             Date dateResult = mainService.getLastDate(sessionBean.getCurrentCompany());
 
-            BigDecimal ins = salePaymentService.getSumAfterByCompany(dateResult, sessionBean.getCurrentCompany());
-            BigDecimal outs = purchasePaymentService.getSumAfterByCompany(dateResult, sessionBean.getCurrentCompany());
-            paymentVoucherTotal = paymentVoucherService.getTotalSumAfterByCompany(dateResult, sessionBean.getCurrentCompany());
-            expectedCash = ins.subtract(outs);
-
+            BigDecimal ins = salePaymentService.getCashAfterByCompany(dateResult, sessionBean.getCurrentCompany());
             credit = salePaymentService.getCreditAfterByCompany(dateResult, sessionBean.getCurrentCompany());
-            visa = saleService.getVisaAfterByCompany(dateResult, sessionBean.getCurrentCompany());
+            outs = purchasePaymentService.getSumAfterByCompany(dateResult, sessionBean.getCurrentCompany());
+            paymentVoucherTotal = paymentVoucherService.getTotalSumAfterByCompany(dateResult, sessionBean.getCurrentCompany());
+            expectedCash = ins.add(credit);
+            realCash = realCash.add(visa).add(new BigDecimal(paymentVoucherTotal));
         }
         selected.setVisa(visa);
+        selected.setOuts(outs);
         selected.setExpectedCash(expectedCash);
         selected.setCredit(credit);
         selected.setPaymentVoucherTotal(paymentVoucherTotal);
@@ -448,7 +459,7 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
         private List<Object[]> data;
 
         public void update() {
-            data = workShiftService.getFreeBasicDataByCompany(new Date(),sessionBean.getCurrentCompany());
+            data = workShiftService.getFreeBasicDataByCompany(new Date(), sessionBean.getCurrentCompany());
         }
 
         public List<Object[]> getData() {
@@ -473,7 +484,7 @@ public class ManagedCashRegisterBean extends AManagedBean<CashRegister, ICashReg
 
         public void update() {
             types = CashType.values();
-            data = cashRegisterDetailService.getQuantitiesAsMap(selected.getId());
+            data = (Map<CashType, Integer>) cashRegisterDetailService.getQuantitiesAsMap(selected.getId())[0];
         }
 
         /**

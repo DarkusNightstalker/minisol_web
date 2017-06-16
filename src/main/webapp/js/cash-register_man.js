@@ -39,10 +39,6 @@ var CashRegisterManaged = function () {
                     $(this).find(".voucher-total").text(subbtotal.toFixed(2))
                     total += subbtotal
                 });
-                var visa = parseFloat($("#form-manage\\:visa").val());
-                if (isNaN(visa))
-                    visa = 0;
-                total += visa;
                 $("#form-manage\\:real-cash").val(total.toFixed(2));
                 $("#form-manage\\:display-real-cash").text("S/. " + total.toFixed(2));
             };
@@ -88,12 +84,12 @@ var CashRegisterManaged = function () {
                 validClass: "has-success",
                 errorElement: "em",
                 rules: {
-                    "form-manage:initial-cash": {
+                    "form-manage:visa": {
                         required: true
                     }
                 },
                 messages: {
-                    "form-manage:initial-cash": {
+                    "form-manage:visa": {
                         required: true
                     }
                 },

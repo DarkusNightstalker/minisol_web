@@ -5,7 +5,6 @@
  */
 package cs.bms.bean;
 
-import cs.bms.bean.managed.ManagedSaleBean;
 import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.model.Product;
 import cs.bms.model.Sale;
@@ -193,7 +192,6 @@ public class VerifySaleBean implements java.io.Serializable {
         protected boolean vouchersVerified;
         protected List<Object[]> detail;
         protected boolean contado;
-        protected boolean visa;
         protected boolean vouchers;
 
         public Info() {
@@ -201,11 +199,10 @@ public class VerifySaleBean implements java.io.Serializable {
 
         }
 
-        public void load(boolean contado, boolean visa, boolean vouchers) {
+        public void load(boolean contado, boolean vouchers) {
             Long id = Long.parseLong(BeanUtil.getParameter("id"));
             if (saleService.isActive(id)) {
                 this.contado = contado;
-                this.visa = visa;
                 this.vouchers = vouchers;
 
                 vourcherCodes.set(0, null);
@@ -298,7 +295,7 @@ public class VerifySaleBean implements java.io.Serializable {
                 salePaymentService.saveOrUpdate(salePayment);
             }
             try {
-                saleService.verified((Long) data[0], visa);
+                saleService.verified((Long) data[0],!contado);
                 DownloadUtil.downloadJSONSale((Long) data[0], sessionBean);
             } catch (Exception ex) {
                 PNotifyMessage.systemError(ex, sessionBean);
@@ -345,20 +342,6 @@ public class VerifySaleBean implements java.io.Serializable {
          */
         public void setContado(boolean contado) {
             this.contado = contado;
-        }
-
-        /**
-         * @return the visa
-         */
-        public boolean isVisa() {
-            return visa;
-        }
-
-        /**
-         * @param visa the visa to set
-         */
-        public void setVisa(boolean visa) {
-            this.visa = visa;
         }
 
         /**

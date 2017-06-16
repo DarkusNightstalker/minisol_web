@@ -29,7 +29,7 @@
                                             <th class=" col-md-3 text-center">CPE</th>
                                             <th class=" col-md-6 ">CLIENTE</th>
                                             <th class=" col-md-2 ">TOTAL</th>
-                                            <th class="text-center" style="min-width:300px;max-width:300px;width:300px !important"></th>
+                                            <th class="text-center" style="min-width:250px;max-width:250px;width:250px !important"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -77,23 +77,18 @@
                                 process="@this"
                                 oncomplete="open_verify_info()"
                                 name="send_verify_cr" 
-                                action="#{verifySaleBean.info.load(false,false,false)}" />                            
+                                action="#{verifySaleBean.info.load(false,false)}" />                            
                             <p:remoteCommand
                                 update=':verify-info-content'
                                 process="@this"
                                 oncomplete="open_verify_info()"
                                 name="send_verify_ct" 
-                                action="#{verifySaleBean.info.load(true,false,false)}" />
-                            <p:remoteCommand
-                                update=':verify-info-content'
-                                process="@this"
-                                name="send_verify_visa" 
-                                action="#{verifySaleBean.info.load(false,true,false)}" />
+                                action="#{verifySaleBean.info.load(true,false)}" />
                             <p:remoteCommand
                                 update=':verify-info-content'
                                 process="@this"
                                 name="send_consumption_voucher" 
-                                action="#{verifySaleBean.info.load(true,false,true)}" />
+                                action="#{verifySaleBean.info.load(true,true)}" />
                             <p:remoteCommand
                                 process="@this"
                                 name="delete_verify" 

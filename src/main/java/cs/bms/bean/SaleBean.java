@@ -138,9 +138,8 @@ public class SaleBean extends ABasicBean<Long> {
                 .add(Projections.property("electronic")) //8
                 .add(Projections.property("sent")) //9
                 .add(Projections.property("active")) //10
-                .add(Projections.property("visa"))
-                .add(Projections.property("verified"))
-                .add(Projections.sqlProjection("(SELECT SUM(sp.quantity) FROM sale_payment sp WHERE sp.id_sale = {alias}.id) as payment", new String[]{"payment"}, new Type[]{BigDecimalType.INSTANCE}));      //11
+                .add(Projections.property("verified")) //11
+                .add(Projections.property("credit"));      //12
         CriterionList criterionList = new CriterionList();
         AliasList aliasList = new AliasList();
         aliasList.add("customer", "cs", JoinType.LEFT_OUTER_JOIN);

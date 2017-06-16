@@ -54,7 +54,7 @@ public class CashRegisterBean extends ABasicBean<Long> {
     public void init() {
         aditionalData = new HashMap();
         pagination = new Pagination(cashRegisterService);
-        orderFactory = new OrderFactory(new OrderList());
+        orderFactory = new OrderFactory(new OrderList(Order.desc("dateArcing")));
         orderFactory.setDefaultOrder(Order.desc("dateArcing"), Order.asc("ws.timeEntry"));
         types = CashType.values();
    }
@@ -88,9 +88,14 @@ public class CashRegisterBean extends ABasicBean<Long> {
                 .add(Projections.property("id"))
                 .add(Projections.property("ws.name"))
                 .add(Projections.property("dateArcing"))
-                .add(Projections.property("initialCash"))
+                .add(Projections.property("id"))
+                .add(Projections.property("id"))
+                .add(Projections.property("visa"))
+                .add(Projections.property("paymentVoucherTotal"))
                 .add(Projections.property("realCash"))
-                .add(Projections.property("id"));
+                .add(Projections.property("outs"))
+                .add(Projections.property("credit"))
+                .add(Projections.property("expectedCash"));
         AliasList aliasList = new AliasList();
         aliasList.add("workShift", "ws");
         CriterionList criterionList = new CriterionList();
@@ -102,14 +107,17 @@ public class CashRegisterBean extends ABasicBean<Long> {
             criterionList.add(Restrictions.ge("dateArcing", dateInit));
         }
         pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
-        pagination.getData().forEach(item -> {
-            item[5] = cashRegisterDetailService.getQuantitiesAsMap((Long) item[0]);
+        pagination.getData().forEach(item -> {     
+            Object[] detailData = cashRegisterDetailService.getQuantitiesAsMap((Long) item[0]);
+            item[3] = detailData[0];
+            item[4] = detailData[1];
         });
     }
 
     /**
      * @return the sessionBean
      */
+    @Override
     public SessionBean getSessionBean() {
         return sessionBean;
     }

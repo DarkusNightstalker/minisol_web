@@ -53,7 +53,6 @@ var SaleVerification = function () {
                     markup += "<td class='text-center ptn pbn' style=''>";
                     markup += "<div class='btn-group' style=''>";
                     markup += "    <button onclick='SaleVerification.verify_contado(" + data[0] + ")'       type='button' title='AL CONTADO' class='btn btn-info w50 pln prn'><i class='fa fa-2x fa-dollar' /></button>";
-                    markup += "    <button onclick='SaleVerification.verify_visa(" + data[0] + ")'          type='button' title='VISA' class='btn btn-warning  w50 pln prn'><i class='fa fa-2x fa-credit-card' /></button>";
                     markup += "    <button onclick='SaleVerification.consumption_voucher(" + data[0] + ")'  type='button' title='VALES DE COMPRA' class='btn btn-dark  w50 pln prn'><i class='fa fa-2x fa-money'/></button>";
                     markup += "    <button onclick='SaleVerification.verify_credit(" + data[0] + ")'        type='button' title='CREDITO' class='btn btn-system w50 pln prn'><i class='fa fa-2x fa-clock-o'/></button>";
                     markup += "    <button onclick='SaleVerification.delete(" + data[0] + ")'               type='button' title='ANULAR' class='btn btn-danger w50 pln prn' ><i class='fa fa-2x fa-times'/></button>";
@@ -74,9 +73,6 @@ var SaleVerification = function () {
         },
         verify_credit: function (id) {
             send_verify_cr([{name: 'id', value: id}]);
-        },
-        verify_visa: function (id) {
-            send_verify_visa([{name: 'id', value: id}]);
         },
         consumption_voucher: function (id) {
             send_consumption_voucher([{name: 'id', value: id}]);

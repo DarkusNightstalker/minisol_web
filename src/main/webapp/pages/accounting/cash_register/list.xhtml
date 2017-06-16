@@ -29,31 +29,39 @@
     <h:form id="form" style="padding-top: 50px">
         <section id="content" class="table-layout  animated fadeIn">
             <div class="tray tray-center">
-                <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pbn prn pln" style="display: block;">
-                    <div class="topbar-menu row">
-                        <div class="col-xs-4 col-sm-2">
-                            <p:commandLink  action="#{managedCashRegisterBean.create()}" 
-                                            update=":managed-content" 
-                                            process="@this" 
-                                            onstart="begin_load()"
-                                            oncomplete="end_load();open_managed()" styleClass="metro-tile bg-success light">
-                                <span class="icon-cash-register2 text-muted"></span>
-                                <span class="metro-title">Registrar</span>
-                            </p:commandLink>
-                        </div>
-                        <div class="col-xs-4 col-sm-2">
-                            <p:commandLink  action="#{cashRegisterBean.cleanReports()}" 
-                                            oncomplete="end_load();open_report();"
-                                            process="@this" 
-                                            update=":report-content" 
-                                            onstart="begin_load()"
-                                            styleClass="metro-tile bg-dark light">
-                                <span class="glyphicons glyphicons-dashboard text-muted"></span>
-                                <span class="metro-title">Reportes</span>
-                            </p:commandLink>
+
+                <ui:fragment rendered="#{sessionBean.authorize('M_CHR,R_CHR')}">
+                    <div id="topbar-dropmenu" class="alt topbar-menu-open ptn pbn prn pln" style="display: block;">
+                        <div class="topbar-menu row">
+                            <ui:fragment rendered="#{sessionBean.authorize('M_CHR')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  action="#{managedCashRegisterBean.create()}" 
+                                                    update=":managed-content" 
+                                                    process="@this" 
+                                                    onstart="begin_load()"
+                                                    oncomplete="end_load();open_managed()" styleClass="metro-tile bg-success light">
+                                        <span class="icon-cash-register2 text-muted"></span>
+                                        <span class="metro-title">Registrar</span>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('R_CHR')}">
+                                <div class="col-xs-4 col-sm-2">
+                                    <p:commandLink  
+                                        action="#{reportCashRegisterBean.cleanReports()}" 
+                                        oncomplete="end_load();open_report();"
+                                        process="@this" 
+                                        update=":report-content" 
+                                        onstart="begin_load()"
+                                        styleClass="metro-tile bg-dark light">
+                                        <span class="glyphicons glyphicons-dashboard text-muted"></span>
+                                        <span class="metro-title">Reportes</span>
+                                    </p:commandLink>
+                                </div>
+                            </ui:fragment>
                         </div>
                     </div>
-                </div>
+                </ui:fragment>
                 <div class="panel">
                     <div class="panel-body pn">
                         <h:panelGroup id="table-wrapper" layout="block" styleClass="table-responsive">
@@ -71,84 +79,133 @@
                                                 <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
                                                 <ui:param name="label" value="Turno" />
                                                 <ui:param name="field" value="ws.name" />
-                                                <ui:param name="class" value="text-center col-md-3" />
-                                            </ui:include>
-                                            <ui:include src="/layout/datatable/sorter.xhtml">
-                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
-                                                <ui:param name="label" value="Fecha" />
-                                                <ui:param name="field" value="dateArcing" />
-                                                <ui:param name="class" value="text-center col-md-3" />
-                                            </ui:include>                   
-                                            <ui:include src="/layout/datatable/sorter.xhtml">
-                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
-                                                <ui:param name="label" value="Sal. Inicial" />
-                                                <ui:param name="field" value="code" />
-                                                <ui:param name="class" value="text-center col-md-3" />
-                                            </ui:include>                                         
+                                                <ui:param name="class" value="text-center col-md-1 fs9 dark" />
+                                            </ui:include>           
                                             <ui:repeat value="#{cashRegisterBean.types}" var="t">
-                                                <th class="text-center" style="min-width: 70px">#{t.value}</th>                                                
+                                                <th class="text-center fs9 alert" style="min-width: 45px;vertical-align: middle;">#{t.value}</th>                                                
                                             </ui:repeat>
+                                            <th class="text-center col-md-1 fs9 alert" style="vertical-align: middle;">
+                                                Total <br/> Efectivo
+                                            </th>    
                                             <ui:include src="/layout/datatable/sorter.xhtml">
                                                 <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
-                                                <ui:param name="label" value="Total" />
-                                                <ui:param name="field" value="code" />
-                                                <ui:param name="class" value="text-center col-md-3" />
-                                            </ui:include>                                   
-                                            <th class="text-center" style="min-width: 100px"></th>
+                                                <ui:param name="label" value="Ventas &lt;br/&gt; VISA" />
+                                                <ui:param name="field" value="visa" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 warning" />
+                                            </ui:include>     
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
+                                                <ui:param name="label" value="Vales de &lt;br/&gt; Consumo" />
+                                                <ui:param name="field" value="paymentVoucherTotal" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 warning" />
+                                            </ui:include>     
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
+                                                <ui:param name="label" value="Importe &lt;br/&gt; Ingresos" />
+                                                <ui:param name="field" value="realCash" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 warning" />
+                                            </ui:include>    
+
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
+                                                <ui:param name="label" value="Importe &lt;br/&gt; Gastos" />
+                                                <ui:param name="field" value="outs" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 info" />
+                                            </ui:include>    
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
+                                                <ui:param name="label" value="Importe &lt;br/&gt; Credito" />
+                                                <ui:param name="field" value="credit" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 info" />
+                                            </ui:include>            
+                                            <th class="text-center col-md-1 fs9 warning" style="vertical-align: middle;">
+                                                Importe <br/> Final
+                                            </th>           
+                                            <ui:include src="/layout/datatable/sorter.xhtml">
+                                                <ui:param name="order" value="#{cashRegisterBean.orderFactory}" />
+                                                <ui:param name="label" value="Ventas &lt;br/&gt; Efectivo" />
+                                                <ui:param name="field" value="expectedCash" />
+                                                <ui:param name="class" value="text-center col-md-1 fs9 system" />
+                                            </ui:include>     
+                                            <th class="text-center col-md-1 fs9 system" style="vertical-align: middle;">
+                                                Ventas <br/> VISA
+                                            </th>           
+                                            <th class="text-center col-md-1 fs9 system" style="vertical-align: middle;">
+                                                Importe <br/> Total
+                                            </th>           
+                                            <th class="text-center col-md-1 fs9" style="vertical-align: middle;">
+                                                Sobrante y/o <br/> Faltante
+                                            </th>           
+                                            <th class="text-center" style="min-width: 70px"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <ui:repeat value="#{cashRegisterBean.pagination.data}"  var="item">
+                                        <ui:repeat value="#{cashRegisterBean.pagination.data}"  var="item" varStatus="st">
                                             <tr>
-                                                <td class="text-center">#{item[1]}</td>
-                                                <td class="text-center">#{item[2]}</td>
-                                                <td class="text-right">S/. #{item[3]}</td>
+                                                <th class="text-center fs9 dark">#{item[1]}<br/><b><h:outputText value="#{item[2]}"><f:convertDateTime pattern="dd/MM/yyyy" /></h:outputText></b></th>
                                                 <ui:repeat value="#{cashRegisterBean.types}" var="t">
-                                                    <td class="text-right">#{item[5][t]}</td>
+                                                    <td class="text-right fs10 alert">#{item[3][t] eq 0 ? '-' : item[3][t]}</td>
                                                 </ui:repeat>
-                                                <td class="text-right">S/. #{item[4]}</td>
-                                                <td class="text-center">
-                                                    <div class="btn-group">
-                                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" >
-                                                            <i class="fa fa-cog"/>
-                                                            <span class="caret ml5"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-right ptn pbn" role="menu">     
-                                                            <li>
-                                                                <p:commandLink 
-                                                                    process="@this" 
-                                                                    onstart="begin_load()"
-                                                                    action="#{cashRegisterBean.load()}"
-                                                                    oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
-                                                                    styleClass="btn btn-xs btn-gradient btn-info">
-                                                                    Información
-                                                                    <f:setPropertyActionListener target="#{cashRegisterBean.id}" value="#{item[0]}"/>
-                                                                </p:commandLink>
-                                                            </li>
-                                                            <li>
-                                                                <p:commandLink 
-                                                                    update=":managed-content" 
-                                                                    process="@this" 
-                                                                    onstart="begin_load()"
-                                                                    oncomplete="end_load();open_managed()" 
-                                                                    styleClass="btn btn-xs btn-gradient btn-system">
-                                                                    Editar
-                                                                    <f:setPropertyActionListener target="#{managedCashRegisterBean.idSelected}" value="#{item[0]}"/>
-                                                                </p:commandLink>
-                                                            </li>
-                                                            <li>
-                                                                <p:commandLink 
-                                                                    update=":delete-content" 
-                                                                    process="@this" 
-                                                                    onstart="begin_load()"
-                                                                    oncomplete="end_load();PaymentProof.delete('#{item[4]}');" 
-                                                                    styleClass="btn btn-xs btn-gradient btn-danger">
-                                                                    Eliminar
-                                                                    <f:setPropertyActionListener target="#{paymentProofBean.id}" value="#{item[0]}"/>
-                                                                </p:commandLink>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                <td class="text-right fs9 alert">S/. #{item[4]}</td>
+                                                <td class="text-right fs9 warning">S/. #{item[5]}</td>
+                                                <td class="text-right fs9 warning">S/.<h:outputText value="#{item[6]}"><f:convertNumber minFractionDigits="2" maxFractionDigits="2"/></h:outputText> </td>
+                                                <td class="text-right fs9 warning">S/. #{item[7]}</td>
+                                                <td class="text-right fs9 info">S/. #{item[8]}</td>
+                                                <td class="text-right fs9 info">S/. #{item[9]}</td>
+                                                <td class="text-right fs9 warning">S/. #{item[7] + item[8] + item[9]}</td>
+                                                <td class="text-right fs9 system">S/. #{item[10] + item[6]}</td>
+                                                <td class="text-right fs9 system">S/. 0.00</td>
+                                                <td class="text-right fs9 system">S/. #{item[10] + item[6]}</td>
+                                                <td class="text-right fs9 #{(item[7] + item[8] + item[9] - item[10] - item[6]) lt 0 ? 'danger' : 'success'}">S/.#{item[7] + item[8] + item[9] - item[10] - item[6]}</td>
+                                                <td class="text-center fs9 ">
+                                                    <ui:fragment rendered="#{sessionBean.authorize('R_CHR') and not sessionBean.authorize('R_CHR,A_CHR')}">
+                                                        <p:commandLink 
+                                                            process="@this" 
+                                                            onstart="begin_load()"
+                                                            action="#{cashRegisterBean.load()}"
+                                                            oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                            styleClass="btn btn-xs btn-gradient btn-info">
+                                                            <i class="fa fa-info-circle"/>
+                                                            <f:setPropertyActionListener target="#{cashRegisterBean.id}" value="#{item[0]}"/>
+                                                        </p:commandLink>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{sessionBean.authorize('R_CHR,A_CHR')}">
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" >
+                                                                <i class="fa fa-cog"/>
+                                                                <span class="caret ml5"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right ptn pbn" role="menu">     
+                                                                <ui:fragment rendered="#{sessionBean.authorize('R_CHR')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            action="#{cashRegisterBean.load()}"
+                                                                            oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-info">
+                                                                            Información
+                                                                            <f:setPropertyActionListener target="#{cashRegisterBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{st.index+1 eq cashRegisterBean.pagination.data.size() and  sessionBean.authorize('A_CHR')}">
+                                                                    <li>
+                                                                        <p:commandLink 
+                                                                            update=":delete-content" 
+                                                                            process="@this" 
+                                                                            onstart="begin_load()"
+                                                                            oncomplete="end_load();CashRegisterView.delete('#{item[1]}','#{item[2]}');" 
+                                                                            styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                            Eliminar
+                                                                            <f:setPropertyActionListener target="#{cashRegisterBean.id}" value="#{item[0]}"/>
+                                                                        </p:commandLink>
+                                                                    </li>
+                                                                </ui:fragment>
+
+                                                            </ul>
+                                                        </div>
+                                                    </ui:fragment>
                                                 </td>
                                             </tr>
                                         </ui:repeat>
@@ -156,7 +213,7 @@
                                     <ui:fragment rendered="#{empty cashRegisterBean.pagination.data}">
                                         <tfoot>
                                             <tr>
-                                                <td colspan="#{5+cashRegisterBean.types.stream().toList().size()}}">
+                                                <td colspan="#{13+cashRegisterBean.types.stream().toList().size()}">
                                                     <h4 class="text-muted text-center">No se ha encontrado ningun arqueo registrado</h4>
                                                 </td>
                                             </tr>
@@ -177,14 +234,22 @@
 
             <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{cashRegisterBean.search()}" process="@form" update="form:table-wrapper" />
             <p:remoteCommand name="refresh" onstart="begin_load();clean();" oncomplete="end_load()" action="#{cashRegisterBean.refresh()}" process="@form" update="form:table-wrapper" />
-            <p:remoteCommand name="del" action="#{managedCashRegisterBean.delete(cashRegisterBean.id)}" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" update="form:table-wrapper" />
+            <p:remoteCommand name="del" action="#{managedCashRegisterBean.delete(cashRegisterBean.id)}" onstart="begin_load()" oncomplete="end_load();search();" update="form:table-wrapper" />
             <p:remoteCommand name="recovery" action="#{managedCashRegisterBean.recovery(cashRegisterBean.id)}"  oncomplete="search()" update="form:table-wrapper" />
 
         </section>
     </h:form>
+    <script src="#{request.contextPath}/js/cash-register_view.js"/>
+    <ui:include rendered="#{sessionBean.authorize('A_CHR')}" src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="delete"/>
+        <ui:param name="modal_title" value="ANULAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
     <ui:include src="managed.xhtml"/> 
     <ui:include src="report.xhtml"/> 
-    <ui:include src="/layout/delete.xhtml"/> 
 </ui:composition>
 
 

@@ -421,7 +421,7 @@ public class SessionBean extends AbstractSessionBean<User> {
 
         public void update() {
             if (getCurrentUser().getSuperUser()) {
-                data = companyService.getDataByList(Collections.EMPTY_LIST);
+                data = companyService.getBasicData();
             } else {
                 List list = specialPermissionService.listHQL("SELECT sp.identifier FROM SpecialPermission sp join sp.users u WHERE u.id = ? AND sp.entityName LIKE ?", getCurrentUser().getId(), Company.class.getSimpleName());
                 data = companyService.getDataByList(list);
