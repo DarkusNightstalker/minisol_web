@@ -179,7 +179,7 @@ http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
         <property name="driverClassName" value="org.postgresql.Driver"/> 
         <property name="username" value="postgres"/>
         <property name="password" value="admin1986"/>
-<!--                <property name="url" value="jdbc:postgresql://localhost:5432/bms_test" /> 
+<!--        <property name="url" value="jdbc:postgresql://localhost:5432/bms_test" /> 
         <property name="driverClassName" value="org.postgresql.Driver"/> 
         <property name="username" value="postgres"/>
         <property name="password" value="admin"/>-->
