@@ -74,9 +74,9 @@ public class IsmPrintBean implements java.io.Serializable {
             JRTextExporter exporter = new JRTextExporter();
             exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
             exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, BeanUtil.getResponse().getOutputStream());
-            exporter.setParameter(JRTextExporterParameter.CHARACTER_WIDTH, new Integer(10));
+            exporter.setParameter(JRTextExporterParameter.CHARACTER_WIDTH, 10);
 
-            exporter.setParameter(JRTextExporterParameter.CHARACTER_HEIGHT, new Integer(10));
+            exporter.setParameter(JRTextExporterParameter.CHARACTER_HEIGHT, 10);
 
             exporter.setParameter(JRTextExporterParameter.BETWEEN_PAGES_TEXT, "");
             exporter.setParameter(JRPdfExporterParameter.PDF_JAVASCRIPT, "this.print();");

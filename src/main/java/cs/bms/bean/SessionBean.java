@@ -16,6 +16,8 @@ import cs.bms.service.interfac.IUserService;
 import gkfire.web.bean.AbstractSessionBean;
 import gkfire.web.util.AbstractImport;
 import gkfire.web.util.BeanUtil;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -36,23 +38,25 @@ import javax.servlet.http.HttpSession;
 public class SessionBean extends AbstractSessionBean<User> {
 
     @ManagedProperty(value = "#{userService}")
-    protected IUserService userService;
+    private IUserService userService;
     @ManagedProperty(value = "#{permissionService}")
-    protected IPermissionService permissionService;
+    private IPermissionService permissionService;
     @ManagedProperty(value = "#{companyService}")
-    protected ICompanyService companyService;
+    private ICompanyService companyService;
     @ManagedProperty(value = "#{documentNumberingService}")
-    protected IDocumentNumberingService documentNumberingService;
+    private IDocumentNumberingService documentNumberingService;
     @ManagedProperty(value = "#{specialPermissionService}")
-    protected ISpecialPermissionService specialPermissionService;
-    protected Authentication authentication;
-    protected AbstractImport import_;
-    protected String topLeftName;
-    protected String avatarURL;
-    protected boolean superAdmin;
-    protected Company currentCompany;
-    protected CompanySearcher companySearcher;
-    protected List<Object[]> documentNumberings;
+    private ISpecialPermissionService specialPermissionService;
+    @ManagedProperty(value = "#{appBean}")
+    private AppBean appBean;
+    private Authentication authentication;
+    private AbstractImport import_;
+    private String topLeftName;
+    private String avatarURL;
+    private boolean superAdmin;
+    private Company currentCompany;
+    private CompanySearcher companySearcher;
+    private List<Object[]> documentNumberings;
 
     @Override
     public void onLoad() {
@@ -64,7 +68,7 @@ public class SessionBean extends AbstractSessionBean<User> {
             return;
         }
         loadPermissions();
-        companySearcher.update();
+        getCompanySearcher().update();
     }
 
     @Override
@@ -78,19 +82,34 @@ public class SessionBean extends AbstractSessionBean<User> {
 
     @PostConstruct
     public void init() {
-        companySearcher = new CompanySearcher();
-        superAdmin = false;
+        setCompanySearcher(new CompanySearcher());
+        setSuperAdmin(false);
         setAuthentication(new Authentication());
+    }
+    
+    @Override
+    public void printErrors(PrintWriter writer) {
+        appBean.printErrors(writer);
+    }
+
+    @Override
+    public String addError(Throwable e) {
+        return appBean.addError(e,currentUser);
+    }
+
+    @Override
+    public String printErrorStack() {
+        return appBean.printErrorStack();
     }
 
     public void setCurrentCompanyById(Integer id) {
-        currentCompany = companyService.getById(id);
-        documentNumberings = documentNumberingService.getDataByUser(currentUser, currentCompany.getRuc());
+        setCurrentCompany(getCompanyService().getById(id));
+        setDocumentNumberings(getDocumentNumberingService().getDataByUser(currentUser, getCurrentCompany().getRuc()));
     }
 
     @Override
     protected void loadPermissions() {
-        permissions = permissionService.getPermissionCodeFromUser(currentUser);
+        permissions = getPermissionService().getPermissionCodeFromUser(currentUser);
     }
 
     public Authentication getAuthentication() {
@@ -239,6 +258,20 @@ public class SessionBean extends AbstractSessionBean<User> {
      */
     public void setImport_(AbstractImport import_) {
         this.import_ = import_;
+    }
+
+    /**
+     * @return the appBean
+     */
+    public AppBean getAppBean() {
+        return appBean;
+    }
+
+    /**
+     * @param appBean the appBean to set
+     */
+    public void setAppBean(AppBean appBean) {
+        this.appBean = appBean;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Authentication Class">    
@@ -421,10 +454,10 @@ public class SessionBean extends AbstractSessionBean<User> {
 
         public void update() {
             if (getCurrentUser().getSuperUser()) {
-                data = companyService.getBasicData();
+                data = getCompanyService().getBasicData();
             } else {
-                List list = specialPermissionService.listHQL("SELECT sp.identifier FROM SpecialPermission sp join sp.users u WHERE u.id = ? AND sp.entityName LIKE ?", getCurrentUser().getId(), Company.class.getSimpleName());
-                data = companyService.getDataByList(list);
+                List list = getSpecialPermissionService().listHQL("SELECT sp.identifier FROM SpecialPermission sp join sp.users u WHERE u.id = ? AND sp.entityName LIKE ?", getCurrentUser().getId(), Company.class.getSimpleName());
+                data = getCompanyService().getDataByList(list);
             }
             if (data.size() == 1) {
                 setCurrentCompanyById((Integer) data.get(0)[0]);

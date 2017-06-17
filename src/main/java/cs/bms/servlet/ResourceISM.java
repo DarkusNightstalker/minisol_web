@@ -11,6 +11,7 @@ import cs.bms.model.InternalStockMovement;
 import cs.bms.model.User;
 import cs.bms.service.interfac.IInternalStockMovementService;
 import cs.bms.service.interfac.IUserService;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -83,18 +84,14 @@ public class ResourceISM {
             parameters.put("id_ism", ism.getId());
             JasperPrint jasperPrint = JasperFillManager.fillReport(is, parameters, new JDBCPostGresSQL().getConnection());
             JRPdfExporter exporter = new JRPdfExporter();
-            File tempFile = File.createTempFile("darkus", null);
-            FileOutputStream output = new FileOutputStream(tempFile);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
             exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
             exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, output);
 
             exporter.exportReport();
-            Response.ResponseBuilder response = Response.ok(FileUtils.readFileToByteArray(tempFile));
-            tempFile.delete();
+            Response.ResponseBuilder response = Response.ok(output.toByteArray());
             return response.header("Content-Disposition", "attachment; filename=\"Guia de Remisión Remitente "+ism.getSerie() + "-" + ism.getDocumentNumber()+".pdf\"").build();
         
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (JRException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {

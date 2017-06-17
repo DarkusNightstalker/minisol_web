@@ -58,6 +58,7 @@ var SaleM = function () {
             }
         },
         configure_detail: function () {
+            App.scrollBot($('#formc\\:detail-wrapper > table tbody')[0]);
             $("#formc\\:detail-wrapper .detail-quantity")
                     .numeric({scale: 2})
                     .on("input", function () {

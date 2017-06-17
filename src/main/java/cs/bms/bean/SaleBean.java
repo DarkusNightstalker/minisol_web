@@ -9,7 +9,7 @@ import cs.bms.model.Sale;
 import cs.bms.service.interfac.ICompanyService;
 import cs.bms.service.interfac.ISaleDetailService;
 import cs.bms.service.interfac.ISaleService;
-import cs.bms.util.DownloadUtil;
+import cs.bms.servlet.util.DownloadUtil;
 import gkfire.hibernate.AliasList;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;

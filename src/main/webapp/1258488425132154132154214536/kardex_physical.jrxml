@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex_report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f4ff809e-964b-4faa-a1e6-fd0a25dcc29f">
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
-	<property name="ireport.zoom" value="1.1000000000000048"/>
-	<property name="ireport.x" value="110"/>
+	<property name="ireport.zoom" value="0.9090909090909126"/>
+	<property name="ireport.x" value="111"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
@@ -45,10 +45,10 @@
 		<parameter name="date_end" class="java.util.Date">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
-		<parameter name="id_companies" class="java.util.List" nestedType="java.lang.Integer">
+		<parameter name="id_companies" class="java.util.List" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
-		<parameter name="barcode_product" class="java.lang.String">
+		<parameter name="barcode_product" class="java.lang.String" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
 		<queryString>
@@ -92,8 +92,7 @@ order by k.date,k.priority]]>
 			<variableExpression><![CDATA[$F{quantity_in} == null ? ($F{quantity_out}.multiply($F{cost_out}).multiply(new java.math.BigDecimal(-1))) : ($F{quantity_in}.multiply($F{cost_in}))]]></variableExpression>
 		</variable>
 	</subDataset>
-	<subDataset name="Table Dataset 1" uuid="e16b9055-6ec9-4674-9764-5b257918aafd"/>
-	<parameter name="logo" class="java.lang.String">
+	<parameter name="logo" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["logo.png"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="id_companies" class="java.util.List"/>
@@ -125,177 +124,177 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="161" splitType="Stretch">
+		<band height="144" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="84161c6e-6095-43bb-8655-9365d03f53c0" style="Column header" x="1" y="0" width="803" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[FORMATO 13.1 REGISTRO DEL INVENTARIO PERMANENTE EN UNIDADES FISICAS]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f3682339-1a9a-4b40-9abd-72f846dd243b" style="Column header" x="538" y="81" width="12" height="20" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="33473fa9-6c8d-429a-8fc3-e812c1b6a3f7" style="Column header" x="115" y="41" width="12" height="20" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[:]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="bb502278-8c20-447b-b43e-02546d4a8453" style="Column header" x="550" y="101" width="261" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{uom_code}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="147867e8-ee01-4e84-845e-8b3f5fad6c74" style="Column header" x="342" y="61" width="196" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[TIPO ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="1eff749e-3ce2-41e6-b339-6bd6b8bbf0d5" style="Column header" x="342" y="121" width="196" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[METODO DE VALUACIÓN]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="7d0d2847-b368-4f43-8259-edfc6cbeee49" style="Column header" x="127" y="41" width="177" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{date_init})+" - "+new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{date_end})]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="008b0725-1981-4997-9e1d-bd5821b4a55a" style="Column header" x="115" y="81" width="12" height="20" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[:]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="aed7e623-203d-4508-9e93-022dee297b5d" style="Column header" x="550" y="81" width="261" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="ebd08ff6-b9f4-40e6-a5fc-2ceb77bb1d1f" style="Column header" x="11" y="41" width="104" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[PERIODO]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="83f25511-a8e9-4d24-8c33-529a5f9afd0e" style="Column header" x="538" y="61" width="12" height="20" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f31c077a-2944-4247-a505-1acfe315bc57" style="Column header" x="538" y="121" width="12" height="20" forecolor="#000000"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="dd1e99e8-c7be-4582-8565-b7858c327572" style="Column header" x="342" y="101" width="196" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[U.MEDIDA]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="65b344b1-8e8f-4595-9fcf-49973020eae7" style="Column header" x="550" y="41" width="261" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{barcode}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="0d20a6d0-6d86-4b63-81a4-626ca5bb16a9" style="Column header" x="551" y="121" width="261" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Promedio]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="a871df81-79c1-4d7c-8800-6765a1fefc76" style="Column header" x="550" y="61" width="261" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{st_code}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="22d1e8c3-a28c-47f1-bfbc-4c73ff7d7af7" style="Column header" x="11" y="81" width="104" height="20" forecolor="#000000"/>
-				<textElement verticalAlignment="Middle" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[RAZON SOCIAL]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="44735feb-8700-4a01-bf06-66ce98b2467a" style="Column header" x="342" y="41" width="196" height="20" forecolor="#000000"/>
+				<reportElement uuid="bea7d0b2-5229-4165-9d3f-8f11fe29ec31" style="Column header" x="332" y="31" width="196" height="20" forecolor="#000000"/>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[CODIGO EXISTENCIA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c69f79b8-067c-4064-a2b3-432c61cfbf0e" style="Column header" x="538" y="101" width="12" height="20" forecolor="#000000"/>
+				<reportElement uuid="3d87236d-ddbc-4359-8303-e6eb5da1e638" style="Column header" x="332" y="51" width="196" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TIPO ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1eaf1227-4e2f-4d73-80ec-e6baa6aaa0fa" style="Column header" x="332" y="71" width="196" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESCRIPCION ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="538e5442-20af-44fb-a1c1-570d7225996c" style="Column header" x="332" y="91" width="196" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[U.MEDIDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="53b9d7ac-9a9e-4cc4-a29e-9b7434a3324f" style="Column header" x="528" y="91" width="12" height="20" forecolor="#000000"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="89e30763-e54a-45aa-a766-324e93119ad7" style="Column header" x="539" y="41" width="12" height="20" forecolor="#000000"/>
+				<reportElement uuid="b64dad6e-450f-4ec4-a487-8dae7d4cd229" style="Column header" x="528" y="51" width="12" height="20" forecolor="#000000"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d48ec0cf-8256-4a85-9e60-ea10fa6e6e96" style="Column header" x="11" y="61" width="104" height="20" forecolor="#000000"/>
+				<reportElement uuid="42469fb1-f36b-429a-aff1-e2c95facfd47" style="Column header" x="528" y="31" width="12" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e5c5d95d-2488-4ebc-8b4e-d048a169b0cf" style="Column header" x="528" y="71" width="12" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="5168d596-3682-4ebd-b3e4-c5eb8ad2396b" style="Column header" x="540" y="31" width="261" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{barcode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f2287fb1-b1a7-4022-961b-c5d6bd09c1ee" style="Column header" x="540" y="51" width="261" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{st_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="321d6ebe-2f0a-454d-89f3-b4eedfa8880a" style="Column header" x="540" y="71" width="261" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8e6e81d2-ddfd-470b-93d5-7f67dc2c5683" style="Column header" x="540" y="91" width="261" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{uom_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="71e22c3b-a5f9-46f8-bd4d-d1c61e74185e" style="Column header" x="-1" y="0" width="803" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FORMATO 12.1 REGISTRO DEL INVENTARIO PERMANENTE EN UNIDADES FISICAS prueba]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bf603192-b623-4f11-96ec-c0ba5b90e45b" style="Column header" x="1" y="31" width="104" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERIODO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dd367096-0db0-4c65-885d-72f416b32328" style="Column header" x="105" y="31" width="12" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="aa65428b-d986-4a07-afed-ab0ceb0d6073" style="Column header" x="117" y="31" width="177" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{date_init})+" - "+new java.text.SimpleDateFormat("dd/MM/yyyy").format($P{date_end})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="11a313d9-633e-4a2c-a5ed-c514b78f3e29" style="Column header" x="1" y="51" width="104" height="20" forecolor="#000000"/>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[RUC]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0d384ae3-25ad-42c2-91ab-bb8e40ce2c1c" style="Column header" x="115" y="61" width="12" height="20" forecolor="#000000"/>
+				<reportElement uuid="c88c1fa4-4be4-4467-9e59-e57edf413b1e" style="Column header" x="105" y="51" width="12" height="20" forecolor="#000000"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="75cd3520-a529-4ab7-937b-231957e59c35" style="Column header" x="341" y="81" width="196" height="20" forecolor="#000000"/>
+				<reportElement uuid="7a3e865a-b5c8-4db5-9ea0-7070f5078a6d" style="Column header" x="1" y="71" width="104" height="20" forecolor="#000000"/>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[DESCRIPCION ]]></text>
+				<text><![CDATA[RAZON SOCIAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d66a52e6-5a74-433d-bee2-9cd3202062b4" style="Column header" x="105" y="71" width="12" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9f0ba603-8603-42ce-8b3c-98c4d4ee9505" style="Column header" x="332" y="111" width="196" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[METODO DE VALUACIÓN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f2270b77-9b2f-475b-a122-80c532e4ce78" style="Column header" x="528" y="111" width="12" height="20" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f195a4a2-a0db-4649-a572-7b8ebcd64b78" style="Column header" x="541" y="111" width="261" height="20" forecolor="#000000"/>
+				<textElement verticalAlignment="Middle" markup="none">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Promedio]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="d011557f-f260-4be4-82a7-d979d6c18c73" style="Column header" x="127" y="61" width="177" height="20" forecolor="#000000"/>
+				<reportElement uuid="98d9f9f2-140c-4dd7-9890-1478e2ee03fa" style="Column header" x="117" y="51" width="177" height="20" forecolor="#000000"/>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{ruc}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="8329caf9-cbd6-42ce-a0dc-f71c0072bb17" style="Column header" x="127" y="81" width="177" height="20" forecolor="#000000"/>
+				<reportElement uuid="0f2362b3-4f6d-4774-b1a1-b5e799989b23" style="Column header" x="117" y="71" width="177" height="20" forecolor="#000000"/>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="false"/>
 				</textElement>
@@ -309,21 +308,21 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 	<pageFooter>
 		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement uuid="4956eb88-6b8c-42d5-86e7-e6969f8cb449" x="682" y="0" width="80" height="20"/>
+				<reportElement uuid="4956eb88-6b8c-42d5-86e7-e6969f8cb449" style="Column header" x="682" y="0" width="80" height="20"/>
 				<textElement textAlignment="Right">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Pág. "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement uuid="bd4c562a-fe87-410d-888f-72a901d59a92" x="762" y="0" width="40" height="20"/>
+				<reportElement uuid="bd4c562a-fe87-410d-888f-72a901d59a92" style="Column header" x="762" y="0" width="40" height="20"/>
 				<textElement>
 					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement uuid="540679f1-6928-490c-abe3-c2e5978df068" x="0" y="0" width="197" height="20"/>
+				<reportElement uuid="540679f1-6928-490c-abe3-c2e5978df068" style="Column header" x="0" y="0" width="197" height="20"/>
 				<textElement>
 					<font size="10" isBold="false"/>
 				</textElement>
@@ -334,9 +333,9 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 	<summary>
 		<band height="155" splitType="Stretch">
 			<componentElement>
-				<reportElement uuid="1b66659b-b677-4cd8-a52a-b09d666c4338" key="table 1" x="-1" y="18" width="803" height="50"/>
+				<reportElement uuid="0fb83f96-5d61-4409-8674-9b1496460f2d" key="table 1" x="1" y="15" width="801" height="50"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="kardex" uuid="c49bd651-70d5-467b-b03a-94d9b53fdc01">
+					<datasetRun subDataset="kardex" uuid="5bd992d7-7e8f-4605-9841-e0f5bc857fef">
 						<datasetParameter name="id_companies">
 							<datasetParameterExpression><![CDATA[$P{id_companies}]]></datasetParameterExpression>
 						</datasetParameter>
@@ -351,11 +350,11 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 						</datasetParameter>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
-					<jr:column width="61" uuid="7e292446-dfe2-4da9-800a-c00afa347909">
+					<jr:column width="61" uuid="06e2e45e-38a8-4b4a-92a8-1c9e5c9d41d2">
 						<jr:tableFooter height="0" rowSpan="1"/>
 						<jr:columnHeader height="30" rowSpan="1">
 							<staticText>
-								<reportElement uuid="fb4330bd-2fa2-4ab0-bbe4-06266a1ef018" mode="Opaque" x="0" y="0" width="61" height="30" backcolor="#E6E6E6"/>
+								<reportElement uuid="18dc9505-3b72-418a-aa37-6d1e161567d8" mode="Opaque" x="0" y="0" width="61" height="30" backcolor="#E6E6E6"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -372,7 +371,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 						<jr:columnFooter height="0" rowSpan="1"/>
 						<jr:detailCell height="20" rowSpan="1">
 							<textField pattern="dd/MM/yyyy">
-								<reportElement uuid="d57737a3-082a-4443-818a-601b5204a4ff" x="0" y="0" width="61" height="20"/>
+								<reportElement uuid="73532ac8-df4e-4830-ac8c-72b3d7e4c136" x="0" y="0" width="61" height="20"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -387,10 +386,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:columnGroup width="224" uuid="c01e5244-1fb1-49cf-8fc5-f621ebffc345">
+					<jr:columnGroup width="224" uuid="ccba2b0a-f65f-4bbd-b01a-89ed33a4be29">
 						<jr:tableHeader height="31" rowSpan="1">
 							<staticText>
-								<reportElement uuid="c8b1aaa3-d666-43f8-9b61-1a93bd144b93" mode="Opaque" x="0" y="0" width="218" height="30" backcolor="#E6E6E6"/>
+								<reportElement uuid="43b155df-2064-4dfa-973a-a79f25b148b7" mode="Opaque" x="0" y="0" width="218" height="30" backcolor="#E6E6E6"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -404,10 +403,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								<text><![CDATA[DOCUMENTO DE TRASLADO, COMPROBANTE DE PAGO, DOCUMENTO INTERNO O SIMILAR]]></text>
 							</staticText>
 						</jr:tableHeader>
-						<jr:column width="54" uuid="c55f4ec9-21b8-4025-86a8-3a35d4c7d189">
+						<jr:column width="54" uuid="e8292905-3dd5-463e-b891-39f2a15a2923">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="cab100ef-581f-4bd5-ab6f-7b53fdb44034" mode="Opaque" x="0" y="0" width="54" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="a312cfea-5928-4381-b36d-efcc4afafadd" mode="Opaque" x="0" y="0" width="54" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -423,7 +422,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="dd/MM/yyyy">
-									<reportElement uuid="fda05979-a216-4423-8d8b-ba6f4d2dc547" x="0" y="0" width="54" height="20"/>
+									<reportElement uuid="69ffe4a1-6c7a-4dfd-8e16-8365b9e02948" x="0" y="0" width="54" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -438,10 +437,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								</textField>
 							</jr:detailCell>
 						</jr:column>
-						<jr:column width="60" uuid="62bb841b-8fb4-4142-8ed8-abb49272ad7f">
+						<jr:column width="60" uuid="607d7aff-b6b8-4f3d-85f6-10b18ffe33e7">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="5b511196-ccff-4376-9574-79e579e8c8a2" mode="Opaque" x="0" y="0" width="60" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="e58111ee-152b-4b9f-8b70-f848f54d185c" mode="Opaque" x="0" y="0" width="60" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -457,7 +456,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField isBlankWhenNull="true">
-									<reportElement uuid="7761d580-e28d-480d-9a48-0e4d15db9d40" x="0" y="0" width="60" height="20"/>
+									<reportElement uuid="daa641ca-672a-455f-87ef-e4f4da98fae5" x="0" y="0" width="60" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -472,10 +471,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								</textField>
 							</jr:detailCell>
 						</jr:column>
-						<jr:column width="52" uuid="f7198dcb-83a5-498f-ae92-f68f069384bc">
+						<jr:column width="52" uuid="ed5249ed-0f82-44b8-926a-8930a4c67678">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="636fd5c0-e2a5-4a0f-a537-8012f8394784" mode="Opaque" x="0" y="0" width="52" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="25ad985a-d2a1-4954-ad86-835eeb23b61b" mode="Opaque" x="0" y="0" width="52" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -491,7 +490,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField isBlankWhenNull="true">
-									<reportElement uuid="ff1494a9-0639-466a-bffd-e6b3c9eaa013" x="0" y="0" width="52" height="20"/>
+									<reportElement uuid="7adb8382-558c-47a9-bff1-68891e5f8889" x="0" y="0" width="52" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -506,10 +505,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 								</textField>
 							</jr:detailCell>
 						</jr:column>
-						<jr:column width="58" uuid="ca23751e-515b-42cb-bbde-2b5f3a7f593e">
+						<jr:column width="58" uuid="09e7946b-5238-4aa8-b1ca-d4f8e2c24d47">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="eb8e845c-56bb-4071-88e0-d7791a5f95c1" mode="Opaque" x="0" y="0" width="58" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="cc190dc5-1822-4dbc-9509-dab3782d4a06" mode="Opaque" x="0" y="0" width="58" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -525,7 +524,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField isBlankWhenNull="true">
-									<reportElement uuid="81de4a0f-5c09-4763-ad18-e5f1e9483a52" x="0" y="0" width="58" height="20"/>
+									<reportElement uuid="6922def5-cd1e-48ed-a71a-000a35f316a3" x="0" y="0" width="58" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -541,10 +540,10 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:detailCell>
 						</jr:column>
 					</jr:columnGroup>
-					<jr:column width="58" uuid="26cb9023-88ef-4126-8e19-8035c9ed02a0">
+					<jr:column width="58" uuid="40367b2b-6a79-4721-bfd6-bd33e6f73c2c">
 						<jr:columnHeader height="30" rowSpan="1">
 							<staticText>
-								<reportElement uuid="5ec9bd34-6bfe-4d3f-b799-dd3e5da37911" mode="Opaque" x="0" y="0" width="58" height="30" backcolor="#E6E6E6"/>
+								<reportElement uuid="fb8f517a-23e4-43e7-8355-33963fc15c72" mode="Opaque" x="0" y="0" width="58" height="30" backcolor="#E6E6E6"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -560,7 +559,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 						</jr:columnHeader>
 						<jr:detailCell height="20" rowSpan="1">
 							<textField>
-								<reportElement uuid="9a5c5d7e-1420-40b2-ae14-d338ac6dd7a3" x="0" y="0" width="58" height="20"/>
+								<reportElement uuid="0e7061c6-a394-4dd0-95f8-15a945925db7" x="0" y="0" width="58" height="20"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -575,11 +574,11 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:columnGroup width="107" uuid="eb4e9b16-fd04-47c6-b968-f59e78f0ec3d">
-						<jr:column width="107" uuid="002f3c66-732a-4e68-8a31-eb0b7ddb6d14">
+					<jr:columnGroup width="107" uuid="cae609e5-d1b4-4745-b2c6-6475a68a4383">
+						<jr:column width="107" uuid="4fac757a-29c3-4137-a44c-c2644ef68bad">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="3b7928db-e6a3-440c-8617-70e845007b12" mode="Opaque" x="0" y="0" width="107" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="ef39b8e3-3bcd-472c-8db2-3763f989eab9" mode="Opaque" x="0" y="0" width="107" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -595,7 +594,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="###0" isBlankWhenNull="true">
-									<reportElement uuid="f26184cf-60a3-40cd-80ab-98afef3f7cb6" x="0" y="0" width="107" height="20"/>
+									<reportElement uuid="4609b677-56db-40fe-99f3-54301ed8e87c" x="0" y="0" width="107" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -611,11 +610,11 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:detailCell>
 						</jr:column>
 					</jr:columnGroup>
-					<jr:columnGroup width="107" uuid="c3439332-8144-47e1-aabd-a35f47035a9b">
-						<jr:column width="107" uuid="018b0cb3-f4b8-4cd9-be84-d95322773056">
+					<jr:columnGroup width="107" uuid="2d83c023-bcee-4526-9ca5-cd0edd8533a5">
+						<jr:column width="107" uuid="24db9aa8-42c0-41a8-a9de-f606396466f1">
 							<jr:columnHeader height="30" rowSpan="1">
 								<staticText>
-									<reportElement uuid="a7852572-503e-46d3-961c-716f72cf77d7" mode="Opaque" x="0" y="0" width="107" height="30" backcolor="#E6E6E6"/>
+									<reportElement uuid="620efeae-c193-4545-b6df-63527e4d6b23" mode="Opaque" x="0" y="0" width="107" height="30" backcolor="#E6E6E6"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -631,7 +630,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:columnHeader>
 							<jr:detailCell height="20" rowSpan="1">
 								<textField pattern="###0" isBlankWhenNull="true">
-									<reportElement uuid="73c6c73e-deb9-4c5d-8e39-e22caab8d311" x="0" y="0" width="107" height="20"/>
+									<reportElement uuid="94ff57b5-808e-4948-817e-59973d63b408" x="0" y="0" width="107" height="20"/>
 									<box>
 										<pen lineWidth="1.0"/>
 										<topPen lineWidth="1.0"/>
@@ -647,11 +646,11 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 							</jr:detailCell>
 						</jr:column>
 					</jr:columnGroup>
-					<jr:column width="108" uuid="1fd473db-225e-475b-b32c-bcad6f243877">
+					<jr:column width="108" uuid="33c09fb2-b50c-4e3b-87b1-c0eedad87ba0">
 						<jr:tableFooter height="0" rowSpan="1"/>
 						<jr:columnHeader height="30" rowSpan="1">
 							<staticText>
-								<reportElement uuid="ec068739-8ab3-4d6f-8192-1cf80c0967e9" mode="Opaque" x="0" y="0" width="108" height="30" backcolor="#E6E6E6"/>
+								<reportElement uuid="b38891ff-779b-4a6e-bc1b-0cd4b1354737" mode="Opaque" x="0" y="0" width="108" height="30" backcolor="#E6E6E6"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -668,7 +667,7 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 						<jr:columnFooter height="0" rowSpan="1"/>
 						<jr:detailCell height="20" rowSpan="1">
 							<textField pattern="###0" isBlankWhenNull="true">
-								<reportElement uuid="ad59ff78-2e46-4a6c-a64b-642ec9b9650c" x="0" y="0" width="108" height="20"/>
+								<reportElement uuid="7aca54f5-474b-4f03-82a4-7b8da8647ee2" x="0" y="0" width="108" height="20"/>
 								<box rightPadding="5">
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>

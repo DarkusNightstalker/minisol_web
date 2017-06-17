@@ -78,9 +78,10 @@ public class AccountingEntryBean extends ABasicBean<Long> {
         path = "";
         name = "";
     }
-    
+
     @Override
     public void search() {
+
         path = path.trim();
         name = name.trim();
         ProjectionList projectionList = Projections.projectionList()
@@ -94,7 +95,11 @@ public class AccountingEntryBean extends ABasicBean<Long> {
         if (name.length() != 0) {
             criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
         }
-        pagination.search(1, projectionList, criterionList, orderFactory.make());
+        try {
+            pagination.search(1, projectionList, criterionList, orderFactory.make());
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+        }
     }
 
     //<editor-fold defaultstate="collapsed" desc="initImport">
@@ -243,7 +248,6 @@ public class AccountingEntryBean extends ABasicBean<Long> {
     }
 
     //</editor-fold>
-    
     public class Export implements java.io.Serializable {
 
         private Boolean activeHeader;

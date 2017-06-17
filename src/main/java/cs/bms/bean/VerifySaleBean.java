@@ -15,7 +15,7 @@ import cs.bms.service.interfac.ISaleDetailService;
 import cs.bms.service.interfac.ISalePaymentService;
 import cs.bms.service.interfac.ISaleService;
 import cs.bms.service.interfac.IStockService;
-import cs.bms.util.DownloadUtil;
+import cs.bms.servlet.util.DownloadUtil;
 import gkfire.auditory.Auditory;
 import gkfire.web.util.BeanUtil;
 import java.math.BigDecimal;

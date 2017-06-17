@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)">ERRORES DE APLICACIÓN</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+            <a href="ecommerce_orders.html" class="btn btn-default btn-sm fw600 ml10">
+                <span class="fa fa-refresh pr5"></span> Limpiar historial</a>
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 50px">
+        <script src="#{request.contextPath}/vendor/plugins/highlight/highlight.pack.js"></script>
+
+        <section id="content" class="table-layout">
+            <div class="tray tray-center" style="height: 903px;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <script>
+                            $(function () {
+//                                $('pre.highlight').each(function (i, block) {
+//                                    hljs.highlightBlock(block);
+//                                });
+                            });
+                        </script>
+                        <ui:repeat value="#{appBean.errors}" varStatus="st" var="item">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <span class="panel-title">CODE ERROR #{appBean.getCode(st.index)} <small class="pull-right"><h:outputText value="#{item[2]}"><f:convertDateTime pattern="dd/MM/yyyy hh:mm:ss aa"/></h:outputText></small></span>                                  
+                                </div>
+                                <div class="panel-body pn">
+                                    <pre class="highlight br bw2 br-grey br-dashed br0 p10 mn">
+                                    <code>
+                                        <h:outputText value="#{appBean.printError(item[0])}" escape="false" />
+                                    </code>
+                                    </pre>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </h:form>
+
+</ui:composition>

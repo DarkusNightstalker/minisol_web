@@ -59,6 +59,23 @@
                         <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/rol/list.xhtml"/>
                     </p:commandLink>
                 </div>
+                <ui:fragment rendered="#{sessionBean.currentUser.superUser}">
+                    <div class="col-md-2 text-center mb15">
+                        <p:commandLink  
+                            action="#{rolBean.onLoad(true)}" 
+                            onerror="error()" 
+                            onstart="begin_load()"
+                            oncomplete="end_load()" 
+                            styleClass="fs11 btn btn-block  btn-danger"
+                            process="@this" update=":content-wrapper">
+                            <i class="glyphicons glyphicons-bug fs30  mt20 mb20"/>
+                            <br/>
+                            <br/> Errores
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                            <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/security/error_app.xhtml"/>
+                        </p:commandLink>
+                    </div>
+                </ui:fragment>
             </div>
         </section>
     </h:form>

@@ -175,14 +175,14 @@ http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     <bean id="dataSource"  class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
-        <property name="url" value="jdbc:postgresql://195.154.56.237:5432/bms" /> 
+<!--        <property name="url" value="jdbc:postgresql://195.154.56.237:5432/bms" /> 
         <property name="driverClassName" value="org.postgresql.Driver"/> 
         <property name="username" value="postgres"/>
-        <property name="password" value="admin1986"/>
-<!--                <property name="url" value="jdbc:postgresql://localhost:5432/bms_test" /> 
+        <property name="password" value="admin1986"/>-->
+                <property name="url" value="jdbc:postgresql://localhost:5432/bms_test" /> 
         <property name="driverClassName" value="org.postgresql.Driver"/> 
         <property name="username" value="postgres"/>
-        <property name="password" value="admin"/>-->
+        <property name="password" value="admin"/>
     </bean>
       
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">

@@ -344,8 +344,8 @@ public class StockMovementBean extends ABasicBean<Long> {
                     + "ismd.uom.abbr,"
                     + "ismd.productName,"
                     + "ismd.weight,"
-                    + "ismd.weightUoM.abbr "
-                    + "FROM InternalStockMovementDetail ismd WHERE ismd.internalStockMovement = ?", selected);
+                    + "wuom.abbr "
+                    + "FROM InternalStockMovementDetail ismd left join ismd.weightUoM wuom WHERE ismd.internalStockMovement = ?", selected);
         }
 
         /**

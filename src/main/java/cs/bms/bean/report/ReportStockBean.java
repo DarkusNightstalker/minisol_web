@@ -6,6 +6,7 @@
 package cs.bms.bean.report;
 
 import cs.bms.bean.SessionBean;
+import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.dao.util.PGSqlUtil;
 import cs.bms.model.Product;
 import cs.bms.service.interfac.IProductService;
@@ -72,7 +73,7 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
-        map.put("date_end", null);                
+        map.put("date_end", null);
         kardexValuate = new ReportExport("/1258488425132154132154214536/kardex_valuate.jasper", "Inventario en unidades valorizadas", sessionBean, map);
         /**/
         map = new HashMap();
@@ -80,7 +81,7 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
-        map.put("date_end", null);                
+        map.put("date_end", null);
         kardexValuateTotal = new ReportExport("/1258488425132154132154214536/kardex_valuate_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
         /**/
         map = new HashMap();
@@ -91,13 +92,13 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("date_init", null);
         map.put("date_end", null);
         kardexPhysical = new ReportExport("/1258488425132154132154214536/kardex_physical.jasper", "Inventario en unidades fisicas", sessionBean, map);
-        /**/ 
+        /**/
         map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
-        map.put("date_end", null);                
+        map.put("date_end", null);
         kardexValuateTotal = new ReportExport("/1258488425132154132154214536/kardex_physical_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
         /**/
         map = new HashMap();
@@ -192,7 +193,6 @@ public class ReportStockBean implements java.io.Serializable {
         this.productService = productService;
     }
 
-
     /**
      * @param kardexPhysical the kardexPhysical to set
      */
@@ -283,14 +283,18 @@ public class ReportStockBean implements java.io.Serializable {
                     .add(Projections.property("active"));
             CriterionList criterionList = new CriterionList();
             criterionList.add(Restrictions.eq("active", true));
-            if (terms.length() != 0) {
-                criterionList.add(
-                        Restrictions.or(
-                                Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
-                                Restrictions.like("name", terms, MatchMode.ANYWHERE)
-                        ));
+            try {
+                if (terms.length() != 0) {
+                    criterionList.add(
+                            Restrictions.or(
+                                    Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
+                                    Restrictions.like("name", terms, MatchMode.ANYWHERE).ignoreCase()
+                            ));
+                }
+                pagination.search(1, projectionList, criterionList, orderFactory.make());
+            } catch (Exception e) {
+                PNotifyMessage.systemError(e, sessionBean);
             }
-            pagination.search(1, projectionList, criterionList, orderFactory.make());
         }
         //<editor-fold defaultstate="collapsed" desc="Gets & Sets">
 

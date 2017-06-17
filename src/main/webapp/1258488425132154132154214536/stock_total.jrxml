@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="permissions" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f4ff809e-964b-4faa-a1e6-fd0a25dcc29f">
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
 	<property name="ireport.zoom" value="1.4641000000000062"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="233"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
@@ -155,7 +155,7 @@ ORDER BY p.id]]>
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="2e7fe808-acf0-471f-80c2-0014fd7c96f0" style="Crosstab Data Text" x="0" y="0" width="65" height="24"/>
+								<reportElement uuid="2e7fe808-acf0-471f-80c2-0014fd7c96f0" style="Crosstab Data Text" x="0" y="0" width="65" height="15"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -181,7 +181,7 @@ ORDER BY p.id]]>
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="f251c8c5-527c-479f-9cf1-7d22dacf01e5" style="Crosstab Data Text" x="0" y="0" width="158" height="24"/>
+								<reportElement uuid="f251c8c5-527c-479f-9cf1-7d22dacf01e5" style="Crosstab Data Text" x="0" y="0" width="158" height="15"/>
 								<box leftPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -207,7 +207,7 @@ ORDER BY p.id]]>
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="fa0b1fdd-bbf0-40a1-9ab5-851d83417927" style="Crosstab Data Text" x="0" y="0" width="100" height="24"/>
+								<reportElement uuid="fa0b1fdd-bbf0-40a1-9ab5-851d83417927" style="Crosstab Data Text" x="0" y="0" width="100" height="15"/>
 								<box leftPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -233,7 +233,7 @@ ORDER BY p.id]]>
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="a884cece-c4dd-4b5c-85ff-1520ecc4caca" style="Crosstab Data Text" x="0" y="0" width="117" height="24"/>
+								<reportElement uuid="a884cece-c4dd-4b5c-85ff-1520ecc4caca" style="Crosstab Data Text" x="0" y="0" width="117" height="15"/>
 								<box leftPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -307,13 +307,13 @@ ORDER BY p.id]]>
 				<measure name="quantityMeasure" class="java.math.BigDecimal" calculation="First">
 					<measureExpression><![CDATA[$F{quantity}]]></measureExpression>
 				</measure>
-				<crosstabCell width="55" height="24">
+				<crosstabCell width="55" height="15">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="###0">
-							<reportElement uuid="303858d0-7ee1-49d5-93b2-420686d17b78" style="Crosstab Data Text" x="0" y="0" width="55" height="24"/>
+							<reportElement uuid="303858d0-7ee1-49d5-93b2-420686d17b78" style="Crosstab Data Text" x="0" y="0" width="55" height="15"/>
 							<box leftPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -335,13 +335,13 @@ ORDER BY p.id]]>
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="69" height="24" columnTotalGroup="id_company">
+				<crosstabCell width="69" height="15" columnTotalGroup="id_company">
 					<cellContents backcolor="#FFFFFF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="###0.00">
-							<reportElement uuid="9733ae52-49f2-46cf-90d2-9fad64265f4f" style="Crosstab Data Text" x="0" y="0" width="69" height="24"/>
+							<reportElement uuid="9733ae52-49f2-46cf-90d2-9fad64265f4f" style="Crosstab Data Text" x="0" y="0" width="69" height="15"/>
 							<box leftPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>

@@ -5,6 +5,7 @@
  */
 package cs.bms.bean;
 
+import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.enumerated.CashType;
 import cs.bms.model.CashRegister;
 import cs.bms.service.interfac.ICashRegisterDetailService;
@@ -44,8 +45,8 @@ public class CashRegisterBean extends ABasicBean<Long> {
     protected ICashRegisterDetailService cashRegisterDetailService;
 
     protected CashRegister selected;
-    protected Map<String,Object> aditionalData;
-    
+    protected Map<String, Object> aditionalData;
+
     protected Date dateInit;
     protected Date dateEnd;
     protected CashType[] types;
@@ -57,8 +58,7 @@ public class CashRegisterBean extends ABasicBean<Long> {
         orderFactory = new OrderFactory(new OrderList(Order.desc("dateArcing")));
         orderFactory.setDefaultOrder(Order.desc("dateArcing"), Order.asc("ws.timeEntry"));
         types = CashType.values();
-   }
-
+    }
 
     @Override
     public void onLoad(boolean allowAjax) {
@@ -106,12 +106,16 @@ public class CashRegisterBean extends ABasicBean<Long> {
         if (dateInit != null) {
             criterionList.add(Restrictions.ge("dateArcing", dateInit));
         }
-        pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
-        pagination.getData().forEach(item -> {     
-            Object[] detailData = cashRegisterDetailService.getQuantitiesAsMap((Long) item[0]);
-            item[3] = detailData[0];
-            item[4] = detailData[1];
-        });
+        try {
+            pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
+            pagination.getData().forEach(item -> {
+                Object[] detailData = cashRegisterDetailService.getQuantitiesAsMap((Long) item[0]);
+                item[3] = detailData[0];
+                item[4] = detailData[1];
+            });
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+        }
     }
 
     /**
@@ -212,20 +216,19 @@ public class CashRegisterBean extends ABasicBean<Long> {
     public void setCashRegisterDetailService(ICashRegisterDetailService cashRegisterDetailService) {
         this.cashRegisterDetailService = cashRegisterDetailService;
     }
-    
+
     /**
      * @return the aditionalData
      */
-    public Map<String,Object> getAditionalData() {
+    public Map<String, Object> getAditionalData() {
         return aditionalData;
     }
 
     /**
      * @param aditionalData the aditionalData to set
      */
-    public void setAditionalData(Map<String,Object> aditionalData) {
+    public void setAditionalData(Map<String, Object> aditionalData) {
         this.aditionalData = aditionalData;
     }
-
 
 }

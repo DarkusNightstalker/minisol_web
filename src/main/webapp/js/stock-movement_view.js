@@ -31,7 +31,7 @@ var SM = function() {
         print: function(ctx,id) {
             $("<iframe>") // create a new iframe element
                 .hide() // make it invisible
-                .attr("src", ctx+"/service/print_ism.xhtml?id="+id) // point the iframe to the page you want to print
+                .attr("src", ctx+"/resources/ism/print.pdf?id="+id) // point the iframe to the page you want to print
                 .appendTo("body");
         }
     };

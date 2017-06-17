@@ -288,7 +288,11 @@ public class ActorBean extends ABasicBean<Long> {
         if (name.length() != 0) {
             criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
         }
-        pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
+        try {
+            pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+        }
     }
 
     //<editor-fold defaultstate="collapsed" desc="Gets & Sets">
@@ -549,7 +553,7 @@ public class ActorBean extends ABasicBean<Long> {
                     finalize = true;
                 }
             };
-            executor.submit(task);    
+            executor.submit(task);
         }
 
         private void search(String identityNumber, String identityDocumentCode) throws Exception {

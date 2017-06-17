@@ -5,6 +5,7 @@
  */
 package cs.bms.bean;
 
+import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.service.interfac.ICompanyService;
 import cs.bms.service.interfac.IStockService;
 import gkfire.hibernate.AliasList;
@@ -80,16 +81,19 @@ public class StockBean extends ABasicBean<Long> {
         aliasList.add("product", "p");
         aliasList.add("p.uom", "uom");
         CriterionList criterionList = new CriterionList();
-        if (productName.length() != 0) {
-            criterionList.add(Restrictions.like("p.name", productName, MatchMode.ANYWHERE).ignoreCase());
-        }
-        if (barcode.length() != 0) {
-            criterionList.add(Restrictions.like("p.barcode", barcode, MatchMode.ANYWHERE).ignoreCase());
-        }
         criterionList.add(Restrictions.eq("p.active", true));
         criterionList.add(Restrictions.eq("company", sessionBean.getCurrentCompany()));
-
-        pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
+        try {
+            if (productName.length() != 0) {
+                criterionList.add(Restrictions.like("p.name", productName, MatchMode.ANYWHERE).ignoreCase());
+            }
+            if (barcode.length() != 0) {
+                criterionList.add(Restrictions.like("p.barcode", barcode, MatchMode.ANYWHERE).ignoreCase());
+            }
+            pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+        }
     }
 
     /**

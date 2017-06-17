@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cash_register_total" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f4ff809e-964b-4faa-a1e6-fd0a25dcc29f">
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
 	<property name="ireport.zoom" value="2.1435888100000358"/>
-	<property name="ireport.x" value="526"/>
+	<property name="ireport.x" value="1133"/>
 	<property name="ireport.y" value="186"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
@@ -179,13 +179,13 @@ ORDER BY c.id,cr.date_arcing,ws.time_entry]]>
 		<variableExpression><![CDATA[$F{real_cash}.subtract($F{expected_cash})]]></variableExpression>
 	</variable>
 	<variable name="final_import_1" class="java.math.BigDecimal" resetType="Group" resetGroup="company" calculation="Sum">
-		<variableExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{visa})]]></variableExpression>
+		<variableExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{credit})]]></variableExpression>
 	</variable>
 	<variable name="total_moneda_1" class="java.lang.Double" resetType="Group" resetGroup="company" calculation="Sum">
 		<variableExpression><![CDATA[$F{_0}*0.1+$F{_1}*0.2+$F{_2}*0.5+$F{_3}+$F{_4}*2+$F{_5}*5+$F{_6}*10+$F{_7}*20+$F{_8}*50+$F{_9}*100+$F{_10}*200]]></variableExpression>
 	</variable>
 	<variable name="final_import_2" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{visa})]]></variableExpression>
+		<variableExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{credit})]]></variableExpression>
 	</variable>
 	<variable name="total_moneda_2" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{_0}*0.1+$F{_1}*0.2+$F{_2}*0.5+$F{_3}+$F{_4}*2+$F{_5}*5+$F{_6}*10+$F{_7}*20+$F{_8}*50+$F{_9}*100+$F{_10}*200]]></variableExpression>
@@ -961,7 +961,7 @@ TOTAL]]></text>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{visa})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{credit})]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
 				<reportElement uuid="acb6a0fe-ba78-4a92-a031-500bf7a5c2b3" style="sobrante_faltante" x="748" y="0" width="54" height="15"/>
@@ -975,7 +975,7 @@ TOTAL]]></text>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{visa}).doubleValue()-$F{expected_cash}.doubleValue()-$F{payment_voucher}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{real_cash}.add($F{outs}).add($F{credit}).doubleValue()-$F{expected_cash}.doubleValue()-$F{payment_voucher}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.00" isBlankWhenNull="true">
 				<reportElement uuid="5d0dd997-bdc6-4d86-a305-ae170b21a50f" mode="Opaque" x="370" y="0" width="42" height="15" backcolor="#FDF0D4"/>

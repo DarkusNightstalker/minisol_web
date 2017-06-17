@@ -27,6 +27,7 @@ import cs.bms.service.interfac.IProductCostPriceService;
 import cs.bms.service.interfac.IProductService;
 import cs.bms.service.interfac.IStockService;
 import cs.bms.service.interfac.IUoMService;
+import cs.bms.servlet.util.DownloadUtil;
 import gkfire.auditory.Auditory;
 import gkfire.web.bean.AManagedBean;
 import gkfire.web.bean.ILoadable;
@@ -320,7 +321,7 @@ public class ManagedStockMovementBean extends AManagedBean<InternalStockMovement
             }
         }
         PNotifyMessage.saveMessage("Se ha creado el movimiento " + serie + "-" + documentNumber);
-        BeanUtil.exceuteJS("window.open('" + BeanUtil.getRequest().getContextPath() + "/resources/ism/print.pdf?id=" + selected.getId() + "')");
+        DownloadUtil.downloadISM(selected.getId(), sessionBean);
         return allow;
     }
 
