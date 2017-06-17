@@ -677,6 +677,10 @@ public class ManagedStockReductionBean extends AManagedBean<StockReduction, ISto
             }
         }
 
+        @Override
+        protected void errorMessage(String message) {
+            PNotifyMessage.errorMessage(message);
+        }
     }
 //</editor-fold>
 

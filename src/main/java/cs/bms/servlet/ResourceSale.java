@@ -6,7 +6,6 @@
 package cs.bms.servlet;
 
 import cs.bms.dao.util.JDBCPostGresSQL;
-import cs.bms.bean.SalePrintBean;
 import cs.bms.model.Sale;
 import cs.bms.model.User;
 import cs.bms.service.interfac.IActorService;
@@ -121,7 +120,7 @@ public class ResourceSale {
         } catch (JRException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SalePrintBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ResourceSale.class.getName()).log(Level.SEVERE, null, ex);
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }

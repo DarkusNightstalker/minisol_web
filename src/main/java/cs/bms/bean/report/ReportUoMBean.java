@@ -7,7 +7,7 @@ package cs.bms.bean.report;
 
 import cs.bms.bean.SessionBean;
 import cs.bms.service.interfac.IUoMService;
-import cs.bms.util.ReportExport;
+import cs.bms.report.util.ReportExport;
 import java.util.HashMap;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;

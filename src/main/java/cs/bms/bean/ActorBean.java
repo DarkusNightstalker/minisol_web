@@ -279,16 +279,16 @@ public class ActorBean extends ABasicBean<Long> {
         }
         criterionList.add(d);
 
-        if (identityNumber.length() != 0) {
-            criterionList.add(Restrictions.like("identityNumber", identityNumber, MatchMode.ANYWHERE));
-        }
-        if (identityDocumentId != null) {
-            criterionList.add(Restrictions.eq("idd.id", identityDocumentId));
-        }
-        if (name.length() != 0) {
-            criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
-        }
         try {
+            if (identityNumber.length() != 0) {
+                criterionList.add(Restrictions.like("identityNumber", identityNumber, MatchMode.ANYWHERE));
+            }
+            if (identityDocumentId != null) {
+                criterionList.add(Restrictions.eq("idd.id", identityDocumentId));
+            }
+            if (name.length() != 0) {
+                criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
+            }
             pagination.search(1, projectionList, criterionList, aliasList, orderFactory.make());
         } catch (Exception e) {
             PNotifyMessage.systemError(e, sessionBean);

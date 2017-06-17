@@ -6,15 +6,11 @@
 package cs.bms.servlet;
 
 import cs.bms.dao.util.JDBCPostGresSQL;
-import cs.bms.bean.SalePrintBean;
 import cs.bms.model.InternalStockMovement;
 import cs.bms.model.User;
 import cs.bms.service.interfac.IInternalStockMovementService;
 import cs.bms.service.interfac.IUserService;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -33,7 +29,6 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -95,7 +90,7 @@ public class ResourceISM {
         } catch (JRException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SalePrintBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ResourceSale.class.getName()).log(Level.SEVERE, null, ex);
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }

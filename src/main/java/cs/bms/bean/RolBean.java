@@ -8,7 +8,7 @@ package cs.bms.bean;
 import cs.bms.model.PermissionCategory;
 import cs.bms.model.Rol;
 import cs.bms.service.interfac.IRolService;
-import cs.bms.util.ReportExport;
+import cs.bms.report.util.ReportExport;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;
 import gkfire.hibernate.OrderList;

@@ -11,8 +11,7 @@ import cs.bms.dao.util.PGSqlUtil;
 import cs.bms.model.Product;
 import cs.bms.service.interfac.IProductService;
 import cs.bms.service.interfac.IStockService;
-import cs.bms.util.ReportExport;
-import cs.bms.util.ReportExportList;
+import cs.bms.report.util.ReportExport;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;
 import gkfire.hibernate.OrderList;
@@ -196,7 +195,7 @@ public class ReportStockBean implements java.io.Serializable {
     /**
      * @param kardexPhysical the kardexPhysical to set
      */
-    public void setKardexPhysical(ReportExportList kardexPhysical) {
+    public void setKardexPhysical(ReportExport kardexPhysical) {
         this.kardexPhysical = kardexPhysical;
     }
 
@@ -403,13 +402,6 @@ public class ReportStockBean implements java.io.Serializable {
      */
     public ReportExport getKardexPhysical() {
         return kardexPhysical;
-    }
-
-    /**
-     * @param kardexPhysical the kardexPhysical to set
-     */
-    public void setKardexPhysical(ReportExport kardexPhysical) {
-        this.kardexPhysical = kardexPhysical;
     }
 
     /**

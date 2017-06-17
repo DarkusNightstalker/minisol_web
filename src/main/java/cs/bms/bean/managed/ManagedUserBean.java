@@ -438,6 +438,10 @@ public class ManagedUserBean extends AManagedBean<User, IUserService> implements
         }
 
         @Override
+        protected void errorMessage(String message) {
+            PNotifyMessage.errorMessage(message);
+        }
+        @Override
         protected void saveOrUpdateByDNI(String name) {
             actor = searchActorInService();
             if (actor == null) {

@@ -91,7 +91,7 @@ public class IsmPrintBean implements java.io.Serializable {
         } catch (JRException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
-            Logger.getLogger(SalePrintBean.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IsmPrintBean.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

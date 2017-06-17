@@ -1161,6 +1161,11 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
             }
         }
 
+        @Override
+        protected void errorMessage(String message) {
+            PNotifyMessage.errorMessage(message);
+        }
+
     }
     //</editor-fold>
 

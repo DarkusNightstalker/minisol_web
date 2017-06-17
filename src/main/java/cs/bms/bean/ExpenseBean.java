@@ -8,7 +8,7 @@ package cs.bms.bean;
 import cs.bms.model.PurchasePayment;
 import cs.bms.service.interfac.ICompanyService;
 import cs.bms.service.interfac.IPurchasePaymentService;
-import cs.bms.util.ReportExport;
+import cs.bms.report.util.ReportExport;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;
 import gkfire.hibernate.OrderList;

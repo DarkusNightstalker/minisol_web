@@ -89,13 +89,13 @@ public class AccountingEntryBean extends ABasicBean<Long> {
                 .add(Projections.property("path"))
                 .add(Projections.property("name"));
         CriterionList criterionList = new CriterionList();
-        if (path.length() != 0) {
-            criterionList.add(Restrictions.like("path", path, MatchMode.START));
-        }
-        if (name.length() != 0) {
-            criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
-        }
         try {
+            if (path.length() != 0) {
+                criterionList.add(Restrictions.like("path", path, MatchMode.START));
+            }
+            if (name.length() != 0) {
+                criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
+            }
             pagination.search(1, projectionList, criterionList, orderFactory.make());
         } catch (Exception e) {
             PNotifyMessage.systemError(e, sessionBean);

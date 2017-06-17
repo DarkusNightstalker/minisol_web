@@ -5,6 +5,7 @@
  */
 package cs.bms.bean;
 
+import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.service.interfac.ICompanyService;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;
@@ -80,14 +81,17 @@ public class CompanyBean extends ABasicBean<Long> {
                 .add(Projections.property("active"));
         CriterionList criterionList = new CriterionList();
         criterionList.add(Restrictions.eq("active", true));
-
-        if (city.length() != 0) {
-            criterionList.add(Restrictions.like("city", city, MatchMode.ANYWHERE).ignoreCase());
+        try {
+            if (city.length() != 0) {
+                criterionList.add(Restrictions.like("city", city, MatchMode.ANYWHERE).ignoreCase());
+            }
+            if (name.length() != 0) {
+                criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
+            }
+            pagination.search(1, projectionList, criterionList, orderFactory.make());
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
         }
-        if (name.length() != 0) {
-            criterionList.add(Restrictions.like("name", name, MatchMode.ANYWHERE).ignoreCase());
-        }
-        pagination.search(1, projectionList, criterionList, orderFactory.make());
     }
 
     /**

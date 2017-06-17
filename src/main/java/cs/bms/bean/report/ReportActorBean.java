@@ -7,7 +7,7 @@ package cs.bms.bean.report;
 
 import cs.bms.bean.SessionBean;
 import cs.bms.service.interfac.IActorService;
-import cs.bms.util.ReportExport;
+import cs.bms.report.util.ReportExport;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

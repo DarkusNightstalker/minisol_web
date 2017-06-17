@@ -1054,6 +1054,11 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
             }
         }
 
+        @Override
+        protected void errorMessage(String message) {
+            PNotifyMessage.errorMessage(message);
+        }
+
     }
 
     //</editor-fold>
