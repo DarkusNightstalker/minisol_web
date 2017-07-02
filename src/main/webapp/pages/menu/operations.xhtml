@@ -7,6 +7,12 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript">
+        $(function () {
+            document.title = 'Operaciones #{sessionBean.currentCompany.name} - #{sessionBean.currentCompany.city}';
+            $("#short-icon").attr("href","#{request.contextPath}/assets/img/icon/default.ico");
+        });
+    </script>
     <header id="topbar" class="affix">
         <div class="topbar-left">
             <ol class="breadcrumb">
@@ -119,7 +125,7 @@
                 <ui:fragment rendered="#{sessionBean.currentCompany.buy and sessionBean.authorize('V_DES')}">
                     <div class="col-md-2 text-center mb15">
                         <p:commandLink 
-                            action="#{purchaseBean.onLoad(true)}" 
+                            action="#{supplierReturnBean.onLoad(true)}" 
                             onerror="error()" 
                             onstart="begin_load()"
                             oncomplete="end_load()"
@@ -128,7 +134,7 @@
                             <i class="glyphicons glyphicons-inbox_in fs30  mt20 mb20"/>
                             <br/>
                             Devolucion<br/> a Proveedores
-                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{null}"/>
+                            <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{supplierReturnBean}"/>
                             <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/wms/supplier_return/list.xhtml"/>
                         </p:commandLink>
                     </div>

@@ -75,6 +75,12 @@ public class SaleBean extends ABasicBean<Long> {
         otherData.put("detail", detail);
     }
 
+    public void print() {
+        if (selected.getVerified()) {
+            DownloadUtil.downloadJSONSale(selected.getId(), sessionBean);;
+        }
+    }
+
     public void copyPrint() {
         DownloadUtil.downloadJSONSale(id, sessionBean);
     }

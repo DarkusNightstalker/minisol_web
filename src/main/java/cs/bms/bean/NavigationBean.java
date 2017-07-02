@@ -16,43 +16,50 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class NavigationBean implements INavigationBean{
-    private String content = "/pages/home.xhtml";
-    private String javascriptMenu = "Menu.change('#form-nav-menu\\\\:home',false)";
-    private String topMenú ="home-opt";
     
     @Override
     public String getContent() {
-        return content;
+        return ViewNavigationBean.getCurrent().getContent();
     }
     
     @Override
     public void setContent(String content) {
-        this.content = content;
+        ViewNavigationBean.getCurrent().setContent(content);
     }
 
     
     @Override
     public String getJavascriptMenu() {
-        return javascriptMenu;
+        return ViewNavigationBean.getCurrent().getJavascriptMenu();
     }
     
     @Override
     public void setJavascriptMenu(String javascriptMenu) {
-        this.javascriptMenu = javascriptMenu;
+       ViewNavigationBean.getCurrent().setJavascriptMenu(javascriptMenu);
     }
 
     /**
      * @return the topMenú
      */
     public String getTopMenú() {
-        return topMenú;
+        return ViewNavigationBean.getCurrent().getTopMenú();
     }
 
     /**
      * @param topMenú the topMenú to set
      */
     public void setTopMenú(String topMenú) {
-        this.topMenú = topMenú;
+       ViewNavigationBean.getCurrent().setTopMenú(topMenú);
+    }
+
+    @Override
+    public String getIcon() {        
+        return ViewNavigationBean.getCurrent().getIcon();
+    }
+
+    @Override
+    public void setIcon(String icon) {
+        ViewNavigationBean.getCurrent().setIcon(icon);
     }
     
 }

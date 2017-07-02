@@ -1,0 +1,198 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script>
+        function open_reportpurchase() {
+            $('#modal-report-purchase').modal({backdrop: 'static', keyboard: false});
+        }
+        $(function () {
+            $('#modal-report-purchase').on('shown.bs.modal', function () {
+                $('#form-r-debts\\:identity-number').focus();
+            });
+        });
+    </script>
+    <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
+
+    <div id="modal-report-purchase" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">            
+            <h:panelGroup layout="block" id="create-content" styleClass="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">[X]</button>
+                    <h4 class="mtn"><small>Descarga de</small></h4>
+                    <h3 class="mt10">REPORTES DE COMPRAS</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tab-block mb25">
+                        <ul class="nav tabs-left tabs-border col-md-4 prn">
+                            <ui:fragment rendered="#{sessionBean.authorize('RP_PRC')}">
+                                <li class="active">
+                                    <a href="#tab1" onclick="Report.clean('form-r-debts')" data-toggle="tab">  
+                                        <span class="fs20 pl5 pr5 bg-system mr15"><i class="icon-documents-text"/></span> Deudas por proveedor
+                                    </a>
+                                </li>                 
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('R_PRC')}">
+                                <li class="#{not sessionBean.authorize('RP_PRC') ? 'active' : ''}">
+                                    <a href="#tab2" onclick="Report.clean('form-r-purchase')" data-toggle="tab">
+                                        <span class="fs20 pl5 pr5 bg-alert mr15"><i class="icon-documents-text"/></span> Lista de Compras
+                                    </a>
+                                </li>
+                            </ui:fragment>
+                        </ul>
+                        <div class="tab-content">
+
+                            <ui:fragment rendered="#{sessionBean.authorize('RP_PRC')}">
+                                <div id="tab1" class="tab-pane active">
+                                    <h:form id="form-r-debts">
+                                        <script>
+                                            $(function () {
+                                                Report.configure("form-r-debts");
+                                            });
+                                        </script>
+                                        <p:commandLink id="pdf" action="#{purchaseReportBean.toPdf()}" styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="xlsx" action="#{purchaseReportBean.toXlsx()}" styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="docx" action="#{purchaseReportBean.toDocx()}" styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="html" action="#{purchaseReportBean.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                        <p><span class="pl5 pr5 bg-system mr10"><i class="icon-documents-text"/></span><b>DEUDAS A PROVEEDOR</b></p>
+                                        <div class="form-horizontal">
+                                            <div class="form-group form-group-sm">
+                                                <label class="control-label col-md-3" style="">Identificación</label>
+                                                <div class="col-md-9">
+                                                    <p:remoteCommand 
+                                                        name="search_supplier"
+                                                        onstart="begin_load()"  
+                                                        onsuccess="end_load()"   
+                                                        process="@this,identity-number" 
+                                                        action="#{purchaseReportBean.searchSupplier()}"
+                                                        update="form-r-debts:customer-info"/>
+                                                    <p:remoteCommand 
+                                                        name="null_supplier"
+                                                        onstart="begin_load()"  
+                                                        onsuccess="end_load()"   
+                                                        process="@this" 
+                                                        update="form-r-debts:customer-info">
+                                                        <f:setPropertyActionListener target="#{purchaseReportBean.actor}" value="#{null}" />
+                                                    </p:remoteCommand>
+                                                    <script>
+                                                        $(function () {
+                                                            $("#form-r-debts\\:identity-number")
+                                                                    .keyup(function (e) {
+                                                                        var code = e.keyCode ? e.keyCode : e.which;
+                                                                        if (code == 13) {
+                                                                            search_supplier();
+                                                                            e.preventDefault();
+                                                                            return false;
+                                                                        }
+                                                                    })
+                                                                    .numeric({precision: 11, scale: 0})
+                                                                    .on("input", function () {
+                                                                        if ($("#exist_customer").val() == "true") {
+                                                                            null_supplier();
+                                                                        }
+                                                                    });
+                                                        });
+                                                    </script>
+                                                    <p:inputText id="identity-number" value="#{purchaseReportBean.identityNumber}" styleClass="fs11 form-control input-sm" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-group-sm">
+                                                <h:panelGroup id="customer-info" layout="block"> 
+                                                    <input id="exist_customer" type="hidden" value="#{purchaseReportBean.actor ne null}" />
+                                                    <ui:fragment rendered="#{purchaseReportBean.actor ne null}">
+                                                        <div class="form-group form-group-sm">
+                                                            <label class="control-label col-md-3" style="">Nombre</label>
+                                                            <div class="col-md-9">
+                                                                <h4>#{purchaseReportBean.actor.other}</h4>
+                                                            </div>
+                                                        </div>
+                                                    </ui:fragment>
+                                                    <ui:fragment rendered="#{purchaseReportBean.actor eq null}">
+                                                        <div class="text-center">
+                                                            <h3>No hay informacion de cliente</h3>
+                                                        </div>
+                                                    </ui:fragment>
+                                                </h:panelGroup>
+                                            </div>
+                                            <div class="form-group form-group-sm">
+                                                <label class="col-md-3 control-label">Fecha inicio</label>
+                                                <div class="col-md-3">
+                                                    <p:inputText class="form-control d" value="#{purchaseReportBean.supplierDebts.params['date_start']}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                    </p:inputText>
+                                                </div>
+                                                <label class="col-md-3 control-label">Fecha Fin</label>
+                                                <div class="col-md-3">
+                                                    <p:inputText class="form-control d" value="#{purchaseReportBean.supplierDebts.params['date_end']}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                    </p:inputText>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="short mt10 mb10"/>
+                                        <div class="text-right">
+                                            <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                                <i class="fa fa-file-pdf-o fa-2x"/>
+                                            </button>
+                                            <button data-exp="xlsx" type="button" class="btn btn-success">
+                                                <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                            </button>
+                                            <button data-exp="docx" type="button" class="btn btn-primary">
+                                                <i class="fa fa-file-word-o fa-2x"/>
+                                            </button>
+                                            <button data-exp="html" type="button" class="btn btn-system">
+                                                <i class="fa fa-file-code-o fa-2x"/>
+                                            </button>
+                                        </div>
+                                    </h:form>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.authorize('R_PRC')}">
+                                <div id="tab2" class="tab-pane #{not sessionBean.authorize('RP_PRC') ? 'active' : ''}">   
+                                    <h:form id="form-r-purchase">
+                                        <script>
+                                            $(function () {
+                                                Report.configure("form-r-purchase");
+                                            });
+                                        </script>
+                                        <p:commandLink id="pdf"  styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="xlsx"  styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="docx"  styleClass="hidden" ajax="false" />
+                                        <p:commandLink id="html" styleClass="hidden" ajax="false" />
+
+                                        <p><span class="pl5 pr5 bg-alert mr10">
+                                                <i class="icon-documents-text"/></span><b>LISTA DE COMPRAS</b></p>
+                                        <div class="form-horizontal">
+
+
+                                        </div>
+                                        <hr class="short mt10 mb10"/> 
+                                        <div class="text-right">
+                                            <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                                <i class="fa fa-file-pdf-o fa-2x"/>
+                                            </button>
+                                            <button data-exp="excel" type="button" class="btn btn-success">
+                                                <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                            </button>
+                                            <button data-exp="word" type="button" class="btn btn-primary">
+                                                <i class="fa fa-file-word-o fa-2x"/>
+                                            </button>
+                                            <button data-exp="html" type="button" class="btn btn-system">
+                                                <i class="fa fa-file-code-o fa-2x"/>
+                                            </button>
+                                        </div>
+                                    </h:form>           
+                                </div>
+                            </ui:fragment>
+                        </div>
+                    </div>
+                </div>   
+            </h:panelGroup>
+        </div>
+    </div>
+</ui:composition>

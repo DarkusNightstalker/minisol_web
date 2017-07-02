@@ -7,6 +7,12 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <script  type="text/javascript" src="#{request.contextPath}/js/purchase_view.js"/>
+    <script type="text/javascript">
+        $(function () {
+            document.title = 'Compras #{sessionBean.currentCompany.name} - #{sessionBean.currentCompany.city}';
+            $("#short-icon").attr("href","#{request.contextPath}/assets/img/icon/purchase.ico");
+        });
+    </script>
     <header id="topbar" class="affix">
         <div class="topbar-left">
             <ol class="breadcrumb">

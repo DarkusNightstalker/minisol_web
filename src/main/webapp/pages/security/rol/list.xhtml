@@ -5,6 +5,7 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script src="#{request.contextPath}/js/rol_view.js"></script>
 
     <header id="topbar" class="affix">
         <div class="topbar-left">
@@ -68,7 +69,7 @@
                                             <ui:param name="order_factory" value="#{rolBean.orderFactory}"/>
                                             <ui:param name="update_script" value="search()"/>
                                         </ui:include>
-                                        <table class="table table-condensed table-bordered table-striped theme-warning  fs13">
+                                        <table class="table table-condensed table-striped theme-warning  fs13">
                                             <thead>
                                                 <tr class="bg-light">
                                                     <th class="">Nombre</th>
@@ -77,7 +78,7 @@
                                             </thead>
                                             <tbody>
                                                 <ui:repeat value="#{rolBean.pagination.data}" var="item">
-                                                    <tr>
+                                                    <tr class="#{item[2]  ? '' : 'danger'}">
                                                         <td class="">#{item[1]}</td>
                                                         <td class="text-right">
                                                             <div class="btn-group">
@@ -86,7 +87,7 @@
                                                                     <span class="caret ml5"></span>
                                                                 </button>
                                                                 <ul class="dropdown-menu dropdown-menu-right ptn pbn" role="menu">
-                                                                   
+
                                                                     <li>
                                                                         <p:commandLink 
                                                                             update=":m-rol-content"
@@ -109,17 +110,32 @@
                                                                             Editar
                                                                             <f:setPropertyActionListener value="#{item[0]}" target="#{managedRolBean.idSelected}" />
                                                                         </p:commandLink>
-                                                                    </li>
-                                                                     <li>
-                                                                        <p:commandLink 
-                                                                            process="@this" 
-                                                                            styleClass="btn btn-xs btn-gradient btn-danger"
-                                                                            onstart="begin_load()"
-                                                                            oncomplete="end_load();">
-                                                                            Desactivar
-                                                                            <f:setPropertyActionListener target="#{stockMovementBean.id}" value="#{item[0]}"/>
-                                                                        </p:commandLink>
-                                                                    </li>
+                                                                    </li><ui:fragment rendered="#{item[2]}">
+                                                                        <li>
+                                                                            <p:commandLink 
+                                                                                update=":delete-content" 
+                                                                                process="@this" 
+                                                                                onstart="begin_load()"
+                                                                                oncomplete="end_load();Rol.delete('#{item[1]}');" 
+                                                                                styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                                Eliminar
+                                                                                <f:setPropertyActionListener target="#{rolBean.id}" value="#{item[0]}"/>
+                                                                            </p:commandLink>
+                                                                        </li>
+                                                                    </ui:fragment>
+                                                                    <ui:fragment rendered="#{not item[2]}">
+                                                                        <li>
+                                                                            <p:commandLink 
+                                                                                update=":delete-content" 
+                                                                                process="@this" 
+                                                                                onstart="begin_load()"
+                                                                                oncomplete="end_load();Rol.recovery('#{item[1]}');" 
+                                                                                styleClass="btn btn-xs btn-gradient btn-success">
+                                                                                Restaurar
+                                                                                <f:setPropertyActionListener target="#{rolBean.id}" value="#{item[0]}"/>
+                                                                            </p:commandLink>
+                                                                        </li>
+                                                                    </ui:fragment>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -149,7 +165,8 @@
             </div>
         </section>
         <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{rolBean.search()}" process="@form" update="form:table-wrapper" />
-        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();$.magnificPopup.close();search();" action="#{managedRolBean.delete(rolBean.id)}" process="@form" update="form:table-wrapper" />
+        <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedRolBean.delete(rolBean.id)}" process="@form" update="form:table-wrapper" />
+        <p:remoteCommand name="recovery" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedRolBean.recovery(rolBean.id)}" process="@form" update="form:table-wrapper" />
         <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{rolBean.refresh()}" process="@form" update="form:table-wrapper" />
 
     </h:form>
@@ -160,6 +177,14 @@
         <ui:param name="modal_title" value="ANULAR"/>
         <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
         <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="recovery"/>
+        <ui:param name="modal_title" value="RESTAURAR"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="recovery()"/>
         <ui:param name="accept_text" value="SI"/>
         <ui:param name="cancel_text" value="NO"/>
     </ui:include>

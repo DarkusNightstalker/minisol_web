@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="kardex_report" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f4ff809e-964b-4faa-a1e6-fd0a25dcc29f">
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
 	<property name="ireport.zoom" value="0.9090909090909126"/>
-	<property name="ireport.x" value="111"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
@@ -48,7 +48,7 @@
 		<parameter name="id_companies" class="java.util.List" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
-		<parameter name="barcode_product" class="java.lang.String" isForPrompting="false">
+		<parameter name="id_product" class="java.lang.Long" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
 		<queryString>
@@ -70,7 +70,7 @@ left join payment_proof pp on k.id_payment_proof = pp.id
 left join operation_type ot on k.id_operation_type = ot.id
 join product p on p.id = k.id_product
 join company c on c.id = k.id_company
-WHERE (k.date between $P{date_init} AND $P{date_end}) AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product}
+WHERE (k.date between $P{date_init} AND $P{date_end}) AND $X{IN, k.id_company, id_companies} AND p.id = $P{id_product} and k.active = true
 order by k.date,k.priority]]>
 		</queryString>
 		<field name="code" class="java.lang.String"/>
@@ -96,7 +96,7 @@ order by k.date,k.priority]]>
 		<defaultValueExpression><![CDATA["logo.png"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="id_companies" class="java.util.List"/>
-	<parameter name="barcode_product" class="java.lang.String"/>
+	<parameter name="id_product" class="java.lang.Long"/>
 	<parameter name="date_init" class="java.util.Date"/>
 	<parameter name="date_end" class="java.util.Date"/>
 	<parameter name="ruc" class="java.lang.String"/>
@@ -112,7 +112,7 @@ uom.name as uom_name
 from product p
 join stock_type st on p.id_stock_type = st.id
 join uom on p.id_uom = uom.id
-WHERE p.barcode LIKE $P{barcode_product}]]>
+WHERE p.id = $P{id_product}]]>
 	</queryString>
 	<field name="barcode" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
@@ -335,12 +335,12 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 			<componentElement>
 				<reportElement uuid="0fb83f96-5d61-4409-8674-9b1496460f2d" key="table 1" x="1" y="15" width="801" height="50"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="kardex" uuid="5bd992d7-7e8f-4605-9841-e0f5bc857fef">
+					<datasetRun subDataset="kardex" uuid="755feecb-6a1a-46a4-ae25-06e7a75b9ec0">
 						<datasetParameter name="id_companies">
 							<datasetParameterExpression><![CDATA[$P{id_companies}]]></datasetParameterExpression>
 						</datasetParameter>
-						<datasetParameter name="barcode_product">
-							<datasetParameterExpression><![CDATA[$P{barcode_product}]]></datasetParameterExpression>
+						<datasetParameter name="id_product">
+							<datasetParameterExpression><![CDATA[$P{id_product}]]></datasetParameterExpression>
 						</datasetParameter>
 						<datasetParameter name="date_init">
 							<datasetParameterExpression><![CDATA[$P{date_init}]]></datasetParameterExpression>

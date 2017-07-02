@@ -45,13 +45,13 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#tab14_3" onclick="Report.clean('form-r-kardex-valuate');anulateValuateProduct();" data-toggle="tab">
+                                <a href="#tab14_3" onclick="Report.clean('form-r-kardex-valuate');" data-toggle="tab">
                                     <span class="fs16 pl5 pt5 pr5 bg-warning mr15">
                                         <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Valorizadas por producto
                                 </a>
                             </li>
                             <li>
-                                <a href="#tab14_4" onclick="Report.clean('form-r-kardex-physical');anulatePhysicalProduct();" data-toggle="tab">
+                                <a href="#tab14_4" onclick="Report.clean('form-r-kardex-physical');" data-toggle="tab">
                                     <span class="fs16 pl5 pt5 pr5 bg-primary mr15">
                                         <i class="glyphicons glyphicons-cargo"/></span>  Inventario Unid. Físicas por producto
                                 </a>
@@ -171,29 +171,8 @@
                             </div>
                             <div id="tab14_3" class="tab-pane">   
                                 <h:form id="form-r-kardex-valuate">
-                                    <p:remoteCommand process="@this" update="form-r-kardex-valuate:name-wrapper" name="anulateValuateProduct">                                        
-                                        <f:setPropertyActionListener target="#{reportStockBean.kardexValuate.params['name_product']}" value="#{null}" />
-                                    </p:remoteCommand>
-                                    <p:remoteCommand process="@this" onstart="begin_load()" oncomplete="end_load()" action="#{reportStockBean.productSearcher.searchByBarcode()}" update="form-r-kardex-valuate:name-wrapper" name="searchValuateProduct">      
-                                    </p:remoteCommand>
                                     <script>
                                         $(function () {
-                                            $("#form-r-kardex-valuate\\:barcode").pressEnter(function () {
-                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
-                                                    $("#form-r-kardex-valuate\\:date-init").focus();
-                                                } else {
-                                                    searchValuateProduct([{name: 'barcode', value: this.value}]);
-                                                }
-                                            }).on("blur", function () {
-                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
-                                                } else {
-                                                    this.value = "";
-                                                }
-                                            }).on("input", function () {
-                                                if ($("#form-r-kardex-valuate\\:name-wrapper .form-group").length) {
-                                                    anulateValuateProduct();
-                                                }
-                                            });
                                             Report.configure("form-r-kardex-valuate");
                                         });
                                     </script>
@@ -212,31 +191,27 @@
                                         <div class="form-group form-group-sm mb5">
                                             <label class="col-md-3 control-label">Cod. Barras.</label>
                                             <div class="col-md-7">
-                                                <div class="input-group input-group-sm">
-                                                    <p:inputText id="barcode" value="#{reportStockBean.kardexValuate.params['barcode_product']}" class="form-control none-pass">
-                                                        <f:passThroughAttribute name="maxlength" value="13"/>
-                                                        <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
-                                                        <f:passThroughAttribute name="required" value=""/>
-                                                        <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
-                                                    </p:inputText>
-                                                    <span class="input-group-btn">
-                                                        <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
-                                                            <i class="fa fa-search"/>
-                                                        </p:commandLink>
-                                                    </span>
-                                                </div>
+                                                <p:autoComplete 
+                                                    id="product"                                                   
+                                                    widgetVar="valuate_product"
+                                                    value="#{reportStockBean.kardexValuate.params['product']}" 
+                                                    completeMethod="#{reportStockBean.searchProduct}"
+                                                    var="c" 
+                                                    itemLabel="#{c[2]}" 
+                                                    itemValue="#{c}"  
+                                                    inputStyleClass="form-control input-sm required"
+                                                    styleClass="col-xs-12 pln prn"
+                                                    converter="dn.web.converter.arrayConverter"
+                                                    emptyMessage="No hay resultados"
+                                                    forceSelection="true"> 
+                                                    <f:passThroughAttribute name="index" value="1" />
+                                                    <p:column>
+                                                        <h:outputText class="fs11" value="#{c[2]}" /><br/>
+                                                        <small class="text-muted fs9"><b>#{c[1]}</b> </small>
+                                                    </p:column>
+                                                </p:autoComplete>
                                             </div>
                                         </div>
-                                        <h:panelGroup id="name-wrapper" layout="block">
-                                            <ui:fragment rendered="#{reportStockBean.kardexValuate.params['name_product'] ne null}">
-                                                <div class="form-group form-group-sm mb5">
-                                                    <label class="col-md-3 control-label">Nombre prod.</label>
-                                                    <div class="col-md-9">
-                                                        <p class="form-control-static">#{reportStockBean.kardexValuate.params['name_product']}</p>
-                                                    </div>
-                                                </div>
-                                            </ui:fragment>
-                                        </h:panelGroup>
                                         <div class="form-group form-group-sm mb5">
                                             <label class="col-md-3 control-label">Fec. Inicio.</label>
                                             <div class="col-md-7">
@@ -290,29 +265,8 @@
                             </div>
                             <div id="tab14_4" class="tab-pane">   
                                 <h:form id="form-r-kardex-physical">
-                                    <p:remoteCommand process="@this" update="form-r-kardex-physical:name-wrapper" name="anulatePhysicalProduct">                                        
-                                        <f:setPropertyActionListener target="#{reportStockBean.kardexPhysical.params['name_product']}" value="#{null}" />
-                                    </p:remoteCommand>
-                                    <p:remoteCommand process="@this" onstart="begin_load()" oncomplete="end_load()" action="#{reportStockBean.productSearcher.searchByBarcode()}" update="form-r-kardex-physical:name-wrapper" name="searchPhysicalProduct">      
-                                    </p:remoteCommand>
                                     <script>
                                         $(function () {
-                                            $("#form-r-kardex-physical\\:barcode").pressEnter(function () {
-                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
-                                                    $("#form-r-kardex-physical\\:date-init").focus();
-                                                } else {
-                                                    searchPhysicalProduct([{name: 'barcode', value: this.value}]);
-                                                }
-                                            }).on("blur", function () {
-                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
-                                                } else {
-                                                    this.value = "";
-                                                }
-                                            }).on("input", function () {
-                                                if ($("#form-r-kardex-physical\\:name-wrapper .form-group").length) {
-                                                    anulatePhysicalProduct();
-                                                }
-                                            });
                                             Report.configure("form-r-kardex-physical");
                                         });
                                     </script>
@@ -331,19 +285,24 @@
                                         <div class="form-group form-group-sm mb5">
                                             <label class="col-md-3 control-label">Cod. Barras.</label>
                                             <div class="col-md-7">
-                                                <div class="input-group input-group-sm">
-                                                    <p:inputText id="barcode" value="#{reportStockBean.kardexPhysical.params['barcode_product']}" class="form-control none-pass" >
-                                                        <f:passThroughAttribute name="maxlength" value="13"/>
-                                                        <f:passThroughAttribute name="data-msg-maxlength" value="Maximo 13"/>
-                                                        <f:passThroughAttribute name="required" value=""/>
-                                                        <f:passThroughAttribute name="data-msg-required" value="Campo obligatorio"/>
-                                                    </p:inputText>
-                                                    <span class="input-group-btn">                                                        
-                                                        <p:commandLink process="@this" update=":form-search-product" onstart="begin_load();" oncomplete="end_load();open_search_product()" action="#{reportStockBean.productSearcher.refresh()}" styleClass="btn btn-sm">
-                                                            <i class="fa fa-search"/>
-                                                        </p:commandLink>
-                                                    </span>
-                                                </div>
+                                                <p:autoComplete 
+                                                    widgetVar="physical_product"
+                                                    value="#{reportStockBean.kardexPhysical.params['product']}" 
+                                                    completeMethod="#{reportStockBean.searchProduct}"
+                                                    var="c" 
+                                                    itemLabel="#{c[2]}" 
+                                                    itemValue="#{c}"  
+                                                    inputStyleClass="form-control input-sm required"
+                                                    styleClass="col-xs-12 pln prn"
+                                                    converter="dn.web.converter.arrayConverter"
+                                                    emptyMessage="No hay resultados"
+                                                    forceSelection="true"> 
+                                                    <f:passThroughAttribute name="index" value="1" />
+                                                    <p:column>
+                                                        <h:outputText class="fs11" value="#{c[2]}" /><br/>
+                                                        <small class="text-muted fs9"><b>#{c[1]}</b> </small>
+                                                    </p:column>
+                                                </p:autoComplete>
                                             </div>
                                         </div>
                                         <h:panelGroup id="name-wrapper" layout="block">
@@ -478,7 +437,7 @@
                             </div>
                             <div id="tab14_6" class="tab-pane">   
                                 <h:form id="form-r-kardex-physical-total">
-                                  
+
                                     <script>
                                         $(function () {
                                             Report.configure("form-r-kardex-physical-total");
@@ -553,89 +512,4 @@
         </div>
     </div>
 
-    <div id="modal-search-product" class="modal fade" role="dialog">
-        <div class="modal-dialog modal-lg">
-            <h:panelGroup layout="block" id="info-content" styleClass="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><i class="fa fa-info-circle"/>  BUSCAR PRODUCTO</h4>
-                </div>
-                <h:form id="form-search-product">
-                    <p:remoteCommand  
-                        name="searchProducts" 
-                        process="@this,terms" 
-                        action="#{reportStockBean.productSearcher.search()}" 
-                        onstart="begin_load();"
-                        oncomplete="end_load();"
-                        update=":form-search-product"/>
-                    <p:remoteCommand  
-                        name="selectReportProduct" 
-                        process="@this" 
-                        action="#{reportStockBean.productSearcher.select()}" 
-                        onstart="begin_load();"
-                        oncomplete="end_load();$('#modal-search-product .close').trigger('click')"
-                        update=":form-r-kardex-valuate,:form-r-kardex-physical"/>
-                    <div class="modal-body">
-                        <div class="form-horizontal">
-                            <div class="form-group form-group-sm mb5">
-                                <label class="col-md-2 control-label">Buscar</label>
-                                <div class="col-md-7">
-                                    <script>
-                                        $(function () {
-                                            $("#form-search-product\\:terms").pressEnter(function () {
-                                                searchProducts();
-                                            });
-                                        });
-                                    </script>
-                                    <p:inputText id="terms" value="#{reportStockBean.productSearcher.terms}" styleClass="form-control input-sm" placeholder="Nombre o codigo de barras"/>
-                                </div>
-                            </div>
-                            <div class="form-group form-group-sm">
-                                <div class="col-md-12">
-                                    <h:panelGroup layout="block" id="table-wrapper">
-                                        <ui:include src="/layout/datatable/toolbar.xhtml">
-                                            <ui:param name="wrapperId"  value="form-search-product:table-wrapper"/>
-                                            <ui:param name="pagination"  value="#{reportStockBean.productSearcher.pagination}"/>
-                                            <ui:param name="order_factory" value="#{reportStockBean.productSearcher.orderFactory}"/>
-                                            <ui:param name="update_script" value="search()"/>
-                                        </ui:include>
-                                        <table class="table table-hover table-bordered table-condensed fs13">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-center" valign="middle" >Codigo</th> 
-                                                    <th  valign="middle" >Nombre</th> 
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <ui:repeat value="#{reportStockBean.productSearcher.pagination.data}" var="item" varStatus="st">
-                                                    <tr onclick="selectReportProduct([{name: 'index', value: #{st.index}}])">
-                                                        <td>#{item[1]}</td>
-                                                        <td>#{item[2]}</td>
-                                                    </tr>
-                                                </ui:repeat>
-                                            </tbody>                                                
-                                            <ui:fragment rendered="#{empty reportStockBean.productSearcher.pagination.data}">
-                                                <tfoot>
-                                                    <tr>
-                                                        <td colspan="2" class="text-center">
-                                                            <h4 class="text-muted">No se ha encontrado registros</h4>
-                                                        </td>
-                                                    </tr>
-                                                </tfoot>
-                                            </ui:fragment>
-                                        </table>
-                                        <ui:include src="/layout/datatable/footer.xhtml">
-                                            <ui:param name="wrapperId"  value="form-search-product:table-wrapper"/>
-                                            <ui:param name="pagination"  value="#{reportStockBean.productSearcher.pagination}"/>
-                                        </ui:include>
-
-                                    </h:panelGroup>
-                                </div>
-                            </div>
-                        </div>
-                    </div>   
-                </h:form>
-            </h:panelGroup>
-        </div>
-    </div>
 </ui:composition>

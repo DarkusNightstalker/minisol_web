@@ -5,6 +5,7 @@
  */
 package cs.bms.servlet;
 
+import cs.bms.model.User;
 import cs.bms.service.interfac.IActorService;
 import cs.bms.service.interfac.ICompanyService;
 import cs.bms.service.interfac.IDocumentNumberingService;
@@ -25,13 +26,13 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import static javafx.scene.input.KeyCode.J;
 import javax.enterprise.context.SessionScoped;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -40,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -133,14 +135,13 @@ public class ResourceSynchro implements java.io.Serializable {
                     )
             );
             //</editor-fold>
-            //<editor-fold defaultstate="collapsed" desc="Numeración de series">
-            
+            //<editor-fold defaultstate="collapsed" desc="Numeración de series">            
             allBuilder.add("document_number",
                     createArrayBuilderFromList(
                             documentNumberingService.getListData()
                     )
             );
-        //</editor-fold>
+            //</editor-fold>
             //<editor-fold defaultstate="collapsed" desc="Tipos de identificaciones">
             allBuilder.add("create_idd",
                     createArrayBuilderFromList(
@@ -192,12 +193,12 @@ public class ResourceSynchro implements java.io.Serializable {
             //<editor-fold defaultstate="collapsed" desc="Usuarios">
             allBuilder.add("create_user",
                     createArrayBuilderFromList(
-                            userService.getCreateByAfterDate(lastUpdate,company)
+                            userService.getCreateByAfterDate(lastUpdate, company)
                     )
             );
             allBuilder.add("edit_user",
                     createArrayBuilderFromList(
-                            userService.getEditedByAfterDate(lastUpdate,company, false)
+                            userService.getEditedByAfterDate(lastUpdate, company, false)
                     )
             );
             //</editor-fold>
@@ -269,7 +270,7 @@ public class ResourceSynchro implements java.io.Serializable {
             );
             //</editor-fold>     
             //<editor-fold defaultstate="collapsed" desc="Movimientos Internos">
-             allBuilder.add("create_stock",
+            allBuilder.add("create_stock",
                     createArrayBuilderFromList(
                             internalStockMovementService.getCreatedByAfterDate(lastUpdate, company)
                     )
@@ -279,9 +280,44 @@ public class ResourceSynchro implements java.io.Serializable {
                             internalStockMovementService.getEditedByAfterDate(lastUpdate, company, false)
                     )
             );
-            
+
             //</editor-fold>
             return allBuilder.build();
+        } else {
+            Response.status(Response.Status.UNAUTHORIZED);
+            return null;
+        }
+    }
+
+    @POST
+    @Path("points.dkn")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonArray updatePoints(JsonObject jsonInput) throws Exception {
+
+        Long time = jsonInput.getJsonNumber("time").longValue();
+
+        Date currentDate = new Date();
+        double minutes = new Long(currentDate.getTime() - time).doubleValue() / 60000.0;
+        if (minutes > 3) {
+            Response.status(Response.Status.REQUEST_TIMEOUT);
+            return null;
+        }
+        String username = AES.decrypt(jsonInput.getString("username"), AESKeys.SYNCHRO_TRANSFERENCE);
+        String password = AES.decrypt(jsonInput.getString("password"), AESKeys.SYNCHRO_TRANSFERENCE);
+        User user =  userService.login(username, password);
+        if (user != null && user.getActive()) {
+            JsonArray data = jsonInput.getJsonArray("data");
+            JsonArrayBuilder responseBuilder = Json.createArrayBuilder();
+            data.getValuesAs(JsonObject.class).forEach((item) -> {
+                Long id = actorService.getIdByIdentityNumber(item.getString("identityNumber"));
+                if(id != null){
+                    actorService.addPoints(id, item.getJsonNumber("points").longValue(), user);                        
+                }else{
+                    responseBuilder.add(item.getJsonNumber("saleId").longValue());
+                }
+            });
+            return responseBuilder.build();
         } else {
             Response.status(Response.Status.UNAUTHORIZED);
             return null;

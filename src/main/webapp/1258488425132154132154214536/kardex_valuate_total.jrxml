@@ -3,7 +3,7 @@
 	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
 	<property name="ireport.zoom" value="1.210000000000005"/>
 	<property name="ireport.x" value="307"/>
-	<property name="ireport.y" value="10"/>
+	<property name="ireport.y" value="0"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -70,7 +70,7 @@ left join payment_proof pp on k.id_payment_proof = pp.id
 join operation_type ot on k.id_operation_type = ot.id
 join company c on c.id = k.id_company
 join product p on p.id = k.id_product
-WHERE (k.date between $P{date_init} AND $P{date_end})AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product}
+WHERE (k.date between $P{date_init} AND $P{date_end})AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product} and k.active = true
 order by k.date,k.priority]]>
 		</queryString>
 		<field name="code" class="java.lang.String"/>

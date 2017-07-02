@@ -36,7 +36,7 @@
             <f:setPropertyActionListener value="#{purchaseBean}" target="#{sessionBean.loadable}" />
         </p:commandLink>
         <p:remoteCommand name="refresh" process="@form" action="#{managedPurchaseBean.refresh()}" update=":content-wrapper"/>
-        <p:remoteCommand name="save" process="@form" action="#{managedPurchaseBean.doSave('/pages/purchase/list.xhtml', purchaseBean)}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" onstart="begin_load()" oncomplete="end_load();" action="#{managedPurchaseBean.doSave('/pages/purchase/list.xhtml', purchaseBean)}" update=":content-wrapper"/>
 
         <section id="content" class="table-layout  animated fadeIn">
             <div class="row center-block mt10" style="">

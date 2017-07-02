@@ -70,7 +70,7 @@ left join payment_proof pp on k.id_payment_proof = pp.id
 left join operation_type ot on k.id_operation_type = ot.id
 join product p on p.id = k.id_product
 join company c on c.id = k.id_company
-WHERE (k.date between $P{date_init} AND $P{date_end}) AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product}
+WHERE (k.date between $P{date_init} AND $P{date_end}) AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE  $P{barcode_product}  and k.active = true
 order by k.date,k.priority]]>
 		</queryString>
 		<field name="code" class="java.lang.String"/>

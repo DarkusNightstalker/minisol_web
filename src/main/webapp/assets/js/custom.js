@@ -1,9 +1,3 @@
-JoelPurra.PlusAsTab.setOptions({
-    // Use enter instead of plus
-    // Number 13 found through demo at
-    // https://api.jquery.com/event.which/
-    key: 13
-});
 var App = function () {
 
     var modal = function (content_id, effect, midClick_) {

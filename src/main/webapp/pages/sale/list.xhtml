@@ -7,6 +7,12 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <script  type="text/javascript" src="#{request.contextPath}/js/sale_view.js"/>
+    <script type="text/javascript">
+        $(function () {
+            document.title = 'Ventas #{sessionBean.currentCompany.name} - #{sessionBean.currentCompany.city}';
+            $("#short-icon").attr("href","#{request.contextPath}/assets/img/icon/sale.ico");
+        });
+    </script>
     <script>fixModal();</script>
     <header id="topbar" class="affix">
         <div class="topbar-left">

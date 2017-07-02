@@ -9,6 +9,7 @@ import cs.bms.enumerated.UoMType;
 import cs.bms.model.User;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +26,16 @@ public class AppBean implements java.io.Serializable {
 
     private final UoMType[] uomTypes;
     private List<Object[]> errors;
+    private SimpleDateFormat sdf;
 
     public AppBean() {
+        sdf = new SimpleDateFormat();
         uomTypes = UoMType.values();
         errors = new ArrayList();
+    }
+    public String formatDate(String pattern,Date date){
+        sdf.applyPattern(pattern);
+        return sdf.format(date);
     }
 
     public void printErrors(PrintWriter writer) {

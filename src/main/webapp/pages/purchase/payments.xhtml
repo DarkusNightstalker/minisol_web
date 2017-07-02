@@ -38,7 +38,7 @@
                                         <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
                                     </h:outputText>
                                     <h:panelGroup id="remaining">
-                                        <small class="text-danger pl15">(Falta pagar S/.<h:outputText value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.purchasePaymentSearcher.currentPay}">
+                                        <small class="text-danger pl15">(Falta pagar S/.<h:outputText value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.otherData['currentPay'] - purchaseBean.otherData['repayment']}">
                                                 <f:convertNumber minFractionDigits="2" maxFractionDigits="2" />
                                             </h:outputText>) 
                                         </small>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <h:panelGroup id="payments" layout="block">  
-                            <ui:repeat value="#{purchaseBean.purchasePaymentSearcher.data}" var="item" varStatus="st">
+                            <ui:repeat value="#{purchaseBean.otherData['payments']}" var="item" varStatus="st">
                                 <div class="form-group form-group-sm mbn">
                                     <div class="col-md-1">
                                         <p class="text-muted form-control-static input-sm text-left">
@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
                             </ui:repeat>
-                            <ui:fragment rendered="#{(purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount) gt purchaseBean.purchasePaymentSearcher.currentPay}">
+                            <ui:fragment rendered="#{(purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.otherData['repayment']) gt purchaseBean.otherData['currentPay']}">
                                 <div class="form-group form-group-sm mbn">
                                     <div class="col-md-1">
                                         <p class="text-muted form-control-static input-sm text-left">                                        
@@ -100,7 +100,8 @@
                                         <div class="form-group form-group-sm mbn">
                                             <div class="col-md-12">
                                                 <p:inputText id="quantity"  value="#{purchaseBean.purchasePaymentSearcher.quantity}" placeholder="Cantidad" styleClass="form-control input-sm text-rigth">
-                                                    <f:passThroughAttribute name="max" value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.purchasePaymentSearcher.currentPay}" />
+                                                    <f:passThroughAttribute name="max" value="#{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.otherData['repayment'] - purchaseBean.otherData['currentPay']}" />
+                                                    <f:passThroughAttribute name="data-msg-max" value="Maximo #{purchaseBean.selected.subtotal + purchaseBean.selected.igv - purchaseBean.selected.subtotalDiscount - purchaseBean.otherData['repayment'] - purchaseBean.otherData['currentPay']}" />
                                                 </p:inputText>
                                             </div>
                                         </div>

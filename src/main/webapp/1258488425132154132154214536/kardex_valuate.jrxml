@@ -48,7 +48,7 @@
 		<parameter name="id_companies" class="java.util.List" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
-		<parameter name="barcode_product" class="java.lang.String" isForPrompting="false">
+		<parameter name="id_product" class="java.lang.Long" isForPrompting="false">
 			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 		</parameter>
 		<queryString>
@@ -70,7 +70,7 @@ left join payment_proof pp on k.id_payment_proof = pp.id
 join operation_type ot on k.id_operation_type = ot.id
 join company c on c.id = k.id_company
 join product p on p.id = k.id_product
-WHERE (k.date between $P{date_init} AND $P{date_end})AND $X{IN, k.id_company, id_companies} AND p.barcode LIKE $P{barcode_product}
+WHERE (k.date between $P{date_init} AND $P{date_end})AND $X{IN, k.id_company, id_companies} AND p.id = $P{id_product} and k.active = true
 order by k.date,k.priority]]>
 		</queryString>
 		<field name="code" class="java.lang.String"/>
@@ -96,11 +96,11 @@ order by k.date,k.priority]]>
 		<defaultValueExpression><![CDATA["logo.png"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="id_companies" class="java.util.List"/>
-	<parameter name="barcode_product" class="java.lang.String"/>
 	<parameter name="date_init" class="java.util.Date"/>
 	<parameter name="date_end" class="java.util.Date"/>
 	<parameter name="ruc" class="java.lang.String"/>
 	<parameter name="name_company" class="java.lang.String"/>
+	<parameter name="id_product" class="java.lang.Long"/>
 	<queryString>
 		<![CDATA[select
 p.barcode,
@@ -112,7 +112,7 @@ uom.name as uom_name
 from product p
 join stock_type st on p.id_stock_type = st.id
 join uom on p.id_uom = uom.id
-WHERE p.barcode LIKE $P{barcode_product}]]>
+WHERE p.id = $P{id_product}]]>
 	</queryString>
 	<field name="barcode" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
@@ -335,12 +335,12 @@ WHERE p.barcode LIKE $P{barcode_product}]]>
 			<componentElement>
 				<reportElement uuid="1b66659b-b677-4cd8-a52a-b09d666c4338" key="table 1" x="-1" y="18" width="802" height="50"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="kardex" uuid="f70c6f93-2a72-402a-84fb-cec8e51cb0fb">
+					<datasetRun subDataset="kardex" uuid="30045679-d37b-4630-af8f-9e156304848b">
 						<datasetParameter name="id_companies">
 							<datasetParameterExpression><![CDATA[$P{id_companies}]]></datasetParameterExpression>
 						</datasetParameter>
-						<datasetParameter name="barcode_product">
-							<datasetParameterExpression><![CDATA[$P{barcode_product}]]></datasetParameterExpression>
+						<datasetParameter name="id_product">
+							<datasetParameterExpression><![CDATA[$P{id_product}]]></datasetParameterExpression>
 						</datasetParameter>
 						<datasetParameter name="date_init">
 							<datasetParameterExpression><![CDATA[$P{date_init}]]></datasetParameterExpression>

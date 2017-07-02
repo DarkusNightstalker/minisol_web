@@ -217,7 +217,8 @@ public class VerifySaleBean implements java.io.Serializable {
                         + "s.igv,"
                         + "s.subtotalDiscount,"
                         + "s.points,"
-                        + "s.verified FROM Sale s WHERE s.id = ?", id);
+                        + "s.verified,"
+                        + "c.id FROM Sale s left join s.customer c WHERE s.id = ?", id);
                 if ((Boolean) data[8]) {
                     PNotifyMessage.errorMessage("Esta venta ya fue verificada!!");
                     BeanUtil.exceuteJS("SaleVerification.after_delete(" + id + ");");
@@ -278,6 +279,8 @@ public class VerifySaleBean implements java.io.Serializable {
                     }
                     saleService.updatePoints(points, (Long) data[0]);
                     saleService.updateDiscount(discount, (Long) data[0]);
+                    saleService.subtractCustomerPointsDiscount((Long)data[7] -points, (Long) data[0]);
+                    actorService.subtractPoints((Long)data[9],(Long)data[7] -points,sessionBean.getCurrentUser());
                     for (String code : vourcherCodes) {
                         if (code == null || code.equalsIgnoreCase("")) {
                             continue;

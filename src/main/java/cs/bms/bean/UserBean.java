@@ -27,7 +27,7 @@ import org.hibernate.sql.JoinType;
 
 /**
  *
- * @author CTIC
+ * @author Darkus Nightmare
  */
 @ManagedBean
 @SessionScoped
@@ -64,12 +64,14 @@ public class UserBean extends ABasicBean<Integer> {
         refresh();
     }
 
+    @Override
     public void refresh() {
         setName("");
         setUsername("");
         search();
     }
 
+    @Override
     public void search() {
         name = name.trim();
         username = username.trim();

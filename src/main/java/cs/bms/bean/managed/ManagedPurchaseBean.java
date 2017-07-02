@@ -179,12 +179,17 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
                         initialCost = ((finalCost * finalStock) - (detailStock * detailCost)) / initialStock;
                         //</editor-fold>
 
-                        stockService.substractQuantity(detail.getQuantity(), detail.getProduct(), selected.getCompanyArrival(),sessionBean.getCurrentUser());
-                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(initialCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(),sessionBean.getCurrentUser());
+                        stockService.substractQuantity(
+                                new BigDecimal(detailStock),
+                                detail.getProduct(),
+                                selected.getCompanyArrival(),
+                                sessionBean.getCurrentUser()
+                        );
+                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(initialCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(), sessionBean.getCurrentUser());
 
                         purchaseDetailService.delete(detail);
                     }
-                    
+
                     for (Object[] item : detailSearcher.data) {
                         PurchaseDetail detail = new PurchaseDetail();
                         detail.setId((Long) item[0]);
@@ -195,6 +200,14 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
                         detail.setUnitPrice((BigDecimal) item[4]);
                         detail.setUom(new UoM((Integer) item[7]));
                         detail.setSubtotal((BigDecimal) item[5]);
+
+                        if (item[9] != null && ((Number) item[9]).doubleValue() != 0) {
+                            BigDecimal basicPrice = productSalePriceService.getBasicPrice(sessionBean.getCurrentCompany(), detail.getProduct());
+                            if (basicPrice == null || ((Number) item[9]).doubleValue() != basicPrice.doubleValue()) {
+                                productSalePriceService.deleteByCompanyProduct(sessionBean.getCurrentCompany(), detail.getProduct());
+                                productSalePriceService.saveForGroup((BigDecimal) item[9], 1, sessionBean.getCurrentCompany(), detail.getProduct(), sessionBean.getCurrentUser());
+                            }
+                        }
 
                         if (detail.getId() != null) {
                             //<editor-fold defaultstate="collapsed" desc="Formula de Costo Inicial">
@@ -217,7 +230,7 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
                             stockService.substractQuantity(
                                     purchaseDetailService.getQuantityById(detail.getId()),
                                     detail.getProduct(),
-                                    selected.getCompanyArrival(),sessionBean.getCurrentUser()
+                                    selected.getCompanyArrival(), sessionBean.getCurrentUser()
                             );
                         } else {
                             //<editor-fold defaultstate="collapsed" desc="Formula de Costo Final">
@@ -234,8 +247,8 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
                             }
                             //</editor-fold>
                         }
-                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(finalCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(),sessionBean.getCurrentUser());
-                        stockService.addQuantity(detail.getQuantity(), detail.getProduct(), selected.getCompanyArrival(),sessionBean.getCurrentUser());
+                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(finalCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(), sessionBean.getCurrentUser());
+                        stockService.addQuantity(detail.getQuantity(), detail.getProduct(), selected.getCompanyArrival(), sessionBean.getCurrentUser());
                         purchaseDetailService.saveOrUpdate(detail);
                     }
 
@@ -316,7 +329,7 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
         }
 
         selected.setSerie(serie.toUpperCase());
-        String documentNumber = String.format("%08d", Long.parseLong(this.documentNumber));
+        documentNumber = String.format("%08d", Long.parseLong(this.documentNumber));
         selected.setDocumentNumber(documentNumber);
 
         selected.setElectronic(true);
@@ -897,8 +910,10 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
                     + "from PurchaseDetail pd WHERE pd.purchase = ?", selected);
             details.forEach(item -> {
                 try {
-                    item[9] = productSalePriceService.listHQLPage("SELECT psp.price FROM ProductSalePrice psp WHERE psp.product.id = ? and psp.company = ? ORDER BY psp.price", 1, 1, item[6], sessionBean.getCurrentCompany()).get(0);
+                    item[9] = productSalePriceService.getBasicPrice(sessionBean.getCurrentCompany(), new Product((Long) item[6]));
+
                 } catch (Exception e) {
+
                 }
             });
             data.addAll(details);
@@ -1179,8 +1194,8 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
             CriterionList criterionList = new CriterionList()
                     ._add(Restrictions.eq("active", true))
                     ._add(Restrictions.or(
-                            Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
-                            Restrictions.like("name", terms, MatchMode.ANYWHERE).ignoreCase()));
+                                    Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
+                                    Restrictions.like("name", terms, MatchMode.ANYWHERE).ignoreCase()));
             AliasList aliasList = new AliasList();
             aliasList.add("uom", "uom", JoinType.LEFT_OUTER_JOIN);
             OrderList orderList = new OrderList();

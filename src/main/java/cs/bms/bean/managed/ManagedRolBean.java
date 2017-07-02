@@ -11,13 +11,16 @@ import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.model.Permission;
 import cs.bms.model.PermissionCategory;
 import cs.bms.model.Rol;
+import cs.bms.model.User;
 import cs.bms.service.interfac.IPermissionCategoryService;
 import cs.bms.service.interfac.IPermissionService;
 import cs.bms.service.interfac.IRolService;
+import gkfire.auditory.Auditory;
 import gkfire.hibernate.AliasList;
 import gkfire.hibernate.CriterionList;
 import gkfire.web.bean.AManagedBean;
 import gkfire.web.bean.ILoadable;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,11 +62,50 @@ public class ManagedRolBean extends AManagedBean<Rol, IRolService> implements IL
     }
 
     @Override
+    public void delete(Serializable id) {
+        if (mainService.isActive((Integer) id)) {
+            Rol rol = mainService.getById((Integer) id);
+            Auditory.make(rol, sessionBean.getCurrentUser());
+            try {
+                getMainService().delete(rol);
+            } catch (Exception e) {
+                PNotifyMessage.systemError(e, sessionBean);
+                return;
+            }
+            PNotifyMessage.infoMessage("Se ha desactivado un rol");
+        } else {
+            PNotifyMessage.errorMessage("Este rol ya fue desactivado!!");
+        }
+    }
+
+    @Override
+    public void recovery(Serializable id) {
+        if (!mainService.isActive((Integer) id)) {
+            Rol rol = mainService.getById((Integer) id);
+            Auditory.make(rol, sessionBean.getCurrentUser());
+            rol.setActive(true);
+            try {
+                getMainService().update(rol);
+            } catch (Exception e) {
+                PNotifyMessage.systemError(e, sessionBean);
+                return;
+            }
+            PNotifyMessage.infoMessage("Se ha activado un rol");
+        } else {
+            PNotifyMessage.errorMessage("Este rol ya fue recuperado!!");
+        }
+    }
+
+    @Override
     public boolean save() {
-        String content = getSelected().getId() != null ? "Se ha actualizado un rol" : "Se ha creado un rol";
-        super.save(); //To change body of generated methods, choose Tools | Templates.
-        PNotifyMessage.saveMessage(content);
-        saved = true;
+        try {
+            String content = getSelected().getId() != null ? "Se ha actualizado un rol" : "Se ha creado un rol";
+            saved = super.save(); //To change body of generated methods, choose Tools | Templates.
+            PNotifyMessage.saveMessage(content);
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+            saved = false;
+        }
         return saved;
     }
 

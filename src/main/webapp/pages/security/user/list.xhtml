@@ -6,6 +6,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
+    <script src="#{request.contextPath}/js/user_view.js"></script>
     <header id="topbar" class="affix">
         <div class="topbar-left">
             <ol class="breadcrumb">
@@ -72,7 +73,7 @@
                                             </thead>
                                             <tbody>
                                                 <ui:repeat value="#{userBean.pagination.data}" var="item">
-                                                    <tr>
+                                                    <tr class="#{item[4] ? '' : 'danger'}">
                                                         <td class="">#{item[1]}
                                                         </td>
                                                         <td class="">#{item[2]}</td>
@@ -90,7 +91,7 @@
                                                                             process="@this" 
                                                                             onstart="begin_load()"
                                                                             action="#{userBean.load()}"
-                                                                            oncomplete="end_load();App.open_modal('#modal-info','mfp-zoomIn',false)" 
+                                                                            oncomplete="end_load();open_info()" 
                                                                             styleClass="btn btn-xs btn-gradient btn-info">
                                                                             Información
                                                                             <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
@@ -107,17 +108,32 @@
                                                                             <f:setPropertyActionListener value="#{item[0]}" target="#{managedUserBean.idSelected}" />
                                                                         </p:commandLink>
                                                                     </li>
-                                                                    <li>
-                                                                        <p:commandLink 
-                                                                            update=":delete-content" 
-                                                                            process="@this" 
-                                                                            onstart="begin_load()"
-                                                                            oncomplete="end_load();User.delete('#{item[4]}');" 
-                                                                            styleClass="btn btn-xs btn-gradient btn-danger">
-                                                                            Eliminar
-                                                                            <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
-                                                                        </p:commandLink>
-                                                                    </li>
+                                                                    <ui:fragment rendered="#{item[4]}">
+                                                                        <li>
+                                                                            <p:commandLink 
+                                                                                update=":delete-content" 
+                                                                                process="@this" 
+                                                                                onstart="begin_load()"
+                                                                                oncomplete="end_load();User.delete('#{item[1]}');" 
+                                                                                styleClass="btn btn-xs btn-gradient btn-danger">
+                                                                                Eliminar
+                                                                                <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
+                                                                            </p:commandLink>
+                                                                        </li>
+                                                                    </ui:fragment>
+                                                                    <ui:fragment rendered="#{not item[4]}">
+                                                                        <li>
+                                                                            <p:commandLink 
+                                                                                update=":delete-content" 
+                                                                                process="@this" 
+                                                                                onstart="begin_load()"
+                                                                                oncomplete="end_load();User.recovery('#{item[1]}');" 
+                                                                                styleClass="btn btn-xs btn-gradient btn-success">
+                                                                                Restaurar
+                                                                                <f:setPropertyActionListener target="#{userBean.id}" value="#{item[0]}"/>
+                                                                            </p:commandLink>
+                                                                        </li>
+                                                                    </ui:fragment>
                                                                 </ul>
                                                             </div>
                                                         </td>
@@ -170,8 +186,8 @@
                                     <span class="input-group-addon">
                                         <i class="glyphicons glyphicons-vcard"></i>
                                     </span>
-                                <p:inputText id="employee" value="#{userBean.name}"  styleClass="form-control input-sm" placeholder="Nombre de empleado" />
-                            </div>
+                                    <p:inputText id="employee" value="#{userBean.name}"  styleClass="form-control input-sm" placeholder="Nombre de empleado" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -186,7 +202,8 @@
                         <p:remoteCommand name="search" onstart="begin_load()" oncomplete="end_load()" action="#{userBean.search()}" process="@form" update="form:table-wrapper" />
                         <p:remoteCommand name="del" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedUserBean.delete(userBean.id)}" process="@form" update="form:table-wrapper" />
                         <p:remoteCommand name="refresh" onstart="begin_load()" oncomplete="end_load()" action="#{userBean.refresh()}" process="@form" update="form:table-wrapper" />
-                    </div>
+                    <p:remoteCommand name="recovery" onstart="begin_load()" oncomplete="end_load();search();" action="#{managedUserBean.recovery(userBean.id)}" process="@form" update="form:table-wrapper" />
+                         </div>
                 </div>
             </aside>
         </section>
@@ -198,6 +215,14 @@
         <ui:param name="modal_title" value="ANULAR"/>
         <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
         <ui:param name="accept_option" value="del()"/>
+        <ui:param name="accept_text" value="SI"/>
+        <ui:param name="cancel_text" value="NO"/>
+    </ui:include>
+    <ui:include src="/layout/modal_bioptional.xhtml">
+        <ui:param name="modal_name" value="recovery"/>
+        <ui:param name="modal_title" value="RESTAURAR|"/>
+        <ui:param name="modal_icon" value="fa fa-warning shaked animated"/>
+        <ui:param name="accept_option" value="recovery()"/>
         <ui:param name="accept_text" value="SI"/>
         <ui:param name="cancel_text" value="NO"/>
     </ui:include>

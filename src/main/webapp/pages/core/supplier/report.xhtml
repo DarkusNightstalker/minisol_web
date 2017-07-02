@@ -14,6 +14,8 @@
             $('#modal-report').on('shown.bs.modal', function () {
                 $('#formc\\:identity-number').focus();
             });
+            $('.ui-autocomplete-panel table').removeClass();
+            $('.ui-autocomplete-panel table').addClass("table table-condensed table-hover");
         });
     </script>
     <script type="text/javascript" src="#{request.contextPath}/js/report_util.js"/>
@@ -38,6 +40,12 @@
                                 <a href="#tab14_2" onclick="Report.clean('form-r-expense-ws')" data-toggle="tab">
                                     <span class="fs16 pl5 pt5 pr5 bg-alert mr15">
                                         <i class="glyphicons glyphicons-building"/></span>  Proveedores registrados
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab14_3" onclick="Report.clean('form-r-customer-sale')" data-toggle="tab">
+                                    <span class="fs16 pl5 pt5 pr5 bg-primary mr15">
+                                        <i class="fa fa-file-text"/></span>  Registros de ventas por cliente
                                 </a>
                             </li>
                         </ul>
@@ -120,6 +128,84 @@
                                                     </div>
                                                 </ui:repeat>
                                                 <h:inputHidden value="#{reportActorBean.supplierExport.params['id_identity_documents']}" converter="gkfire.converter.ListShort" id='many-identity-document-value' />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <br/>
+                                    <hr class="short mt10 mb10"/>
+                                    <div class="text-right">
+                                        <button data-exp="pdf" type="button" class="btn btn-danger ">
+                                            <i class="fa fa-file-pdf-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="xlsx" type="button" class="btn btn-success">
+                                            <i class="fa fa-file-excel-o fa-2x"/>                                        
+                                        </button>
+                                        <button data-exp="docx" type="button" class="btn btn-primary">
+                                            <i class="fa fa-file-word-o fa-2x"/>
+                                        </button>
+                                        <button data-exp="html" type="button" class="btn btn-system">
+                                            <i class="fa fa-file-code-o fa-2x"/>
+                                        </button>
+                                    </div>
+                                </h:form>
+                            </div>
+                            <div id="tab14_3" class="tab-pane">
+                                <h:form id="form-r-customer-sale">
+                                    <script>
+                                        $(function () {
+                                            Report.configure("form-r-customer-sale");
+                                        });
+                                    </script>
+                                    <p:commandLink id="pdf"   action="#{reportActorBean.customerSalesExport.toPdf()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="xlsx"  action="#{reportActorBean.customerSalesExport.toXlsx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="docx"  action="#{reportActorBean.customerSalesExport.toDocx()}" styleClass="hidden" ajax="false" />
+                                    <p:commandLink id="html"  action="#{reportActorBean.customerSalesExport.toHtml()}" styleClass="hidden" ajax="false" />
+
+                                    <p>
+                                        <span class="pl5 pt5 pr5 bg-info mr10">
+                                            <i class="fa fa-file-text"/>
+                                        </span>
+                                        <b>REGISTRO DE VENTAS POR CLIENTE</b>
+                                    </p>
+                                    <div class="form-horizontal"> 
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-4 control-label">Cliente</label>
+                                            <div class="col-md-8">
+                                                <p:autoComplete 
+                                                    widgetVar="customer_autocomplete"
+                                                    value="#{reportActorBean.customerSalesExport.params['customer']}" 
+                                                    completeMethod="#{reportActorBean.searchCustomer}"
+                                                    var="c" 
+                                                    itemLabel="#{c[3]}" 
+                                                    itemValue="#{c}"  
+                                                    inputStyleClass="form-control input-sm required"
+                                                    styleClass="col-xs-12 pln prn"
+                                                    converter="dn.web.converter.arrayConverter"
+                                                    emptyMessage="No hay resultados"
+                                                    forceSelection="true"> 
+                                                    <f:passThroughAttribute name="index" value="1" />
+                                                    <p:column styleClass="bg-white">
+                                                        <h:outputText class="fs11" value="#{c[3]}" /><br/>
+                                                        <small class="text-muted fs9"><b>#{c[1]}</b> #{c[2]}</small>
+                                                    </p:column>
+                                                </p:autoComplete>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-4 control-label">Fecha inicio</label>
+                                            <div class="col-md-6">
+                                                <p:inputText class="form-control d required" value="#{reportActorBean.customerSalesExport.params['date_init']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                        <div class="form-group form-group-sm">
+                                            <label class="col-md-4 control-label">Fecha Fin</label>
+                                            <div class="col-md-6">
+                                                <p:inputText class="form-control d required" value="#{reportActorBean.customerSalesExport.params['date_end']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:inputText>
                                             </div>
                                         </div>
                                     </div>

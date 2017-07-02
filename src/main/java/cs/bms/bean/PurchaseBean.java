@@ -5,6 +5,7 @@ import cs.bms.model.PurchasePayment;
 import cs.bms.service.interfac.ICompanyService;
 import cs.bms.service.interfac.IPurchasePaymentService;
 import cs.bms.service.interfac.IPurchaseService;
+import cs.bms.service.interfac.IStockReturnSupplierService;
 import gkfire.hibernate.AliasList;
 import gkfire.hibernate.CriterionList;
 import gkfire.hibernate.OrderFactory;
@@ -15,7 +16,9 @@ import gkfire.web.util.Pagination;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -43,12 +46,16 @@ public class PurchaseBean extends ABasicBean<Long> {
     private IPurchaseService purchaseService;
     @ManagedProperty(value = "#{purchasePaymentService}")
     private IPurchasePaymentService purchasePaymentService;
+    @ManagedProperty(value = "#{stockReturnSupplierService}")
+    private IStockReturnSupplierService stockReturnSupplierService;
     @ManagedProperty(value = "#{companyService}")
     private ICompanyService companyService;
 
     private CompanySearcher companySearcher;
     private PurchasePaymentSearcher purchasePaymentSearcher;
+
     private Purchase selected;
+    private Map<String, Object> otherData;
 
     private Integer companyId;
     private Date dateInit;
@@ -81,6 +88,13 @@ public class PurchaseBean extends ABasicBean<Long> {
     public void load() {
         try {
             selected = purchaseService.getById(id);
+            otherData = new HashMap();
+            otherData.put("currentPay", purchasePaymentService.getCurrentPay(selected));
+            List payments = new ArrayList();
+            payments.addAll(purchasePaymentService.listHQL("FROM PurchasePayment pp WHERE pp.purchase  = ?", selected));
+            otherData.put("payments",payments);
+            otherData.put("repayment", stockReturnSupplierService.getSumRepayment(selected));
+            otherData.put("devolutions", stockReturnSupplierService.getBasicDataByPurchase(selected));
             purchasePaymentSearcher.update();
         } catch (Exception e) {
 
@@ -116,15 +130,15 @@ public class PurchaseBean extends ABasicBean<Long> {
         ProjectionList projectionList = Projections.projectionList()
                 .add(Projections.id())
                 .add(Projections.property("dateIssue"))
-                .add(Projections.property("serie"))
-                .add(Projections.property("documentNumber"))
+                .add(Projections.property("pp.abbr"))
+                .add(Projections.property("fullDocument"))
                 .add(Projections.property("supplierName"))
                 .add(Projections.property("subtotal"))
                 .add(Projections.property("igv"))
                 .add(Projections.property("subtotalDiscount"))
                 .add(Projections.property("electronic"))
                 .add(Projections.sqlProjection("(SELECT SUM(pp.quantity) FROM purchase_payment pp WHERE pp.id_purchase = {alias}.id) as current_pay", new String[]{"current_pay"}, new Type[]{BigDecimalType.INSTANCE}))
-                .add(Projections.property("pp.name"))
+                .add(Projections.sqlProjection("(SELECT SUM(srs.repayment+srs.igv) FROM stock_return_supplier srs WHERE srs.id_purchase = {alias}.id) as current_repayment", new String[]{"current_repayment"}, new Type[]{BigDecimalType.INSTANCE}))
                 .add(Projections.property("active"));
         CriterionList criterionList = new CriterionList();
         AliasList aliasList = new AliasList();
@@ -327,6 +341,34 @@ public class PurchaseBean extends ABasicBean<Long> {
         this.purchaseService = purchaseService;
     }
 
+    /**
+     * @return the stockReturnSupplierService
+     */
+    public IStockReturnSupplierService getStockReturnSupplierService() {
+        return stockReturnSupplierService;
+    }
+
+    /**
+     * @param stockReturnSupplierService the stockReturnSupplierService to set
+     */
+    public void setStockReturnSupplierService(IStockReturnSupplierService stockReturnSupplierService) {
+        this.stockReturnSupplierService = stockReturnSupplierService;
+    }
+
+    /**
+     * @return the otherData
+     */
+    public Map<String, Object> getOtherData() {
+        return otherData;
+    }
+
+    /**
+     * @param otherData the otherData to set
+     */
+    public void setOtherData(Map<String, Object> otherData) {
+        this.otherData = otherData;
+    }
+
     public class CompanySearcher implements java.io.Serializable {
 
         private List<Object[]> data;
@@ -370,15 +412,12 @@ public class PurchaseBean extends ABasicBean<Long> {
 
     public class PurchasePaymentSearcher implements java.io.Serializable {
 
-        private List<PurchasePayment> data;
         private BigDecimal quantity;
         private Date datePayment;
-        private BigDecimal currentPay;
 
         void update() {
-            data = new ArrayList();
-            data.addAll(getPurchasePaymentService().listHQL("FROM PurchasePayment pp WHERE pp.purchase  = ?", getSelected()));
-            currentPay = (BigDecimal) getPurchasePaymentService().getByHQL("SELECT COALESCE(SUM(pp.quantity),0) FROM PurchasePayment pp WHERE pp.purchase  = ?", getSelected());
+            quantity = null;
+            datePayment = null;
         }
 
         public void add() {
@@ -388,31 +427,17 @@ public class PurchaseBean extends ABasicBean<Long> {
             pp.setDatePayment(datePayment);
             pp.setPurchase(getSelected());
             pp.setQuantity(quantity);
-            currentPay = currentPay.add(quantity);
             getPurchasePaymentService().saveOrUpdate(pp);
-            data.add(pp);
+            ((List) getOtherData().get("payments")).add(pp);
+            getOtherData().put("currentPay", ((BigDecimal) getOtherData().get("currentPay")).add(quantity));
             quantity = null;
             datePayment = null;
         }
 
         public void remove(int index) {
-            PurchasePayment item = data.remove(index);
-            currentPay = currentPay.subtract(item.getQuantity());
+            PurchasePayment item = ((List<PurchasePayment>) getOtherData().get("payments")).remove(index);
+            getOtherData().put("currentPay", ((BigDecimal) getOtherData().get("currentPay")).subtract(item.getQuantity()));
             getPurchasePaymentService().delete(item);
-        }
-
-        /**
-         * @return the data
-         */
-        public List<PurchasePayment> getData() {
-            return data;
-        }
-
-        /**
-         * @param data the data to set
-         */
-        public void setData(List<PurchasePayment> data) {
-            this.data = data;
         }
 
         /**
@@ -441,20 +466,6 @@ public class PurchaseBean extends ABasicBean<Long> {
          */
         public void setDatePayment(Date datePayment) {
             this.datePayment = datePayment;
-        }
-
-        /**
-         * @return the currentPay
-         */
-        public BigDecimal getCurrentPay() {
-            return currentPay;
-        }
-
-        /**
-         * @param currentPay the currentPay to set
-         */
-        public void setCurrentPay(BigDecimal currentPay) {
-            this.currentPay = currentPay;
         }
 
     }
@@ -490,6 +501,7 @@ public class PurchaseBean extends ABasicBean<Long> {
     }
 
     public enum State {
+
         CANCELED("Anulado", "danger"),
         PAY("Pagado", "success"),
         IN_PAYMENT("En Pago", "alert");

@@ -51,8 +51,8 @@ public class RolBean extends ABasicBean<Integer> {
     @PostConstruct
     public void init() {
         pagination = new Pagination(rolService);
-        orderFactory = new OrderFactory(new OrderList());
-        orderFactory.setDefaultOrder(Order.desc("name"));
+        orderFactory = new OrderFactory(new OrderList(Order.asc("active")));
+        orderFactory.setDefaultOrder(Order.desc("id"));
         reportRols = new ReportExport("/1258488425132154132154214536/exp_rol.jasper", "Lista de Roles activos", sessionBean, new HashMap());
         reportPermissions = new ReportExport("/1258488425132154132154214536/exp_permission.jasper", "Lista de permisos activos", sessionBean, new HashMap());
     }

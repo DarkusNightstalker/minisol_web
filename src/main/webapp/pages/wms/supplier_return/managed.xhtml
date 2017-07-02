@@ -1,0 +1,326 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript" src="#{request.contextPath}/js/srs_man.js"/>
+    <script>
+        fixModal();
+    </script>
+    <header id="topbar" class="affix">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active">
+                    <a href="javascript:void(0)"> #{managedSupplierReturnBean.selected.id eq null ? 'REGISTRAR' : 'EDITAR'} DEVOLUCION A PROVEEDOR</a>
+                </li>
+                <li class="crumb-icon">
+                    <p:commandLink action="#{homeBean.onLoad(true)}" update=":content-wrapper" onstart="begin_load()" oncomplete="end_load()">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <f:setPropertyActionListener target="#{sessionBean.loadable}" value="#{homeBean}"/>
+                        <f:setPropertyActionListener target="#{navigationBean.content}" value="/pages/home.xhtml"/>
+                    </p:commandLink>
+                </li>
+                <li class="crumb-trail">DEVOLUCIONES A PROVEEDOR</li>
+            </ol>
+        </div>
+        <div class="topbar-right hidden-xs hidden-sm">
+        </div>
+    </header>
+    <h:form id="form" style="padding-top: 20px">     
+        <p:commandLink id="back" oncomplete="end_load();Core.trays();" styleClass="hidden" process="@this" update=":content-wrapper" action="#{supplierReturnBean.onLoad(true)}">
+            <f:setPropertyActionListener value="/pages/wms/supplier_return/list.xhtml" target="#{navigationBean.content}" />
+            <f:setPropertyActionListener value="#{supplierReturnBean}" target="#{sessionBean.loadable}" />
+        </p:commandLink>
+        <p:remoteCommand name="refresh" process="@form" action="#{managedSupplierReturnBean.refresh()}" update=":content-wrapper"/>
+        <p:remoteCommand name="save" process="@form" onstart="begin_load()" oncomplete="end_load();" action="#{managedSupplierReturnBean.doSave('/pages/wms/supplier_return/list.xhtml', supplierReturnBean)}" update=":content-wrapper"/>
+
+        <section id="content" class="table-layout  animated fadeIn">
+            <div class="row center-block mt10" style="">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="topbar-dropmenu" class="alt topbar-menu-open pb5 pln prn" style="display: block;">
+                                <div class="topbar-menu row">
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:SupplierReturnM.back()" class="metro-tile bg-danger light">  
+                                            <span class="fa fa-arrow-left text-muted"></span>
+                                            <span class="metro-title">Lista</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:SupplierReturnM.refresh()" class="metro-tile bg-warning light">
+                                            <span class="glyphicons glyphicons-refresh text-muted"></span>
+                                            <span class="metro-title" >Reestablecer</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-2">
+                                        <a href="javascript:SupplierReturnM.save()" class="metro-tile bg-success light">
+                                            <span class="fa fa-save text-muted"></span>
+                                            <span class="metro-title" >Guardar</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon">
+                                        <i class="fa fa-file-text"></i>
+                                    </span>
+                                    <span class="panel-title">COMPRA</span>
+                                </div>
+                                <div class="panel-body pt10 pb5">
+                                    <div class="form-horizontal">
+                                        <div class="col-md-12">
+                                            <h:panelGroup  id="supplier-wrapper" layout="block" >
+                                                <div class="form-group form-group-sm mb10">
+                                                    <label class="col-md-2 control-label input-sm">Prov.</label>
+                                                    <div class="col-md-10">
+
+                                                        <p:autoComplete 
+                                                            id="supplier"
+                                                            value="#{managedSupplierReturnBean.purchaseSearcher.currentSupplier}" 
+                                                            completeMethod="#{managedSupplierReturnBean.purchaseSearcher.searchSupplier}"
+                                                            var="c" 
+                                                            tabindex="1"
+                                                            itemLabel="#{c[2]}" 
+                                                            itemValue="#{c}"  
+                                                            inputStyleClass="form-control input-sm required"
+                                                            styleClass="col-xs-12 pln prn"
+                                                            converter="dn.web.converter.arrayConverter"
+                                                            emptyMessage="No hay resultados"> 
+                                                            <p:column >
+                                                                <h:outputText class="fs11" value="#{c[3]}" /><br/>
+                                                                <small class="text-muted fs9"><b>#{c[1]}</b> #{c[2]}</small>
+                                                            </p:column>
+                                                            <p:ajax event="change" process="@this" onstart="begin_load()"  oncomplete="end_load()" update="form:supplier-info,form:purchase-wrapper,form:detail-wrapper,form:document-wrapper" listener="#{managedSupplierReturnBean.purchaseSearcher.changeSupplier()}" />
+                                                        </p:autoComplete>
+                                                        <span class="help-block mtn mbn fs10">
+
+                                                            <h:panelGroup id="supplier-info" layout="block">
+                                                                <ui:fragment rendered="#{managedSupplierReturnBean.purchaseSearcher.currentSupplier ne null}">
+                                                                    <script>
+                                                                        $(function () {
+                                                                            $("#form\\:purchase input[type=text]").focus();
+                                                                        });
+                                                                    </script>
+                                                                    #{managedSupplierReturnBean.purchaseSearcher.currentSupplier[3]}<br/>
+                                                                    <small ><i class="fa fa-map-marker"></i> #{managedSupplierReturnBean.purchaseSearcher.currentSupplier[4]} (#{managedSupplierReturnBean.purchaseSearcher.currentSupplier[5]})</small>
+
+                                                                </ui:fragment>
+                                                                <ui:fragment rendered="#{managedSupplierReturnBean.purchaseSearcher.currentSupplier eq null}">
+                                                                    <script>
+                                                                        $(function () {
+                                                                            $("#form\\:supplier input[type=text]").val("");
+                                                                        });
+                                                                    </script>
+                                                                </ui:fragment>
+                                                            </h:panelGroup>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup  id="purchase-wrapper" layout="block" class="form-group form-group-sm mb5">
+                                                <label class="col-md-2 control-label input-sm">CPE</label>
+                                                <div class="col-md-9">
+                                                    <script>
+                                                        $(function () {
+                                                            SupplierReturnM.configure_purchase();
+                                                        });
+                                                    </script>
+                                                    <h:selectOneMenu id="purchase" value="#{managedSupplierReturnBean.purchaseSearcher.currentPurchase}" styleClass="form-control input-sm" converter="dn.web.converter.arrayConverter">
+                                                        <f:selectItem/>
+                                                        <f:selectItems value="#{managedSupplierReturnBean.purchaseSearcher.purchases}" var="item"  itemValue="#{item}" itemLabel="#{item[1]}|| #{appBean.formatDate('dd/MM/yyyy', item[2])}" />
+                                                        <p:ajax event="change" process="@this" update="form:purchase-info,form:detail-wrapper,form:document-wrapper" listener="#{managedSupplierReturnBean.purchaseSearcher.changePurchase()}" />
+                                                    </h:selectOneMenu>
+
+                                                    <span class="help-block mtn mbn fs10">
+                                                        <h:panelGroup id="purchase-info" layout="block">
+                                                            <ui:fragment rendered="#{managedSupplierReturnBean.purchaseSearcher.currentPurchase ne null}">
+                                                                <small><i class="fa fa-calendar"/> Fec. de Emision : <h:outputText value="#{managedSupplierReturnBean.purchaseSearcher.currentPurchase[2]}"><f:convertDateTime pattern="dd/MM/yyyy"/></h:outputText>    </small>
+                                                            </ui:fragment>
+
+                                                        </h:panelGroup>
+                                                    </span>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon pull-left">
+                                        <i class="fa fa-file-text"></i>
+                                    </span>
+                                    <span class="panel-title pull-left">COMPROBANTE DE COMPRA</span>
+                                    <div class="btn-group pull-right" style="padding-top: 9px">
+                                        <p:inputText id="date-issue" tabindex="2" value="#{managedSupplierReturnBean.dateIssue}" styleClass="form-control input-sm text-center" placeholder="Fecha de emision" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                                        </p:inputText>
+                                    </div>
+                                </div>
+                                <div class="panel-body pt10 pb5">
+                                    <div class="form-horizontal">
+                                        <div class="form-group form-group-sm mb5">
+                                            <label class="col-md-2 control-label">Tipo</label>
+                                            <div class="col-md-10">
+                                                <h:selectOneMenu id="payment-proof"  value="#{managedSupplierReturnBean.paymentProofId}" styleClass="form-control  input-sm">
+                                                    <f:selectItems 
+                                                        value="#{managedSupplierReturnBean.paymentProofSearcher.data}"
+                                                        var="item"
+                                                        itemLabel="#{item[2]}"
+                                                        itemValue="#{item[0]}"
+                                                        />
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup id="document-wrapper" layout="block" class="form-group form-group-sm mb5">
+                                            <label class="col-md-2 control-label">Documento</label>
+                                            <div class="col-xs-3">
+                                                <div class="form-group form-group-sm mbn">
+                                                    <div class="col-xs-12">
+                                                        <p class="form-control-static input-sm pbn text-center">#{managedSupplierReturnBean.serie eq null ? 'Serie' : managedSupplierReturnBean.serie} </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-1 text-center">
+                                                <p class="form-control-static text-center input-sm"><i class="fa fa-minus"/></p>
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <div class="form-group form-group-sm mbn">
+                                                    <div class="col-xs-12">
+                                                        <p:inputText id="document-number" tabindex="3" value="#{managedSupplierReturnBean.documentNumber}" styleClass="form-control input-sm" placeholder="Nro correlativo" maxlength="8" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup> 
+                                        <div class="form-group form-group-sm mbn">
+                                            <div class="col-md-12 col-md-offset-2">
+                                                <div class="checkbox-custom checkbox-info mb5">
+                                                    <h:selectBooleanCheckbox id="electronic" value="#{managedSupplierReturnBean.electronic}" />
+                                                    <label for="form:electronic">Es un comprobante de pago electrónico</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel mb5">
+                                <div class="panel-heading">
+                                    <span class="panel-icon pull-left">
+                                        <i class="glyphicons glyphicons-tag"></i>
+                                    </span>
+                                    <span class="panel-title pull-left" >DETALLES DE COMPRA</span>
+                                </div>
+                                <div class="panel-body">
+                                    <h:panelGroup id="detail-wrapper" layout="block" class="form-horizontal">
+                                        <table class="table table-condensed table-bordered  mbn">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-md-2">CÓDIGO</th>
+                                                    <th class="col-md-4">PRODUCTO</th>
+                                                    <th class="col-md-2 text-center">CANT.</th>
+                                                    <th class="col-md-2 text-center">P. UNIT.</th>
+                                                    <th class="col-md-2 text-center">DEVOLUCIÓN</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <ui:repeat id="detaill" value="#{managedSupplierReturnBean.detailSearcher.data}" var="item" varStatus="st">
+                                                    <tr data-index="#{st.index}">
+                                                        <td class="ptn pbn text-center">#{item[8]}</td>
+                                                        <td class="ptn pbn">#{item[5]}</td>
+                                                        <td class="ptn pbn text-center">#{item[2]}</td>
+                                                        <td class="ptn pbn text-right">
+                                                            S/.    #{item[6]}
+                                                        </td>
+                                                        <td class="ptn pbn">
+                                                            <div class="form-group form-group-sm mbn mtn pbn ptn">
+                                                                <div class="col-md-12">
+                                                                    <p:inputText id="quantity" converter="javax.faces.BigDecimal"  value="#{item[1]}" class="form-control input-sm text-right detail-item numeric">
+                                                                        <f:passThroughAttribute name="max" value="#{item[2]}" />
+                                                                        <f:passThroughAttribute name="data-msg-max" value="Monto maximo #{item[2]}" />
+                                                                    </p:inputText>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>         
+                                                </ui:repeat>                                                                                       
+                                            </tbody>
+                                            <ui:fragment rendered="#{empty managedSupplierReturnBean.detailSearcher.data}">
+                                                <tfoot>
+                                                    <tr>
+                                                        <td class="text-center" colspan="5"><h4>NO HAY COMPRA SELECCIONADA<br/> <i class="fa fa-2x fa-frown-o"/></h4></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </ui:fragment>
+                                        </table>
+                                        <div class="row" id="invoice-footer">
+                                            <div class="col-md-12">
+                                                <div class="pull-right">
+                                                    <table class="table table-condensed" id="invoice-summary">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="vertical-align: middle">
+                                                                    <b>Devolución</b>
+                                                                </th>
+                                                                <th class="text-right">
+                                                                    <div class="form-group form-group-sm mbn mtn pbn ptn">
+                                                                        <div class="col-md-12">
+                                                                            <div class="input-group input-group-sm">
+                                                                                <span class="input-group-addon">
+                                                                                    <i class="fa">S/.</i>
+                                                                                </span>
+                                                                                <p:inputText id="repayment" value="#{managedSupplierReturnBean.repayment}"  styleClass="form-control input-sm text-right"></p:inputText>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+<!--                                                        <tbody>
+                                                            <tr>
+                                                                <th style="vertical-align: middle">
+                                                                    <b>IGV</b>
+                                                                </th>
+                                                                <td  class="text-right">
+                                                                    <div class="input-group input-group-sm">
+                                                                        <span class="input-group-addon">
+                                                                            <i class="fa">S/.</i>
+                                                                        </span>
+                                                                        <p:inputText id="igv" value="#{managedSupplierReturnBean.igv}"  styleClass="form-control input-sm text-right"></p:inputText>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>-->
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </h:form>
+
+</ui:composition>
+
+

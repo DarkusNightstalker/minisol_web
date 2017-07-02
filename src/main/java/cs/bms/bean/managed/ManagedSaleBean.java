@@ -174,7 +174,7 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
             sale.setSent(false);
             sale.setActive(true);
             getMainService().saveOrUpdate(sale);
-        }else{
+        } else {
             PNotifyMessage.errorMessage("Esta venta ya fue recuperada!!");
         }
     }
@@ -196,12 +196,12 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
             return saved;
         }
         if (saved) {
-            if (selected.getCustomer() != null) {         
+            if (selected.getCustomer() != null) {
                 Long currentPoints = points - new Double(subtotalDiscount.doubleValue() * 100).longValue();
                 if (currentPoints > 0) {
                     actorService.addPoints(selected.getCustomer().getId(), currentPoints, sessionBean.getCurrentUser());
-                }else if (currentPoints < 0){
-                    actorService.subtractPoints(selected.getCustomer().getId(), currentPoints*-1, sessionBean.getCurrentUser());
+                } else if (currentPoints < 0) {
+                    actorService.subtractPoints(selected.getCustomer().getId(), currentPoints * -1, sessionBean.getCurrentUser());
                 }
             }
             for (Object[] item : detailSearcher.removed) {
@@ -328,7 +328,17 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
         selected.setPoints(points);
         selected.setSubtotal(subtotal);
         selected.setIgv(igv);
-
+        if (selected.getCustomer() != null && selected.getCustomerPoints() == null) {
+            Long currentPoints = points - new Double(subtotalDiscount.doubleValue() * 100).longValue();
+            selected.setCustomerPoints(selected.getCustomer().getPoints() + currentPoints);
+        } else if (selected.getCustomerPoints() == null) {
+            selected.setCustomerPoints(0L);
+        }
+        if (selected.getSpendPoints() == null && subtotalDiscount.doubleValue() != 0) {
+            selected.setSpendPoints(subtotalDiscount.multiply(new BigDecimal(100)).intValue());
+        }else if(selected.getSpendPoints() == null){
+            selected.setSpendPoints(0);
+        }
         selected.setIgvDiscount(igvDiscount);
         selected.setSubtotalDiscount(subtotalDiscount);
         selected.setDateIssue(dateIssue == null ? new Date() : dateIssue);

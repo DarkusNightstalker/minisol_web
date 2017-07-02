@@ -11,7 +11,9 @@ import cs.bms.bean.util.PNotifyMessage;
 import cs.bms.model.Actor;
 import cs.bms.model.DocumentNumbering;
 import cs.bms.model.IdentityDocument;
+import cs.bms.model.Product;
 import cs.bms.model.Rol;
+import cs.bms.model.Sale;
 import cs.bms.model.SpecialPermission;
 import cs.bms.model.User;
 import cs.bms.service.interfac.IActorService;
@@ -28,6 +30,8 @@ import gkfire.util.AES;
 import gkfire.web.bean.AManagedBean;
 import gkfire.web.bean.ILoadable;
 import gkfire.web.util.BeanUtil;
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,8 +100,44 @@ public class ManagedUserBean extends AManagedBean<User, IUserService> implements
             return;
         }
         refresh();
-
     }
+
+    @Override
+    public void delete(Serializable id) {
+        if (mainService.isActive((Integer) id)) {
+            User user = mainService.getById((Integer) id);
+            Auditory.make(user, sessionBean.getCurrentUser());
+            try{
+            getMainService().delete(user);
+            }catch(Exception e){
+                PNotifyMessage.systemError(e, sessionBean);
+                return;
+            }
+            PNotifyMessage.infoMessage("Se ha desactivado un usuario");
+        } else {
+            PNotifyMessage.errorMessage("Este usuario ya fue desactivado!!");
+        }
+    }
+    
+    @Override
+    public void recovery(Serializable id) {
+        if (!mainService.isActive((Integer) id)) {
+            User user = mainService.getById((Integer) id);
+            Auditory.make(user, sessionBean.getCurrentUser());
+            user.setActive(true);
+            try{
+                getMainService().update(user);
+            }catch(Exception e){
+                PNotifyMessage.systemError(e, sessionBean);
+                return;
+            }
+            PNotifyMessage.infoMessage("Se ha activado un usuario");
+        }else{
+            PNotifyMessage.errorMessage("Este usuario ya fue recuperado!!");
+        }
+    }
+    
+    
 
     @Override
     public boolean save() {

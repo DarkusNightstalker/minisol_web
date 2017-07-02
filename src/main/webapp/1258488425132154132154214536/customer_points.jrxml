@@ -41,17 +41,22 @@
 	<parameter name="logo" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["logo.png"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="id_customer" class="java.lang.Long"/>
 	<parameter name="date_init" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="date_end" class="java.util.Date"/>
+	<parameter name="name_customer" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="document_customer" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="points_customer" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_customer" class="java.lang.Long"/>
 	<queryString>
 		<![CDATA[SELECT
-	COALESCE(a.other,a.name) as customer,
-	a.points,
-	a.identity_number,
-	idd.abbr,
 	s.date_issue,
 	pp.abbr||' '||s.serie||'-'||s.document_number as document,
 	(SELECT string_agg(pv.numeration, ',') FROM payment_voucher pv WHERE pv.id_sale = s.id) as vouchers,
@@ -60,18 +65,11 @@
 	s.spend_points,
 	s.customer_points
 from sale s
-right join actor a
-	on s.id_customer = a.id
-left join identity_document idd
-	on a.id_identity_document = idd.id
-left join payment_proof pp
+join payment_proof pp
 	on s.id_payment_proof = pp.id
-WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_customer}]]>
+WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  s.id_customer =  $P{id_customer}
+ORDER BY s.date_issue]]>
 	</queryString>
-	<field name="customer" class="java.lang.String"/>
-	<field name="points" class="java.lang.Long"/>
-	<field name="identity_number" class="java.lang.String"/>
-	<field name="abbr" class="java.lang.String"/>
 	<field name="date_issue" class="java.sql.Timestamp"/>
 	<field name="document" class="java.lang.String"/>
 	<field name="vouchers" class="java.lang.String"/>
@@ -120,7 +118,7 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{customer}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{name_customer}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="a917426e-692a-4fdb-9c95-c593326b175f" style="Column header" x="95" y="70" width="12" height="20" forecolor="#000000"/>
@@ -134,7 +132,7 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="8" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{abbr}+" "+$F{identity_number}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{document_customer}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="2a8a36c9-f23a-4cb1-9fc0-1e3bdf01b3d5" style="Column header" x="393" y="70" width="52" height="20" forecolor="#000000"/>
@@ -148,7 +146,7 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="10" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{points}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{points_customer}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="3427566e-59d0-46c5-b46a-b98e5a22a9e4" style="Column header" x="445" y="70" width="12" height="20" forecolor="#000000"/>
@@ -160,9 +158,9 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="20">
+		<band height="30">
 			<staticText>
-				<reportElement uuid="d233ddae-9452-4152-89a7-4d84dda2e74b" mode="Opaque" x="138" y="0" width="344" height="20" forecolor="#FFFFFF" backcolor="#666666"/>
+				<reportElement uuid="d233ddae-9452-4152-89a7-4d84dda2e74b" mode="Opaque" x="138" y="0" width="123" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -171,12 +169,12 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 					<rightPen lineWidth="0.25"/>
 				</box>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NOMBRE]]></text>
+				<text><![CDATA[VOUCHERS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="17e59a37-1880-4191-b593-00cc56f57cf7" mode="Opaque" x="1" y="0" width="52" height="20" forecolor="#FFFFFF" backcolor="#666666"/>
+				<reportElement uuid="17e59a37-1880-4191-b593-00cc56f57cf7" mode="Opaque" x="1" y="0" width="52" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -185,12 +183,12 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 					<rightPen lineWidth="0.25"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FECHA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4ee5f43a-1c0f-455b-9aba-dcecc809028b" mode="Opaque" x="482" y="0" width="73" height="20" forecolor="#FFFFFF" backcolor="#666666"/>
+				<reportElement uuid="4ee5f43a-1c0f-455b-9aba-dcecc809028b" mode="Opaque" x="479" y="0" width="76" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -199,12 +197,13 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 					<rightPen lineWidth="0.25"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[PUNTOS]]></text>
+				<text><![CDATA[PUNTOS
+DEL CLIENTE]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="230e7eb6-4233-4205-83d9-ab6b0f7dd3db" mode="Opaque" x="53" y="0" width="85" height="20" forecolor="#FFFFFF" backcolor="#666666"/>
+				<reportElement uuid="230e7eb6-4233-4205-83d9-ab6b0f7dd3db" mode="Opaque" x="53" y="0" width="85" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
 				<box leftPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -213,16 +212,58 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 					<rightPen lineWidth="0.25"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[DOCUMENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="35bff26c-7c0b-422c-9803-e277ad7cf3ab" mode="Opaque" x="261" y="0" width="98" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2eea2368-f8f5-4705-9e29-a2ed5d51d725" mode="Opaque" x="359" y="0" width="60" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PTOS GENERADOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1ea7c885-ca00-451d-826a-a56d2713ffe0" mode="Opaque" x="419" y="0" width="60" height="30" forecolor="#FFFFFF" backcolor="#666666"/>
+				<box leftPadding="0">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PTOS GASTADOS]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="15">
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="6388a0a9-60ca-494a-9b33-0974674b3706" x="482" y="0" width="72" height="15"/>
+				<reportElement uuid="6388a0a9-60ca-494a-9b33-0974674b3706" x="261" y="0" width="98" height="15"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -233,7 +274,7 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{customer_points}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
 				<reportElement uuid="aae4f8b0-5233-4d94-9536-8fd504d57585" x="53" y="0" width="85" height="15"/>
@@ -264,7 +305,7 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 				<textFieldExpression><![CDATA[$F{date_issue}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="b8599e32-6e72-488c-a45a-b9b988c290ca" x="138" y="0" width="344" height="15"/>
+				<reportElement uuid="b8599e32-6e72-488c-a45a-b9b988c290ca" x="138" y="0" width="123" height="15"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -276,6 +317,48 @@ WHERE (s.date_issue BETWEEN $P{date_init} AND $P{date_end}) and  a.id =$P{id_cus
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{vouchers}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="770ef2d0-5faa-407a-a4e6-5e96f16d7583" x="359" y="0" width="60" height="15"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sale_points}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="736fbb60-aa20-4aaa-a710-5a13ccce2f28" x="419" y="0" width="60" height="15"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{spend_points}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="a21969c6-0e23-4fde-afe5-737d44093322" x="479" y="0" width="75" height="15"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer_points}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

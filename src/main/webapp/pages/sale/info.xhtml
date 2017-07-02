@@ -54,31 +54,12 @@
                                             </ui:fragment>
                                         </div>
                                     </div>
-                                    <div class="form-group form-group-sm">
-                                        <label class="control-label col-md-2">Pto llegada</label>
-                                        <div class="col-md-10">
-                                            <p class="form-control-static input-sm">#{stockMovementBean.selected.targetCompany.address} - #{stockMovementBean.selected.targetCompany.city}</p>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group form-group-sm mbn">
-                                        <label class="control-label col-md-2">Fec partida</label>
+                                        <label class="control-label col-md-2">Puntos</label>
                                         <div class="col-md-10">
-                                            <p class="form-control-static input-sm">
-                                                <h:outputText value="#{stockMovementBean.selected.dateShipping}">
-                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
-                                                </h:outputText>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group form-group-sm">
-                                        <label class="control-label col-md-2">Fec llegada</label>
-                                        <div class="col-md-10">
-                                            <p class="form-control-static input-sm">
-                                                <h:outputText value="#{stockMovementBean.selected.dateArrival}">
-                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
-                                                </h:outputText></p>
+                                            <p class="form-control-static input-sm">#{saleBean.selected.customerPoints} <small class="text-system">(#{saleBean.selected.points} generados)</small> <small class="text-danger">(<h:outputText value="#{saleBean.selected.spendPoints}"> <f:convertNumber minFractionDigits="0" maxFractionDigits="0" /></h:outputText> usados)</small> </p>
                                         </div>
                                     </div>
                                 </div>
@@ -99,33 +80,93 @@
                                         <tbody>
                                             <ui:repeat value="#{saleBean.otherData['detail']}" var="item" varStatus="st">
                                                 <tr>
-                                                    <td>#{st.index+1}</td>
-                                                    <td>#{item[0]}</td>
-                                                    <td><h:outputText value="#{item[1]}">
-                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
-                                                        </h:outputText>#{item[2]}</td>
-                                                    <td class="text-right">
-                                                        S/. 
-                                                        <h:outputText value="#{item[3]}">
-                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
-                                                        </h:outputText>
+                                                    <td class="ptn pbn"><small>#{st.index+1}</small></td>
+                                                    <td class="ptn pbn"><small>#{item[0]}</small></td>
+                                                    <td class="ptn pbn">
+                                                        <small>
+                                                            <h:outputText value="#{item[1]}">
+                                                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                            </h:outputText> #{item[2]} 
+                                                        </small>
+                                                    </td>
+                                                    <td class="ptn pbn text-right">
+                                                        <small>
+                                                            S/. 
+                                                            <h:outputText value="#{item[3]}">
+                                                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                            </h:outputText>
+                                                        </small>
                                                     </td>
                                                     <td class="text-right">
-                                                        S/. 
-                                                        <h:outputText value="#{item[4]}">
-                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
-                                                        </h:outputText> 
+                                                        <small>
+                                                            S/. 
+                                                            <h:outputText value="#{item[4]}">
+                                                                <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                            </h:outputText> 
+                                                        </small>
                                                     </td>
                                                 </tr>
                                             </ui:repeat>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th class="text-right ptn pbn pr5" colspan="4">
+                                                    <small>Subtotal</small>
+                                                </th>
+                                                <th class="text-right ptn pbn">
+                                                    <small>
+                                                        S/.   
+                                                        <h:outputText value="#{saleBean.selected.subtotal}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                        </h:outputText>
+                                                    </small>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-right ptn pbn pr5" colspan="4">
+                                                    <small>Igv</small>
+                                                </th>
+                                                <th class="text-right ptn pbn">
+                                                    <small>
+                                                        S/.   
+                                                        <h:outputText value="#{saleBean.selected.igv}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                        </h:outputText>
+                                                    </small>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-right ptn pbn pr5" colspan="4">
+                                                    <small>Descuento</small>
+                                                </th>
+                                                <th class="text-right ptn pbn">
+                                                    <small>
+                                                      - S/.   
+                                                        <h:outputText value="#{saleBean.selected.subtotalDiscount}">
+                                                            <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                        </h:outputText>
+                                                    </small>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-right pr5 fs15" colspan="4">
+                                                    TOTAL
+                                                </th>
+                                                <th class="text-right fs15">
+                                                    S/.   
+                                                    <h:outputText value="#{saleBean.selected.subtotal + saleBean.selected.igv - saleBean.selected.subtotalDiscount}">
+                                                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+                                                    </h:outputText>
+                                                </th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>             
                     <div class="modal-footer">
-                        <button type="button" onclick="SM.print('#{request.contextPath}',#{stockMovementBean.selected.id})" class="btn btn-primary"><i class="fa fa-print"/> Imprimir</button>
+                        <!--<button type="button" onclick="SM.print('#{request.contextPath}',#{stockMovementBean.selected.id})" class="btn btn-primary"><i class="fa fa-print"/> Imprimir</button>-->
                     </div>
                 </h:form>
             </h:panelGroup>

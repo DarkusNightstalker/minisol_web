@@ -5,38 +5,20 @@
  */
 package cs.bms.bean.report;
 
+import cs.bms.bean.EntityMapBean;
 import cs.bms.bean.SessionBean;
-import cs.bms.bean.util.PNotifyMessage;
-import cs.bms.dao.util.PGSqlUtil;
-import cs.bms.model.Product;
 import cs.bms.service.interfac.IProductService;
 import cs.bms.service.interfac.IStockService;
 import cs.bms.report.util.ReportExport;
-import gkfire.hibernate.CriterionList;
-import gkfire.hibernate.OrderFactory;
-import gkfire.hibernate.OrderList;
-import gkfire.web.util.BeanUtil;
-import gkfire.web.util.Pagination;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import net.sf.jasperreports.engine.JRExporter;
 
 /**
  *
@@ -60,20 +42,28 @@ public class ReportStockBean implements java.io.Serializable {
     protected ReportExport currentStock;
     protected ReportExport totalStock;
 
-    protected ProductSearcher productSearcher;
-
     @PostConstruct
     public void init() {
-        productSearcher = new ProductSearcher();
 
         Map<String, Object> map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
-        map.put("barcode_product", null);
+        map.put("id_product", null);
+        map.put("product", null);
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
         map.put("date_end", null);
-        kardexValuate = new ReportExport("/1258488425132154132154214536/kardex_valuate.jasper", "Inventario en unidades valorizadas", sessionBean, map);
+        kardexValuate = new ReportExport("/1258488425132154132154214536/kardex_valuate.jasper", "Inventario en unidades valorizadas", sessionBean, map) {
+
+            @Override
+            protected String execute(JRExporter exporter) {
+                Object[] product = (Object[]) params.get("product");
+                params.put("id_product", product[0]);
+
+                return super.execute(exporter); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        };
         /**/
         map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
@@ -85,12 +75,23 @@ public class ReportStockBean implements java.io.Serializable {
         /**/
         map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
-        map.put("barcode_product", null);
+        map.put("id_product", null);
+        map.put("product", null);
         map.put("ruc", sessionBean.getCurrentCompany().getRuc());
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
         map.put("date_end", null);
-        kardexPhysical = new ReportExport("/1258488425132154132154214536/kardex_physical.jasper", "Inventario en unidades fisicas", sessionBean, map);
+        kardexPhysical = new ReportExport("/1258488425132154132154214536/kardex_physical.jasper", "Inventario en unidades fisicas", sessionBean, map) {
+
+            @Override
+            protected String execute(JRExporter exporter) {
+                Object[] product = (Object[]) params.get("product");
+                params.put("id_product", product[0]);
+
+                return super.execute(exporter); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        };
         /**/
         map = new HashMap();
         map.put("id_companies", Collections.EMPTY_LIST);
@@ -98,7 +99,7 @@ public class ReportStockBean implements java.io.Serializable {
         map.put("name_company", sessionBean.getCurrentCompany().getName());
         map.put("date_init", null);
         map.put("date_end", null);
-        kardexValuateTotal = new ReportExport("/1258488425132154132154214536/kardex_physical_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
+        kardexPhysicalTotal = new ReportExport("/1258488425132154132154214536/kardex_physical_total.jasper", "Inventario en unidades valorizadas totales", sessionBean, map);
         /**/
         map = new HashMap();
         map.put("company", sessionBean.getCurrentCompany().getName() + " " + sessionBean.getCurrentCompany().getCity() + " (" + sessionBean.getCurrentCompany().getAddress() + ")");
@@ -120,14 +121,14 @@ public class ReportStockBean implements java.io.Serializable {
         kardexValuate.getParams().put("id_companies", Collections.EMPTY_LIST);
         kardexValuate.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
         kardexValuate.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
-        kardexValuate.getParams().put("barcode_product", null);
-        kardexValuate.getParams().put("name_product", null);
+        kardexValuate.getParams().put("id_product", null);
+        kardexValuate.getParams().put("product", null);
         /**/
         kardexPhysical.getParams().put("id_companies", Collections.EMPTY_LIST);
         kardexPhysical.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
         kardexPhysical.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
-        kardexPhysical.getParams().put("barcode_product", null);
-        kardexPhysical.getParams().put("name_product", null);
+        kardexPhysical.getParams().put("id_product", null);
+        kardexPhysical.getParams().put("product", null);
         /**/
         kardexValuateTotal.getParams().put("id_companies", Collections.EMPTY_LIST);
         kardexValuateTotal.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
@@ -136,6 +137,10 @@ public class ReportStockBean implements java.io.Serializable {
         kardexPhysicalTotal.getParams().put("id_companies", Collections.EMPTY_LIST);
         kardexPhysicalTotal.getParams().put("ruc", sessionBean.getCurrentCompany().getRuc());
         kardexPhysicalTotal.getParams().put("name_company", sessionBean.getCurrentCompany().getName());
+    }
+
+    public List<Object[]> searchProduct(String query) {
+        return productService.forAutocomplete(6, query);
     }
 
     public void refreshValuate(Long idProduct) {
@@ -227,134 +232,6 @@ public class ReportStockBean implements java.io.Serializable {
         this.totalStock = totalStock;
     }
 
-    public class ProductSearcher implements java.io.Serializable {
-
-        protected String terms;
-        protected String productName;
-        protected Pagination<Object[]> pagination;
-        protected OrderFactory orderFactory;
-
-        public ProductSearcher() {
-            pagination = new Pagination<>(productService);
-            orderFactory = new OrderFactory(new OrderList());
-            orderFactory.setDefaultOrder(Order.desc("name"));
-        }
-
-        public void refresh() {
-            terms = "";
-            kardexValuate.getParams().put("name_product", null);
-            kardexPhysical.getParams().put("name_product", null);
-            search();
-        }
-
-        public void select() {
-            int index = Integer.parseInt(BeanUtil.getParameter("index"));
-            kardexValuate.getParams().put("name_product", pagination.getData().get(index)[2]);
-            kardexPhysical.getParams().put("name_product", pagination.getData().get(index)[2]);
-            kardexValuate.getParams().put("barcode_product", pagination.getData().get(index)[1]);
-            kardexPhysical.getParams().put("barcode_product", pagination.getData().get(index)[1]);
-        }
-
-        public void searchByBarcode() {
-            String barcode = BeanUtil.getParameter("barcode");
-            if (barcode.equalsIgnoreCase("")) {
-                kardexValuate.getParams().put("name_product", null);
-                kardexPhysical.getParams().put("name_product", null);
-
-            } else {
-                Product p = productService.getByBarcode(barcode);
-                if (p == null) {
-                    kardexValuate.getParams().put("name_product", null);
-                    kardexPhysical.getParams().put("name_product", null);
-                } else {
-                    kardexValuate.getParams().put("name_product", p.getName());
-                    kardexPhysical.getParams().put("name_product", p.getName());
-                }
-            }
-        }
-
-        public void search() {
-            terms = terms.trim();
-            ProjectionList projectionList = Projections.projectionList()
-                    .add(Projections.id())
-                    .add(Projections.property("barcode"))
-                    .add(Projections.property("name"))
-                    .add(Projections.property("active"));
-            CriterionList criterionList = new CriterionList();
-            criterionList.add(Restrictions.eq("active", true));
-            try {
-                if (terms.length() != 0) {
-                    criterionList.add(
-                            Restrictions.or(
-                                    Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
-                                    Restrictions.like("name", terms, MatchMode.ANYWHERE).ignoreCase()
-                            ));
-                }
-                pagination.search(1, projectionList, criterionList, orderFactory.make());
-            } catch (Exception e) {
-                PNotifyMessage.systemError(e, sessionBean);
-            }
-        }
-        //<editor-fold defaultstate="collapsed" desc="Gets & Sets">
-
-        /**
-         * @return the terms
-         */
-        public String getTerms() {
-            return terms;
-        }
-
-        /**
-         * @param terms the terms to set
-         */
-        public void setTerms(String terms) {
-            this.terms = terms;
-        }
-
-        /**
-         * @return the pagination
-         */
-        public Pagination<Object[]> getPagination() {
-            return pagination;
-        }
-
-        /**
-         * @param pagination the pagination to set
-         */
-        public void setPagination(Pagination<Object[]> pagination) {
-            this.pagination = pagination;
-        }
-
-        /**
-         * @return the orderFactory
-         */
-        public OrderFactory getOrderFactory() {
-            return orderFactory;
-        }
-
-        /**
-         * @param orderFactory the orderFactory to set
-         */
-        public void setOrderFactory(OrderFactory orderFactory) {
-            this.orderFactory = orderFactory;
-        }
-
-        /**
-         * @return the productName
-         */
-        public String getProductName() {
-            return productName;
-        }
-
-        /**
-         * @param productName the productName to set
-         */
-        public void setProductName(String productName) {
-            this.productName = productName;
-        }
-//</editor-fold>
-    }
-
     /**
      * @return the kardexValuateTotal
      */
@@ -402,20 +279,6 @@ public class ReportStockBean implements java.io.Serializable {
      */
     public ReportExport getKardexPhysical() {
         return kardexPhysical;
-    }
-
-    /**
-     * @return the productSearcher
-     */
-    public ProductSearcher getProductSearcher() {
-        return productSearcher;
-    }
-
-    /**
-     * @param productSearcher the productSearcher to set
-     */
-    public void setProductSearcher(ProductSearcher productSearcher) {
-        this.productSearcher = productSearcher;
     }
 
 }

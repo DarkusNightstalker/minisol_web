@@ -7,6 +7,12 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <script type="text/javascript">
+        $(function () {
+            document.title = 'Registros Basicos #{sessionBean.currentCompany.name} - #{sessionBean.currentCompany.city}';
+            $("#short-icon").attr("href","#{request.contextPath}/assets/img/icon/default.ico");
+        });
+    </script>
     <header id="topbar" class="affix">
         <div class="topbar-left">
             <ol class="breadcrumb">

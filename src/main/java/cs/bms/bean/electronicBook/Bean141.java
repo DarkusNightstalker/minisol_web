@@ -70,11 +70,6 @@ public class Bean141 extends ABookBean implements java.io.Serializable {
 
     @Override
     public void search() {
-        data = accountingRecordDetailService.listHQL("SELECT "
-                + "ar.id,"
-                + "ar.file,"
-                + "ar.sent,"
-                + "ar.month FROM AccountingRecord ar WHERE ar.year = ? AND  ar.electronicBook = ?", year, electronicBook);
     }
 
 }
