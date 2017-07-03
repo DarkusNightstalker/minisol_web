@@ -31,17 +31,14 @@ public class AuthFilter implements Filter {
             HttpServletRequest req = (HttpServletRequest) request;
             HttpServletResponse res = (HttpServletResponse) response;
             HttpSession ses = req.getSession(false);
-            // allow user to proccede if url is login.xhtml or user logged in or
-            // user is accessing any page in 
-            // public folder
             String reqURI = req.getRequestURI();
-//            System.out.println(req.getContextPath());
             Object o =null;
             if(ses != null){
                 o = ses.getAttribute("user");
-//                System.out.println(String.valueOf(o));
             }
-            if (reqURI.indexOf("/login.xhtml") >= 0 || reqURI.contains(req.getContextPath()+"/service/") || reqURI.equals(req.getContextPath()+"/")
+            if (reqURI.indexOf("/login.xhtml") >= 0 
+                    || reqURI.contains(req.getContextPath()+"/resources/") 
+                    || reqURI.equals(req.getContextPath()+"/")
                     || (ses != null && ses.getAttribute("user") != null)
                     || reqURI.indexOf("/public/") >= 0
                     || reqURI.contains("javax.faces.resource") 

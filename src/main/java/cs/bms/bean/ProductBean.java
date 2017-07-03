@@ -13,6 +13,7 @@ import cs.bms.model.ProductSalePrice;
 import cs.bms.model.Seller;
 import cs.bms.model.Stock;
 import cs.bms.model.UoM;
+import cs.bms.model.User;
 import cs.bms.service.interfac.IActorService;
 import cs.bms.service.interfac.IIdentityDocumentService;
 import cs.bms.service.interfac.IProductCostPriceService;
@@ -23,6 +24,7 @@ import cs.bms.service.interfac.ISellerService;
 import cs.bms.service.interfac.IStockService;
 import cs.bms.service.interfac.IStockTypeService;
 import cs.bms.service.interfac.IUoMService;
+import cs.bms.service.interfac.IUserService;
 import gkfire.auditory.Auditory;
 import gkfire.hibernate.AliasList;
 import gkfire.hibernate.CriterionList;
@@ -37,6 +39,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,41 +67,43 @@ import org.postgresql.util.PSQLException;
 public class ProductBean extends ABasicBean<Long> {
 
     @ManagedProperty(value = "#{sessionBean}")
-    protected SessionBean sessionBean;
+    private SessionBean sessionBean;
     @ManagedProperty(value = "#{productService}")
-    protected IProductService productService;
+    private IProductService productService;
     @ManagedProperty(value = "#{productSalePriceService}")
-    protected IProductSalePriceService productSalePriceService;
+    private IProductSalePriceService productSalePriceService;
     @ManagedProperty(value = "#{productCostPriceService}")
-    protected IProductCostPriceService productCostPriceService;
+    private IProductCostPriceService productCostPriceService;
     @ManagedProperty(value = "#{uomService}")
-    protected IUoMService uomService;
+    private IUoMService uomService;
     @ManagedProperty(value = "#{stockTypeService}")
-    protected IStockTypeService stockTypeService;
+    private IStockTypeService stockTypeService;
     @ManagedProperty(value = "#{stockService}")
-    protected IStockService stockService;
+    private IStockService stockService;
     @ManagedProperty(value = "#{productLineService}")
-    protected IProductLineService productLineService;
+    private IProductLineService productLineService;
     @ManagedProperty(value = "#{sellerService}")
-    protected ISellerService sellerService;
+    private ISellerService sellerService;
     @ManagedProperty(value = "#{actorService}")
-    protected IActorService actorService;
+    private IActorService actorService;
+    @ManagedProperty(value = "#{userService}")
+    private IUserService userService;
     @ManagedProperty(value = "#{identityDocumentService}")
-    protected IIdentityDocumentService identityDocumentService;
+    private IIdentityDocumentService identityDocumentService;
 
-    protected AbstractImport disabledImport;
-    protected AbstractImport priceImport;
-    protected AbstractImport supplierAssigmentImport;
+    private AbstractImport disabledImport;
+    private AbstractImport priceImport;
+    private AbstractImport supplierAssigmentImport;
 
-    protected StockTypeSearcher stockTypeSearcher;
-    protected ProductLineSearcher productLineSearcher;
-    protected Product selected;
-    protected Map<String, Object> otherData;
+    private StockTypeSearcher stockTypeSearcher;
+    private ProductLineSearcher productLineSearcher;
+    private Product selected;
+    private Map<String, Object> otherData;
 
-    protected Short stockTypeId;
-    protected Integer productLineId;
-    protected String barcode;
-    protected String name;
+    private Short stockTypeId;
+    private Integer productLineId;
+    private String barcode;
+    private String name;
 
     @PostConstruct
     public void init() {
@@ -223,49 +228,49 @@ public class ProductBean extends ABasicBean<Long> {
 
                     Product product = null;
                     if (barcode != null) {
-                        product = productService.getByBarcode(barcode);
+                        product = getProductService().getByBarcode(barcode);
                     }
                     if (product == null) {
                         product = new Product();
-                        product.setStockType(stockTypeService.getByCode("01"));
-                        product.setUom(new UoM(uomService.getIdByCode("NIU")));
+                        product.setStockType(getStockTypeService().getByCode("01"));
+                        product.setUom(new UoM(getUomService().getIdByCode("NIU")));
                     }
                     product.setBarcode(barcode);
                     product.setName(name);
                     product.setSellers(new ArrayList());
-                    Actor actor = actorService.getByIdentityNumber(identityNumberSupplier);
+                    Actor actor = getActorService().getByIdentityNumber(identityNumberSupplier);
                     if (actor == null) {
                         actor = new Actor();
                         actor.setIdentityNumber(identityNumberSupplier);
-                        actor.setIdentityDocument(new IdentityDocument(identityDocumentService.getIdByLength(identityNumberSupplier.length())));
+                        actor.setIdentityDocument(new IdentityDocument(getIdentityDocumentService().getIdByLength(identityNumberSupplier.length())));
                         actor.setName(supplierName);
                         Auditory.make(actor, getSessionBean().getCurrentUser());
-                        actorService.saveOrUpdate(actor);
+                        getActorService().saveOrUpdate(actor);
                     }
-                    List<Long> sellersId = sellerService.getIdsByProduct(product);
+                    List<Long> sellersId = getSellerService().getIdsByProduct(product);
                     for (Long id : sellersId) {
                         product.getSellers().add(new Seller(id));
                     }
                     Seller seller;
                     if (selleDesc != null) {
-                        seller = sellerService.getByDescSupplier(selleDesc, actor);
+                        seller = getSellerService().getByDescSupplier(selleDesc, actor);
                         if (seller == null) {
                             seller = new Seller();
                             seller.setDefault_(false);
                             seller.setDescription(selleDesc.toUpperCase());
                             seller.setSupplier(actor);
-                            Auditory.make(seller, sessionBean.getCurrentUser());
-                            sellerService.saveOrUpdate(seller);
+                            Auditory.make(seller, getSessionBean().getCurrentUser());
+                            getSellerService().saveOrUpdate(seller);
                         }
                     } else {
-                        seller = sellerService.getByDefaulSupplier(actor);
+                        seller = getSellerService().getByDefaulSupplier(actor);
                         if (seller == null) {
                             seller = new Seller();
                             seller.setDefault_(true);
                             seller.setDescription("-");
                             seller.setSupplier(actor);
-                            Auditory.make(seller, sessionBean.getCurrentUser());
-                            sellerService.saveOrUpdate(seller);
+                            Auditory.make(seller, getSessionBean().getCurrentUser());
+                            getSellerService().saveOrUpdate(seller);
                         }
                     }
                     if (product.getSellers().contains(seller)) {
@@ -353,7 +358,7 @@ public class ProductBean extends ABasicBean<Long> {
                     UoM uom = null;
                     try {
                         String codeUnit = (String) o[2];
-                        Integer unitId = uomService.getIdByCode(codeUnit);
+                        Integer unitId = getUomService().getIdByCode(codeUnit);
                         if (unitId == null) {
                             addError(i, "UNIDAD DE MEDIDA  :  EL CODIGO DE UNIDAD NO EXISTE");
                             continue;
@@ -366,18 +371,18 @@ public class ProductBean extends ABasicBean<Long> {
 
                     Product product = null;
                     if (barcode != null) {
-                        product = productService.getByBarcode(barcode);
+                        product = getProductService().getByBarcode(barcode);
                     }
                     if (product == null) {
                         product = new Product();
                         product.setBarcode(barcode);
                         product.setName(name);
-                        product.setStockType(stockTypeService.getByCode("01"));
+                        product.setStockType(getStockTypeService().getByCode("01"));
                         product.setUom(uom);
                     } else {
                         product.setBarcode(barcode);
                         product.setName(name);
-                        product.setStockType(stockTypeService.getByCode("01"));
+                        product.setStockType(getStockTypeService().getByCode("01"));
                         product.setUom(uom);
                     }
                     product.setActive(false);
@@ -460,7 +465,7 @@ public class ProductBean extends ABasicBean<Long> {
                     UoM uom = null;
                     try {
                         String codeUnit = (String) o[2];
-                        Integer unitId = uomService.getIdByCode(codeUnit);
+                        Integer unitId = getUomService().getIdByCode(codeUnit);
                         if (unitId == null) {
                             addError(i, "UNIDAD DE MEDIDA  :  EL CODIGO DE UNIDAD NO EXISTE");
                             continue;
@@ -492,40 +497,46 @@ public class ProductBean extends ABasicBean<Long> {
 
                     Product product = null;
                     if (barcode != null) {
-                        product = productService.getByBarcode(barcode);
+                        product = getProductService().getByBarcode(barcode);
                     }
                     if (product == null) {
                         product = new Product();
                         product.setBarcode(barcode);
                         product.setName(name);
-                        product.setStockType(stockTypeService.getByCode("01"));
+                        product.setStockType(getStockTypeService().getByCode("01"));
                         product.setUom(uom);
                         Auditory.make(product, getSessionBean().getCurrentUser());
                     } else {
                         product.setBarcode(barcode);
                         product.setName(name);
-                        product.setStockType(stockTypeService.getByCode("01"));
+                        product.setStockType(getStockTypeService().getByCode("01"));
                         product.setUom(uom);
                     }
 
                     ProductCostPrice productCostPrice = new ProductCostPrice();
-                    productCostPrice.setId(productCostPriceService.getIdByCompanyProduct(sessionBean.getCurrentCompany(), product));
-                    productCostPrice.setCompany(sessionBean.getCurrentCompany());
+                    productCostPrice.setId(getProductCostPriceService().getIdByCompanyProduct(getSessionBean().getCurrentCompany(), product));
+                    productCostPrice.setCompany(getSessionBean().getCurrentCompany());
                     productCostPrice.setCost(cost);
                     productCostPrice.setProduct(product);
-                    
+
                     Auditory.make(product, getSessionBean().getCurrentUser());
 
                     try {
                         getProductService().saveOrUpdate(product);
                         addSaved(i, "Exito");
-                        productSalePriceService.deleteByCompanyProduct(sessionBean.getCurrentCompany(), product);
-                        Stock stock = new Stock(stockService.getIdByCompanyProduct(sessionBean.getCurrentCompany(), product));
+                        getProductSalePriceService().deleteByCompanyProduct(getSessionBean().getCurrentCompany(), product);
+                        Stock stock = new Stock(getStockService().getIdByCompanyProduct(getSessionBean().getCurrentCompany(), product));
                         stock.setProduct(product);
                         stock.setQuantity(stockQuantity.intValue() < 0 ? BigDecimal.ZERO : stockQuantity);
-                        stock.setCompany(sessionBean.getCurrentCompany());
-                        stockService.saveOrUpdate(stock);
-                        productCostPriceService.saveOrUpdate(productCostPrice);
+                        stock.setCompany(getSessionBean().getCurrentCompany());
+                        if (stock.getId() != null) {
+                            Object[] userObject = userService.getCreatedBasicData(stock);
+                            stock.setCreateUser(new User((Integer) userObject[0]));
+                            stock.setCreateDate((Date) userObject[1]);
+                        }
+                        Auditory.make(stock, getSessionBean().getCurrentUser());
+                        getStockService().saveOrUpdate(stock);
+                        getProductCostPriceService().updateGroupCostByCompanyProduct(productCostPrice.getCost(), productCostPrice.getCompany(), product, getSessionBean().getCurrentUser());
                     } catch (Exception e) {
                         if (e instanceof ConstraintViolationException) {
                             PSQLException psql = (PSQLException) ((ConstraintViolationException) e).getSQLException();
@@ -594,14 +605,14 @@ public class ProductBean extends ABasicBean<Long> {
 
                     Product product = null;
                     if (barcode != null) {
-                        product = productService.getByBarcode(barcode);
+                        product = getProductService().getByBarcode(barcode);
                     }
                     if (product == null) {
                         product = new Product();
                         product.setBarcode(barcode);
                         product.setName(name);
-                        product.setStockType(stockTypeService.getByCode("01"));
-                        product.setUom(new UoM(uomService.getIdByCode("NIU")));
+                        product.setStockType(getStockTypeService().getByCode("01"));
+                        product.setUom(new UoM(getUomService().getIdByCode("NIU")));
                         Auditory.make(product, getSessionBean().getCurrentUser());
                     } else {
                         product.setBarcode(barcode);
@@ -622,9 +633,9 @@ public class ProductBean extends ABasicBean<Long> {
 
                     try {
                         getProductService().saveOrUpdate(product);
-                        productSalePriceService.deleteByCompanyProduct(sessionBean.getCurrentCompany(), product);
+                        getProductSalePriceService().deleteByCompanyProduct(getSessionBean().getCurrentCompany(), product);
                         for (ProductSalePrice psp : productSalePrices) {
-                            getProductSalePriceService().saveForGroup(psp.getPrice(), psp.getQuantity(), sessionBean.getCurrentCompany(), product,sessionBean.getCurrentUser());
+                            getProductSalePriceService().saveForGroup(psp.getPrice(), psp.getQuantity(), getSessionBean().getCurrentCompany(), product, getSessionBean().getCurrentUser());
                         }
                         addSaved(i, "Exito");
                     } catch (Exception e) {
@@ -680,7 +691,7 @@ public class ProductBean extends ABasicBean<Long> {
                         return;
                     }
                 }
-                psp.setCompany(sessionBean.getCurrentCompany());
+                psp.setCompany(getSessionBean().getCurrentCompany());
                 psp.setQuantity(quantity);
                 psp.setPrice(price);
                 psp.setProduct(product);
@@ -1019,6 +1030,20 @@ public class ProductBean extends ABasicBean<Long> {
         this.disabledImport = disabledImport;
     }
 
+    /**
+     * @return the userService
+     */
+    public IUserService getUserService() {
+        return userService;
+    }
+
+    /**
+     * @param userService the userService to set
+     */
+    public void setUserService(IUserService userService) {
+        this.userService = userService;
+    }
+
 //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="StockTypeSearcher">
     public class StockTypeSearcher implements java.io.Serializable {
@@ -1026,7 +1051,7 @@ public class ProductBean extends ABasicBean<Long> {
         private List<Object[]> data;
 
         public void update() {
-            data = stockTypeService.getBasicData();
+            data = getStockTypeService().getBasicData();
         }
 
         /**
@@ -1052,7 +1077,7 @@ public class ProductBean extends ABasicBean<Long> {
         private List<Object[]> data;
 
         public void update() {
-            data = productLineService.getBasicData();
+            data = getProductLineService().getBasicData();
         }
 
         public List<Object[]> getData() {
