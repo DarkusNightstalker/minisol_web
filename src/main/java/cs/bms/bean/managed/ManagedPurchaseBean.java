@@ -109,11 +109,8 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
     @ManagedProperty(value = "#{managedProductBean}")
     protected ManagedProductBean managedProductBean;
 
-    protected DetailSearcher detailSearcher;
-
     protected PaymentProofSearcher paymentProofSearcher;
     protected SupplierSearcher supplierSearcher;
-    protected ProductSearcher productSearcher;
 
     protected Long points;
     protected Short paymentProofId;
@@ -135,8 +132,7 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
     @PostConstruct
     public void init() {
         constantIGV = new BigDecimal(0.18).setScale(2, RoundingMode.HALF_UP);
-        detailSearcher = new DetailSearcher();
-        productSearcher = new ProductSearcher();
+
         supplierSearcher = new SupplierSearcher();
         paymentProofSearcher = new PaymentProofSearcher();
     }
@@ -151,142 +147,41 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
 
     @Override
     public boolean save() {
-        if (detailSearcher.data.isEmpty()) {
-            PNotifyMessage.errorMessage("Compra vacia");
-            saved = false;
-        } else {
-            String content = selected.getId() == null ? "Se ha creado la compra " + serie + "-" + documentNumber : "Se han actualizado los datos";
-            try {
-                saved = super.save();
-                if (saved) {
-                    if (selected.getSupplier() != null) {
-                        actorService.saveOrUpdate(selected.getSupplier());
-                    }
-                    Double initialStock, detailStock, finalStock;
-                    Double initialCost, detailCost, finalCost;
-                    for (Object[] item : detailSearcher.removed) {
-                        PurchaseDetail detail = new PurchaseDetail();
-                        detail.setId((Long) item[0]);
-                        detail.setQuantity((BigDecimal) item[3]);
-                        detail.setProduct(new Product((Long) item[6]));
-                        //<editor-fold defaultstate="collapsed" desc="Formula de Costo Inicial">
-                        finalStock = stockService.getGroupQuantityByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-                        finalCost = productCostPriceService.getCostByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-                        detailCost = purchaseDetailService.getUnitCostById(detail.getId()).doubleValue();
-                        detailStock = purchaseDetailService.getQuantityById(detail.getId()).doubleValue();
-
-                        initialStock = finalStock - detailStock;
-                        initialCost = ((finalCost * finalStock) - (detailStock * detailCost)) / initialStock;
-                        //</editor-fold>
-
-                        stockService.substractQuantity(
-                                new BigDecimal(detailStock),
-                                detail.getProduct(),
-                                selected.getCompanyArrival(),
-                                sessionBean.getCurrentUser()
-                        );
-                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(initialCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(), sessionBean.getCurrentUser());
-
-                        purchaseDetailService.delete(detail);
-                    }
-
-                    for (Object[] item : detailSearcher.data) {
-                        PurchaseDetail detail = new PurchaseDetail();
-                        detail.setId((Long) item[0]);
-                        detail.setQuantity((BigDecimal) item[3]);
-                        detail.setProduct(new Product((Long) item[6]));
-                        detail.setPurchase(selected);
-                        detail.setProductName((String) item[2]);
-                        detail.setUnitPrice((BigDecimal) item[4]);
-                        detail.setUom(new UoM((Integer) item[7]));
-                        detail.setSubtotal((BigDecimal) item[5]);
-
-                        if (item[9] != null && ((Number) item[9]).doubleValue() != 0) {
-                            BigDecimal basicPrice = productSalePriceService.getBasicPrice(sessionBean.getCurrentCompany(), detail.getProduct());
-                            if (basicPrice == null || ((Number) item[9]).doubleValue() != basicPrice.doubleValue()) {
-                                productSalePriceService.deleteByCompanyProduct(sessionBean.getCurrentCompany(), detail.getProduct());
-                                productSalePriceService.saveForGroup((BigDecimal) item[9], 1, sessionBean.getCurrentCompany(), detail.getProduct(), sessionBean.getCurrentUser());
-                            }
-                        }
-
-                        if (detail.getId() != null) {
-                            //<editor-fold defaultstate="collapsed" desc="Formula de Costo Inicial">
-                            finalStock = stockService.getGroupQuantityByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-                            finalCost = productCostPriceService.getCostByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-                            detailCost = purchaseDetailService.getUnitCostById(detail.getId()).doubleValue();
-                            detailStock = purchaseDetailService.getQuantityById(detail.getId()).doubleValue();
-
-                            initialStock = finalStock - detailStock;
-                            initialCost = ((finalCost * finalStock) - (detailStock * detailCost)) / initialStock;
-                            //</editor-fold>
-                            //<editor-fold defaultstate="collapsed" desc="Formula de Costo final">
-                            detailCost = detail.getUnitPrice().doubleValue();
-                            detailStock = detail.getQuantity().doubleValue();
-                            finalStock = initialStock + detailStock;
-
-                            finalCost = ((initialCost * initialStock) + (detailCost * detailStock)) / finalStock;
-
-                            //</editor-fold>
-                            stockService.substractQuantity(
-                                    purchaseDetailService.getQuantityById(detail.getId()),
-                                    detail.getProduct(),
-                                    selected.getCompanyArrival(), sessionBean.getCurrentUser()
-                            );
-                        } else {
-                            //<editor-fold defaultstate="collapsed" desc="Formula de Costo Final">
-                            detailCost = detail.getUnitPrice().doubleValue();
-                            detailStock = detail.getQuantity().doubleValue();
-                            try {
-                                initialStock = stockService.getGroupQuantityByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-                                initialCost = productCostPriceService.getCostByCompanyProduct(selected.getCompanyArrival(), detail.getProduct()).doubleValue();
-
-                                finalStock = initialStock + detailStock;
-                                finalCost = ((initialCost * initialStock) + (detailCost * detailStock)) / finalStock;
-                            } catch (NullPointerException e) {
-                                finalCost = detailCost;
-                            }
-                            //</editor-fold>
-                        }
-                        productCostPriceService.updateGroupCostByCompanyProduct(new BigDecimal(finalCost).setScale(4, RoundingMode.HALF_UP), selected.getCompanyArrival(), detail.getProduct(), sessionBean.getCurrentUser());
-                        stockService.addQuantity(detail.getQuantity(), detail.getProduct(), selected.getCompanyArrival(), sessionBean.getCurrentUser());
-                        purchaseDetailService.saveOrUpdate(detail);
-                    }
-
-                    if (cash) {
-                        PurchasePayment purchasePayment = new PurchasePayment();
-                        purchasePayment.setDatePayment(new Date());
-                        purchasePayment.setQuantity(selected.getSubtotal().add(selected.getIgv()).subtract(selected.getSubtotalDiscount()).subtract(selected.getIgvDiscount()));
-                        purchasePayment.setPurchase(selected);
-                        purchasePayment.setCreateDate(new Date());
-                        purchasePayment.setCreateUser(sessionBean.getCurrentUser());
-                        purchasePayment.setDescription("PAGO POR COMPRA");
-                        purchasePaymentService.saveOrUpdate(purchasePayment);
-                    }
+        String content = selected.getId() == null ? "Se ha creado la compra " + serie + "-" + documentNumber : "Se han actualizado los datos";
+        try {
+            saved = super.save();
+            if (saved) {
+                if (selected.getSupplier() != null) {
+                    actorService.saveOrUpdate(selected.getSupplier());
                 }
-                PNotifyMessage.saveMessage(content);
-            } catch (Exception e) {
-                PNotifyMessage.systemError(e, sessionBean);
-                saved = false;
             }
+            PNotifyMessage.saveMessage(content);
+        } catch (Exception e) {
+            PNotifyMessage.systemError(e, sessionBean);
+            saved = false;
         }
         return saved;
     }
 
     @Override
     protected void fillFields() {
+        
         try {
             paymentProofId = selected.getPaymentProof().getId();
         } catch (NullPointerException npe) {
             paymentProofId = paymentProofService.getIdByAbbr("FAC");
         }
+        
         serie = selected.getSerie();
         documentNumber = selected.getDocumentNumber();
         electronic = selected.getElectronic();
+        
         try {
             supplierId = selected.getSupplier().getId();
         } catch (NullPointerException npe) {
             supplierId = null;
         }
+        
         if (supplierId != null) {
             supplierSearcher.setActor(selected.getSupplier());
             supplierSearcher.setIdentityNumber(selected.getSupplier().getIdentityNumber());
@@ -307,7 +202,6 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
         }
 
         createAgain = selected.getId() == null;
-        detailSearcher.update();
         paymentProofSearcher.update();
     }
 
@@ -456,19 +350,6 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
         this.navigationBean = navigationBean;
     }
 
-    /**
-     * @return the detailSearcher
-     */
-    public DetailSearcher getDetailSearcher() {
-        return detailSearcher;
-    }
-
-    /**
-     * @param detailSearcher the detailSearcher to set
-     */
-    public void setDetailSearcher(DetailSearcher detailSearcher) {
-        this.detailSearcher = detailSearcher;
-    }
 
     /**
      * @return the paymentProofSearcher
@@ -778,19 +659,6 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
         this.managedProductBean = managedProductBean;
     }
 
-    /**
-     * @return the productSearcher
-     */
-    public ProductSearcher getProductSearcher() {
-        return productSearcher;
-    }
-
-    /**
-     * @param productSearcher the productSearcher to set
-     */
-    public void setProductSearcher(ProductSearcher productSearcher) {
-        this.productSearcher = productSearcher;
-    }
 
     /**
      * @return the igv
@@ -884,82 +752,6 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
     }
 
 //</editor-fold>
-    //<editor-fold defaultstate="collapsed" desc="DetailSearcher">
-    public class DetailSearcher implements java.io.Serializable {
-
-        private List<Object[]> data;
-        private List<Object[]> removed;
-
-        public void update() {
-            data = new ArrayList<>();
-            removed = new ArrayList<>();
-            if (selected.getId() == null) {
-                return;
-            }
-            List<Object[]> details = purchaseDetailService.listHQL("SELECT "
-                    + "pd.id,"
-                    + "pd.product.barcode,"
-                    + "pd.productName,"
-                    + "pd.quantity,"
-                    + "pd.unitPrice,"
-                    + "pd.subtotal,"
-                    + "pd.product.id,"
-                    + "pd.uom.id, "
-                    + "pd.igv, "
-                    + "cast(null as char) "
-                    + "from PurchaseDetail pd WHERE pd.purchase = ?", selected);
-            details.forEach(item -> {
-                try {
-                    item[9] = productSalePriceService.getBasicPrice(sessionBean.getCurrentCompany(), new Product((Long) item[6]));
-
-                } catch (Exception e) {
-
-                }
-            });
-            data.addAll(details);
-        }
-
-        public void remove(int index) {
-            Object[] item = data.get(index);
-            if (item[0] != null) {
-                removed.add(item);
-            }
-            data.remove(index);
-        }
-
-        public void add() {
-        }
-
-        /**
-         * @return the data
-         */
-        public List<Object[]> getData() {
-            return data;
-        }
-
-        /**
-         * @param data the data to set
-         */
-        public void setData(List<Object[]> data) {
-            this.data = data;
-        }
-
-        /**
-         * @return the removed
-         */
-        public List<Object[]> getRemoved() {
-            return removed;
-        }
-
-        /**
-         * @param removed the removed to set
-         */
-        public void setRemoved(List<Object[]> removed) {
-            this.removed = removed;
-        }
-    }
-
-    //</editor-fold>
     //<editor-fold defaultstate="collapsed" desc="PaymentProofSearcher">
     public class PaymentProofSearcher implements java.io.Serializable {
 
@@ -1077,273 +869,4 @@ public class ManagedPurchaseBean extends AManagedBean<Purchase, IPurchaseService
     }
 
     //</editor-fold>
-    //<editor-fold defaultstate="collapsed" desc="ProductSearcher">
-    public class ProductSearcher implements java.io.Serializable {
-
-        protected Map<Long, Object[]> mapData;
-        protected Pagination<Object[]> pagination;
-        protected boolean valid;
-        protected String terms;
-        protected BigDecimal quantity;
-        protected BigDecimal subtotal;
-        protected boolean type;
-
-        public ProductSearcher() {
-            this.pagination = new Pagination<Object[]>(productService) {
-                @Override
-                public void search(int page, Object... variant) {
-                    if (this.getData() != null) {
-                        this.getData().forEach(item -> {
-                            BigDecimal quantity = (BigDecimal) item[6];
-                            if (quantity == null || quantity.doubleValue() == 0) {
-                                mapData.remove(item[0]);
-                            } else {
-                                mapData.put((Long) item[0], new Object[]{
-                                    item[10],
-                                    item[2],
-                                    item[3],
-                                    item[6],
-                                    item[7],
-                                    item[8],
-                                    item[0],
-                                    item[4],
-                                    item[9],
-                                    item[5]
-                                });
-                            }
-                        });
-                    }
-                    super.search(page, variant); //To change body of generated methods, choose Tools | Templates.
-                    if (this.getData() != null && !this.getData().isEmpty()) {
-                        this.getData().forEach(item -> {
-                            Long productId = (Long) item[0];
-                            Object[] d = mapData.get(productId);
-                            if (d != null) {
-                                item[6] = d[3];
-                                item[7] = d[4];
-                                item[8] = d[5];
-                                item[9] = d[8];
-                                item[10] = d[0];
-                            }
-                        });
-                    }
-                }
-            };
-        }
-
-        public void initManaged(boolean type) {
-            valid = false;
-            this.type = type;
-            subtotal = null;
-            quantity = null;
-            managedProductBean.create();
-        }
-
-        public void refresh() {
-            terms = "";
-            mapData = new HashMap<>();
-            ManagedPurchaseBean.this.detailSearcher.data.forEach(detail -> {
-                mapData.put((Long) detail[6], detail);
-            });
-            pagination.setData(Collections.EMPTY_LIST);
-            update();
-        }
-
-        public void updateDetail() {
-            if (pagination.getData() != null) {
-                pagination.getData().forEach(item -> {
-                    BigDecimal quantity = (BigDecimal) item[6];
-                    if (quantity == null || quantity.doubleValue() == 0) {
-                        mapData.remove(item[0]);
-                    } else {
-                        mapData.put((Long) item[0], new Object[]{
-                            item[10],
-                            item[2],
-                            item[3],
-                            item[6],
-                            item[7],
-                            item[8],
-                            item[0],
-                            item[4],
-                            item[9],
-                            item[5]
-                        });
-                    }
-                });
-            }
-            detailSearcher.data = new ArrayList();
-            mapData.forEach((key, item) -> {
-                detailSearcher.data.add(item);
-            });
-        }
-
-        public void update() {
-            terms = terms.trim();
-            ProjectionList projectionList = Projections.projectionList()
-                    /*0-ID*/.add(Projections.id())
-                    /*1-Imagen*/.add(Projections.property("image"))
-                    /*2-Codigo de Barras*/.add(Projections.property("barcode"))
-                    /*3-Nombre*/.add(Projections.property("name"))
-                    /*4-ID unidad*/.add(Projections.property("uom.id"))
-                    /*5-Precio de venta unit.*/.add(Projections.sqlProjection("(SELECT psp.price/psp.quantity FROM product_sale_price psp WHERE psp.id_product = {alias}.id and psp.id_company = " + sessionBean.getCurrentCompany().getId() + " ORDER BY psp.quantity LIMIT 1) as sale_price", new String[]{"sale_price"}, new Type[]{BigDecimalType.INSTANCE}))
-                    /*6-cantidad*/.add(Projections.sqlProjection("cast(null as char) as f1", new String[]{"f1"}, new Type[]{CharacterType.INSTANCE}))
-                    /*7-Precop comp*/.add(Projections.sqlProjection("cast(null as char) as f2", new String[]{"f2"}, new Type[]{CharacterType.INSTANCE}))
-                    /*8-Subtotal*/.add(Projections.sqlProjection("cast(null as char) as f3", new String[]{"f3"}, new Type[]{CharacterType.INSTANCE}))
-                    /*9-IGV*/.add(Projections.sqlProjection("cast(null as char) as f4", new String[]{"f4"}, new Type[]{CharacterType.INSTANCE}))
-                    /*10-ID detail*/.add(Projections.sqlProjection("cast(null as char) as f5", new String[]{"f5"}, new Type[]{CharacterType.INSTANCE}));
-            CriterionList criterionList = new CriterionList()
-                    ._add(Restrictions.eq("active", true))
-                    ._add(Restrictions.or(
-                                    Restrictions.like("barcode", terms, MatchMode.ANYWHERE),
-                                    Restrictions.like("name", terms, MatchMode.ANYWHERE).ignoreCase()));
-            AliasList aliasList = new AliasList();
-            aliasList.add("uom", "uom", JoinType.LEFT_OUTER_JOIN);
-            OrderList orderList = new OrderList();
-            orderList.add(Order.asc("name"));
-            pagination.search(1, projectionList, aliasList, criterionList, orderList);
-
-        }
-
-        public void save() {
-            valid = managedProductBean.save();
-            if (valid) {
-                BigDecimal priceSale = null;
-                try {
-                    priceSale = (BigDecimal) productSalePriceService.listHQLPage("SELECT psp.price FROM ProductSalePrice psp WHERE psp.product.id = ? and psp.company = ? ORDER BY psp.price", 1, 1, managedProductBean.getSelected().getId(), sessionBean.getCurrentCompany()).get(0);
-                } catch (Exception e) {
-                }
-                double dUnitPrice = (subtotal.doubleValue() + (igv ? subtotal.doubleValue() * constantIGV.doubleValue() : 0)) / quantity.doubleValue();
-                BigDecimal unitPrice = new BigDecimal(dUnitPrice).setScale(2, RoundingMode.HALF_UP);
-                if (type) {
-                    detailSearcher.data.add(new Object[]{
-                        null,
-                        managedProductBean.getSelected().getBarcode(),
-                        managedProductBean.getSelected().getName(),
-                        quantity,
-                        unitPrice,
-                        subtotal,
-                        managedProductBean.getSelected().getId(),
-                        managedProductBean.getSelected().getUom().getId(),
-                        igv ? subtotal.multiply(constantIGV) : BigDecimal.ZERO,
-                        priceSale
-                    });
-                } else {
-                    mapData.put(managedProductBean.getSelected().getId(), new Object[]{
-                        null,
-                        managedProductBean.getSelected().getBarcode(),
-                        managedProductBean.getSelected().getName(),
-                        quantity,
-                        unitPrice,
-                        subtotal,
-                        managedProductBean.getSelected().getId(),
-                        managedProductBean.getSelected().getUom().getId(),
-                        igv ? subtotal.multiply(constantIGV) : BigDecimal.ZERO,
-                        priceSale
-                    });
-                    terms = managedProductBean.getSelected().getName();
-                    update();
-                }
-            }
-        }
-
-        /**
-         * @return the valid
-         */
-        public boolean isValid() {
-            return valid;
-        }
-
-        /**
-         * @param valid the valid to set
-         */
-        public void setValid(boolean valid) {
-            this.valid = valid;
-        }
-
-        /**
-         * @return the terms
-         */
-        public String getTerms() {
-            return terms;
-        }
-
-        /**
-         * @param terms the terms to set
-         */
-        public void setTerms(String terms) {
-            this.terms = terms;
-        }
-
-        /**
-         * @return the quantity
-         */
-        public BigDecimal getQuantity() {
-            return quantity;
-        }
-
-        /**
-         * @param quantity the quantity to set
-         */
-        public void setQuantity(BigDecimal quantity) {
-            this.quantity = quantity;
-        }
-
-        /**
-         * @return the subtotal
-         */
-        public BigDecimal getSubtotal() {
-            return subtotal;
-        }
-
-        /**
-         * @param subtotal the subtotal to set
-         */
-        public void setSubtotal(BigDecimal subtotal) {
-            this.subtotal = subtotal;
-        }
-
-        /**
-         * @return the type
-         */
-        public boolean isType() {
-            return type;
-        }
-
-        /**
-         * @param type the type to set
-         */
-        public void setType(boolean type) {
-            this.type = type;
-        }
-
-        /**
-         * @return the mapData
-         */
-        public Map<Long, Object[]> getMapData() {
-            return mapData;
-        }
-
-        /**
-         * @param mapData the mapData to set
-         */
-        public void setMapData(Map<Long, Object[]> mapData) {
-            this.mapData = mapData;
-        }
-
-        /**
-         * @return the pagination
-         */
-        public Pagination<Object[]> getPagination() {
-            return pagination;
-        }
-
-        /**
-         * @param pagination the pagination to set
-         */
-        public void setPagination(Pagination<Object[]> pagination) {
-            this.pagination = pagination;
-        }
-    }
-    //</editor-fold>
-
 }

@@ -4,7 +4,7 @@
 
     <groupId>darkus-nightmare</groupId>
     <artifactId>dn.bms.minisol.web</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <packaging>war</packaging>
 
     <name>Minisol web</name>

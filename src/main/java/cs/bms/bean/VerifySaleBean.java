@@ -285,7 +285,7 @@ public class VerifySaleBean implements java.io.Serializable {
                         if (code == null || code.equalsIgnoreCase("")) {
                             continue;
                         }
-                        paymentVoucherService.useVoucher(code, (Long) data[0]);
+                        paymentVoucherService.useVoucher(code, (Long) data[0],sessionBean.getCurrentUser());
                     }
                 } else {
                     total = total.subtract((BigDecimal) data[6]);

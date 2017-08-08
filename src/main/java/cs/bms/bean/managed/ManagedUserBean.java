@@ -195,14 +195,14 @@ public class ManagedUserBean extends AManagedBean<User, IUserService> implements
 
     @Override
     protected void fillSelected() {
-        selected.setLastLogin(getLastLogin());
+        selected.setLastLogin(lastLogin);
         try {
-            selected.setPassword(AES.encrypt(password, AESKeys.USER_PASSWORD));
+            selected.setPassword(AES.encrypt(password.trim(), AESKeys.USER_PASSWORD));
         } catch (Exception ex) {
             Logger.getLogger(ManagedUserBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        selected.setSuperUser(isSuperUser());
-        selected.setUsername(getUsername());
+        selected.setSuperUser(superUser);
+        selected.setUsername(username.trim());
         selected.setRols(new ArrayList());
         for (Object[] r : rolSearcher.getRols()) {
             if (rolSearcher.selecteds.get((Integer) r[0])) {

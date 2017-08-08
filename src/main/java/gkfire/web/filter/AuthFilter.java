@@ -42,8 +42,7 @@ public class AuthFilter implements Filter {
                     || (ses != null && ses.getAttribute("user") != null)
                     || reqURI.indexOf("/public/") >= 0
                     || reqURI.contains("javax.faces.resource") 
-                    || reqURI.contains(req.getContextPath()+"/assets/")
-                    || reqURI.contains(req.getContextPath()+"/vendor/")) {
+                    || reqURI.contains(req.getContextPath()+"/assets/")) {
                 try {
                     if ((reqURI.indexOf("/login.xhtml") >= 0 || reqURI.equals(req.getContextPath()+"/") )&& ses != null && ses.getAttribute("user") != null) {
                         res.sendRedirect(req.getContextPath() + "/index.xhtml");

@@ -67,7 +67,7 @@ public class ManagedPaymentVoucherBean extends AManagedBean<PaymentVoucher, IPay
             saved = true;
         } catch (Exception e) {
             saved = false;
-            PNotifyMessage.errorMessage("Consulte el log de la app CODE : " + sessionBean.addError(e));
+            PNotifyMessage.systemError(e, sessionBean);
         }
         return saved;
     }

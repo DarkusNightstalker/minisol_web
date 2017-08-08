@@ -18,6 +18,7 @@ import cs.bms.model.Ubigeo;
 import cs.bms.model.UoM;
 import cs.bms.service.interfac.IActorService;
 import cs.bms.service.interfac.ICompanyService;
+import cs.bms.service.interfac.IDataCompanyService;
 import cs.bms.service.interfac.IDistrictService;
 import cs.bms.service.interfac.IDocumentNumberingService;
 import cs.bms.service.interfac.IIdentityDocumentService;
@@ -38,6 +39,7 @@ import gkfire.web.bean.AManagedBean;
 import gkfire.web.bean.ILoadable;
 import gkfire.web.util.BeanUtil;
 import gkfire.web.util.Pagination;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -68,6 +70,8 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
 
     @ManagedProperty(value = "#{saleService}")
     protected ISaleService mainService;
+    @ManagedProperty(value = "#{dataCompanyService}")
+    private IDataCompanyService dataCompanyService;
     @ManagedProperty(value = "#{actorService}")
     protected IActorService actorService;
     @ManagedProperty(value = "#{stockService}")
@@ -328,6 +332,15 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
         selected.setPoints(points);
         selected.setSubtotal(subtotal);
         selected.setIgv(igv);
+        
+        try {
+            if(dataCompanyService.getStringValue("local.company.code") != null){
+                selected.setUploadPoints(Boolean.FALSE);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            PNotifyMessage.systemError(ex, sessionBean);
+        }
+        
         if (selected.getCustomer() != null && selected.getCustomerPoints() == null) {
             Long currentPoints = points - new Double(subtotalDiscount.doubleValue() * 100).longValue();
             selected.setCustomerPoints(selected.getCustomer().getPoints() + currentPoints);
@@ -775,6 +788,20 @@ public class ManagedSaleBean extends AManagedBean<Sale, ISaleService> implements
      */
     public void setSaleBean(SaleBean saleBean) {
         this.saleBean = saleBean;
+    }
+
+    /**
+     * @return the dataCompanyService
+     */
+    public IDataCompanyService getDataCompanyService() {
+        return dataCompanyService;
+    }
+
+    /**
+     * @param dataCompanyService the dataCompanyService to set
+     */
+    public void setDataCompanyService(IDataCompanyService dataCompanyService) {
+        this.dataCompanyService = dataCompanyService;
     }
 
     //<editor-fold defaultstate="collapsed" desc="DetailSearcher">
